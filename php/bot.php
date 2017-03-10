@@ -113,30 +113,14 @@ $discord->registerCommand('!', function($message, $params) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('set', function($message, $params) use ($definitions) {
-    echo "current definitions: ";
-    echo $definitions;
     $def = array_shift($params);
-    print_r($params);
-
-    echo implode($params, " "), PHP_EOL;
     $definitions->set($def, implode($params, " "));
-    // $definitions["$def"] = implode($params, " ");
-    echo "update definitions: ";
-    echo $definitions;
-
     $message->channel->sendMessage($def . " set to: " . implode($params, " "));
-
 });
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($message, $params) use ($definitions) {
-    echo "current definitions: ";
-    echo $definitions;
-    echo $definitions->get("hello"), PHP_EOL;
     $def = array_shift($params);
-    echo "looking for $def", PHP_EOL;
-    echo $definitions->get($def), PHP_EOL;
-
     $message->channel->sendMessage($def . ": " . $definitions->get($def));
 });
 
