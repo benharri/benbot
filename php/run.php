@@ -1,6 +1,6 @@
 <?php
 
-$app = require __DIR__.'/src/app.php';
+$app = require __DIR__.'/bot.php';
 
 $app->run();
 
