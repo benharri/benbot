@@ -106,9 +106,13 @@ $discord->registerCommand('up', function($message, $params) use ($start_time) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('!', function($message, $params) {
-    $message->channel->sendMessage(implode($params, ''));
-});
+$discord->registerCommand('say', function($message, $params) {
+    $message->channel->sendMessage(implode($params, ' '));
+}, [
+    'description' => 'repeats stuff back to you',
+    'usage' => '<stuff to say>',
+]);
+
 
 
 ///////////////////////////////////////////////////////////
@@ -116,31 +120,56 @@ $discord->registerCommand('set', function($message, $params) use ($definitions) 
     $def = array_shift($params);
     $definitions->set($def, implode($params, " "));
     $message->channel->sendMessage($def . " set to: " . implode($params, " "));
-});
-
+}, [
+    'description' => 'sets this to that',
+    'usage' => '<this> <that>',
+]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($message, $params) use ($definitions) {
     $message->channel->sendMessage($params[0] . ": " . $definitions->get($params[0]));
-});
-
-
+}, [
+    'description' => 'gets a value from the defintions',
+    'usage' => '<thing to get>',
+]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('unset', function($message, $params) use ($definitions) {
     $definitions->unset($params[0]);
     $message->channel->sendMessage($params[0] . " unset");
-});
-
-
+}, [
+    'description' => 'removes a definition',
+    'usage' => '<def to remove>',
+]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('listdefs', function($message, $params) use ($definitions) {
     $message->channel->sendMessage((string)$definitions);
-});
+}, [
+    'description' => 'lists all definitions',
+    'usage' => '',
+]);
 
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('dank', function($message) {
     $message->channel->sendMessage('memes');
 });
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('weather', function($message, $params) {
+    return ["sunny", "cloudy", "bad"];
+}, [
+    'description' => 'gets weather for a location',
+    'usage' => '<location>',
+]);
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('8ball', function($message, $params) {
+    return ["no", "yes", "what the hell are you thinking"];
+}, [
+    'description' => 'tells your fortune',
+    'usage' => '',
+]);
 
 
 
