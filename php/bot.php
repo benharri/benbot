@@ -5,10 +5,10 @@
 ///////////////////////////////////////////////////////////
 
 include __DIR__.'/vendor/autoload.php';
-// $token = require __DIR__.'/secret_token.php';
+include __DIR__.'/definitions.php';
 
 $start_time = microtime(true);
-$definitions = json_decode(file_get_contents(__DIR__.'/definitions.json'));
+$definitions = new Definitions();
 
 $discord = new \Discord\DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
@@ -114,30 +114,30 @@ $discord->registerCommand('!', function($message, $params) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('set', function($message, $params) use ($definitions) {
     echo "current definitions: ";
-    print_r($definitions);
+    echo $definitions;
     $def = array_shift($params);
     print_r($params);
 
     echo implode($params, " "), PHP_EOL;
-    $definitions["$def"] = implode($params, " ");
+    $definitions->set($def, implode($params, " "));
+    // $definitions["$def"] = implode($params, " ");
     echo "update definitions: ";
-    print_r($definitions);
+    echo $definitions;
 
     $message->channel->sendMessage($def . " set to: " . implode($params, " "));
 
-    file_put_contents(__DIR__.'/definitions.json', json_encode($definitions));
 });
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($message, $params) use ($definitions) {
     echo "current definitions: ";
-    print_r($definitions);
-    echo $definitions["hello"], PHP_EOL;
+    echo $definitions;
+    echo $definitions->get("hello"), PHP_EOL;
     $def = array_shift($params);
     echo "looking for $def", PHP_EOL;
-    echo $definitions["$def"], PHP_EOL;
+    echo $definitions->get($def), PHP_EOL;
 
-    $message->channel->sendMessage($def . ": " . $definitions["$def"]);
+    $message->channel->sendMessage($def . ": " . $definitions->get($def));
 });
 
 
