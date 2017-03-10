@@ -92,7 +92,10 @@ $discord->registerCommand('avatar', function($message, $params) {
 
 $discord->registerCommand('up', function($message, $params) use ($start_time) {
     $message->channel->sendMessage("Up for " . gmdate('H:i:s', microtime(true) - $start_time));
-});
+}, [
+    'description' => 'bot uptime',
+    'usage' => '',
+]);
 
 
 
