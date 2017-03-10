@@ -1,4 +1,4 @@
-from discord import Client
+from discord import Client, Message
 from datetime import datetime
 import asyncio
 
@@ -7,7 +7,7 @@ client = Client()
 def is_command(content: str) -> bool:
     return content.startswith(';')
 
-async def reply(message_in, message_out):
+async def reply(message_in: Message, message_out: str):
     await client.send_message(message_in.channel, f'{message_in.author.mention} {message_out}')
 
 @client.event
