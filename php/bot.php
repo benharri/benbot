@@ -120,7 +120,7 @@ $discord->registerCommand('set', function($message, $params) use ($definitions) 
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($message, $params) use ($definitions) {
-    $message->channel->sendMessage($def . ": " . $definitions->get($params[0]));
+    $message->channel->sendMessage($params[0] . ": " . $definitions->get($params[0]));
 });
 
 
@@ -133,7 +133,7 @@ $discord->registerCommand('unset', function($message, $params) use ($definitions
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('listdefs', function($message, $params) use ($definitions) {
-    $message->channel->sendMessage($definitions);
+    $message->channel->sendMessage((string)$definitions);
 });
 
 
