@@ -118,6 +118,7 @@ $discord->registerCommand('set', function($message, $params) use ($definitions) 
     $def = array_shift($params);
     print_r($params);
 
+    echo implode($params, " "), PHP_EOL;
     $definitions["$def"] = implode($params, " ");
     echo "update definitions: ";
     print_r($definitions);
@@ -133,6 +134,8 @@ $discord->registerCommand('get', function($message, $params) use ($definitions) 
     print_r($definitions);
     $def = array_shift($params);
     echo "looking for $def", PHP_EOL;
+    echo $definitions["$def"], PHP_EOL;
+
     $message->channel->sendMessage($def . ": " . $definitions["$def"]);
 });
 
