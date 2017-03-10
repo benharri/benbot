@@ -113,10 +113,15 @@ $discord->registerCommand('!', function($message, $params) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('set', function($message, $params) use ($definitions) {
+    echo "current definitions: ";
     print_r($definitions);
     $def = array_shift($params);
     print_r($params);
+
     $definitions[$def] = implode($params, " ");
+    echo "update definitions: ";
+    print_r($definitions);
+
     $message->channel->sendMessage($def . " set to: " . implode($params, " "));
 
     file_put_contents(__DIR__.'/definitions.json', json_encode($definitions));
@@ -124,7 +129,10 @@ $discord->registerCommand('set', function($message, $params) use ($definitions) 
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($message, $params) use ($definitions) {
+    echo "current definitions: ";
+    print_r($definitions);
     $def = array_shift($params);
+    echo "looking for $def", PHP_EOL;
     $message->channel->sendMessage($def . ": " . $definitions[$def]);
 });
 
