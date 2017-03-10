@@ -132,6 +132,7 @@ $discord->registerCommand('set', function($message, $params) use ($definitions) 
 $discord->registerCommand('get', function($message, $params) use ($definitions) {
     echo "current definitions: ";
     print_r($definitions);
+    echo $definitions["hello"], PHP_EOL;
     $def = array_shift($params);
     echo "looking for $def", PHP_EOL;
     echo $definitions["$def"], PHP_EOL;
