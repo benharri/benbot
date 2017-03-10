@@ -1,0 +1,15 @@
+{
+    "name": "benharri/phpbot",
+    "description": "general purpose discord bot",
+    "type": "discord bot",
+    "authors": [
+        {
+            "name": "Ben Harris",
+            "email": "mail@benharris.ch"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "team-reflex/discord-php": "^4.0"
+    }
+}
