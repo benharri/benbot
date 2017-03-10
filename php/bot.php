@@ -155,18 +155,18 @@ $discord->registerCommand('dank', function($message) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('weather', function($message, $params) {
-    return ["sunny", "cloudy", "bad"];
-}, [
+$discord->registerCommand('weather', [
+    "sunny", "cloudy", "bad"
+], [
     'description' => 'gets weather for a location',
     'usage' => '<location>',
 ]);
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('8ball', function($message, $params) {
-    return ["no", "yes", "what the hell are you thinking"];
-}, [
+$discord->registerCommand('8ball',  [
+    "no", "yes", "what the hell are you thinking"
+], [
     'description' => 'tells your fortune',
     'usage' => '',
 ]);
