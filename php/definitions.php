@@ -14,16 +14,16 @@ class Definitions {
     }
 
     public function get($key) {
-        return $this->definitions[$key];
+        return $this->definitions->$key;
     }
 
     public function set($key, $val) {
-        $this->definitions[$key] = $val;
+        $this->definitions->$key = $val;
         $this->save();
     }
 
     public function unset($key) {
-        unset($this->definitions[$key]);
+        unset($this->definitions->$key);
         $this->save();
     }
 
