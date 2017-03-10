@@ -173,5 +173,5 @@ $discord->registerCommand('8ball',  [
 
 
 
-return $discord;
+$discord->run();
 

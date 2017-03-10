@@ -1,6 +1,3 @@
 <?php
 
-$app = require __DIR__.'/bot.php';
-
-$app->run();
-
+include "bot.php";
