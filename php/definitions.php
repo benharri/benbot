@@ -1,8 +1,8 @@
 <?php
 
 class Definitions {
-    protected var $definitions;
-    protected var $filepath;
+    protected $definitions;
+    protected $filepath;
 
     public function __construct($filepath = __DIR__.'/definitions.json') {
         $this->filepath = $filepath;
