@@ -8,6 +8,7 @@ include __DIR__.'/../vendor/autoload.php';
 $token = require __DIR__.'/../secret_token.php';
 
 $start_time = microtime(true);
+$definitions = json_decode(file_get_contents(__DIR__.'/../definitions.json'));
 
 $discord = new \Discord\DiscordCommandClient([
     'token' => $token,
@@ -67,7 +68,6 @@ $discord->registerCommand('text_benh', function($message, $params) {
         $message->channel->sendMessage('missing message');
         return;
     }
-    print_r($message->author);
     if (mail("9068690061@vtext.com", "", implode($params, " "), "From: {$message->author->user->username} <{$message->author->user->username}@benharri.com>")) {
         return "message sent";
     }
@@ -98,7 +98,28 @@ $discord->registerCommand('up', function($message, $params) use ($start_time) {
 ]);
 
 
+$discord->registerCommand('', function($message, $params) {
+    $message->channel->sendMessage(implode($params, ''));
+});
 
+
+$discord->registerCommand('set', function($message, $params) use ($definitions) {
+    $def = array_shift($params);
+    $definitions[$def] = implode($params, " ");
+    $message->channel->sendMessage($def . " set to: " . implode($params, " "));
+
+    file_put_contents(__DIR__.'/../definitions.json', json_encode($definitions));
+});
+
+$discord->registerCommand('get', function($message, $params) use ($definitions) {
+    $def = array_shift($params);
+    $message->channel->sendMessage($def . ": " . $definitions[$def]);
+});
+
+
+$discord->registerCommand('dank', function($message) {
+    $message->channel->sendMessage('memes');
+});
 
 
 
