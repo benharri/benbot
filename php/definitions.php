@@ -10,7 +10,7 @@ class Definitions {
     }
 
     public function __toString() {
-        return "```\n" . print_r($this->definitions, true) . "\n```";
+        return print_r($this->definitions, true);
     }
 
     public function get($key) {
