@@ -7,9 +7,10 @@
 include __DIR__.'/vendor/autoload.php';
 include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
+include __DIR__.'/util_fns.php';
 
 $start_time = microtime(true);
-$definitions = new Definitions();
+$defs = new Definitions();
 
 $discord = new \Discord\DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
@@ -28,16 +29,16 @@ $discord = new \Discord\DiscordCommandClient([
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('ping', function($message) {
-    $message->channel->sendMessage('pong');
+$discord->registerCommand('ping', function($msg) {
+    send($msg, 'pong');
 }, [
     'description' => 'ping pong',
     'usage' => '',
 ]);
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('ding', function($message, $params) {
-    $message->channel->sendMessage('dong');
+$discord->registerCommand('ding', function($msg, $args) {
+    send($msg, 'dong');
 }, [
     'description' => 'dong',
     'usage' => '',
@@ -59,16 +60,16 @@ $discord->registerCommand('hi', [
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('time', function($message) {
-    $message->channel->sendMessage("It's " . date('g:i A \o\n F j, Y'));
+$discord->registerCommand('time', function($msg) {
+    send($msg, "It's " . date('g:i A \o\n F j, Y'));
 }, [
     'description' => 'current time'
 ]);
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('roll', function ($message, $params) {
-    $message->reply('you rolled a ' . rand(1, $params[0] ?? 6));
+$discord->registerCommand('roll', function ($msg, $args) {
+    $msg->reply('you rolled a ' . rand(1, $args[0] ?? 6));
 }, [
     'description' => 'rolls an n-sided die. defaults to 6.',
     'usage' => '<number of sides>',
@@ -76,12 +77,12 @@ $discord->registerCommand('roll', function ($message, $params) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('text_benh', function($message, $params) {
-    if (count($params) === 0) {
-        $message->channel->sendMessage('missing message');
+$discord->registerCommand('text_benh', function($msg, $args) {
+    if (count($args) === 0) {
+        send($msg, 'missing message');
         return;
     }
-    if (mail("9068690061@vtext.com", "", implode($params, " "), "From: {$message->author->user->username} <{$message->author->user->username}@benharri.com>")) {
+    if (mail("9068690061@vtext.com", "", implode($args, " "), "From: {$msg->author->user->username} <{$msg->author->user->username}@benharri.com>")) {
         return "message sent";
     }
 }, [
@@ -91,13 +92,13 @@ $discord->registerCommand('text_benh', function($message, $params) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('avatar', function($message, $params) {
-    if (count($message->mentions) === 0) {
-        $message->channel->sendMessage($message->author->user->avatar);
+$discord->registerCommand('avatar', function($msg, $args) {
+    if (count($msg->mentions) === 0) {
+        send($msg, $msg->author->user->avatar);
         return;
     }
-    foreach ($message->mentions as $av)
-        $message->channel->sendMessage($av->avatar);
+    foreach ($msg->mentions as $av)
+        send($msg, $av->avatar);
 }, [
     'description' => 'gets the avatar for a user',
     'usage' => '<@user>',
@@ -105,8 +106,8 @@ $discord->registerCommand('avatar', function($message, $params) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function($message, $params) use ($start_time) {
-    $message->channel->sendMessage("Up for " . gmdate('H:i:s', microtime(true) - $start_time));
+$discord->registerCommand('up', function($msg, $args) use ($start_time) {
+    send($msg, "Up for " . gmdate('H:i:s', microtime(true) - $start_time));
 }, [
     'description' => 'bot uptime',
     'usage' => '',
@@ -114,8 +115,8 @@ $discord->registerCommand('up', function($message, $params) use ($start_time) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('say', function($message, $params) {
-    $message->channel->sendMessage(implode($params, ' '));
+$discord->registerCommand('say', function($msg, $args) {
+    send($msg, implode($args, ' '));
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
@@ -124,32 +125,35 @@ $discord->registerCommand('say', function($message, $params) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('set', function($message, $params) use ($definitions) {
-    $def = array_shift($params);
-    $definitions->set($def, implode($params, " "));
-    $message->channel->sendMessage($def . " set to: " . implode($params, " "));
+$discord->registerCommand('set', function($msg, $args) use ($defs) {
+    $def = array_shift($args);
+    $defs->set($def, implode($args, " "));
+    send($msg, $def . " set to: " . implode($args, " "));
 }, [
     'description' => 'sets this to that',
     'usage' => '<this> <that>',
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('get', function($message, $params) use ($definitions) {
-    $message->channel->sendMessage($params[0] . ": " . $definitions->get($params[0]));
+$discord->registerCommand('get', function($msg, $args) use ($defs) {
+    if (isset($args[0]))
+        send($msg, $args[0] . ": " . $defs->get($args[0]));
+    else
+        send($msg, "can't search for nothing");
 }, [
-    'description' => 'gets a value from the defintions',
+    'description' => 'gets a value from the definitions',
     'usage' => '<thing to get>',
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('unset', function($message, $params) use ($definitions) {
-    $definitions->unset($params[0]);
-    $message->channel->sendMessage($params[0] . " unset");
+$discord->registerCommand('unset', function($msg, $args) use ($defs) {
+    $defs->unset($args[0]);
+    send($msg, $args[0] . " unset");
 }, [
     'description' => 'removes a definition',
     'usage' => '<def to remove>',
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('listdefs', function($message, $params) use ($definitions) {
-    $message->channel->sendMessage((string)$definitions);
+$discord->registerCommand('listdefs', function($msg, $args) use ($defs) {
+    send($msg, (string)$defs);
 }, [
     'description' => 'lists all definitions',
     'usage' => '',
@@ -157,8 +161,8 @@ $discord->registerCommand('listdefs', function($message, $params) use ($definiti
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('dank', function($message) {
-    $message->channel->sendMessage('memes');
+$discord->registerCommand('dank', function($msg) {
+    send($msg, 'memes');
 });
 
 
@@ -170,67 +174,176 @@ $discord->registerCommand('weather', [
     'usage' => '<location>',
 ]);
 
+$fortunes = [
+    "It is certain",
+    "It is decidedly so",
+    "Without a doubt",
+    "Yes definitely",
+    "You may rely on it",
+    "As I see it, yes",
+    "Most likely",
+    "Outlook good",
+    "Yes",
+    "Signs point to yes",
+    "Reply hazy try again",
+    "Ask again later",
+    "Better not tell you now",
+    "Cannot predict now",
+    "Concentrate and ask again",
+    "Don't count on it",
+    "My reply is no",
+    "My sources say no",
+    "Outlook not so good",
+    "Very doubtful",
+];
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('8ball',  [
-    "no", "yes", "what the hell are you thinking"
-], [
+$discord->registerCommand('8ball', function($msg, $args) use ($fortunes) {
+    $ret = "Your Question: *";
+    $ret .= count($args) == 0 ? "Why didn't {$msg->author} ask a question?" : implode($args, " ");
+    $ret .= "*\n\n**" . $fortunes[array_rand($fortunes)] . "**";
+    send($msg, $ret);
+}, [
     'description' => 'tells your fortune',
-    'usage' => '',
+    'usage' => '<question to ask the mighty 8ball>',
 ]);
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('lenny', function($message, $params) {
-    $message->channel->sendMessage("( ͡° ͜ʖ ͡°)");
-    $channel = $message->channel;
-    $channel->deleteMessages([$message]);
+$discord->registerCommand('lenny', function($msg, $args) {
+    send($msg, "( ͡° ͜ʖ ͡°)");
+    $channel = $msg->channel;
+    $channel->deleteMessages([$msg]);
 }, [
     'description' => 'lenny face ( ͡° ͜ʖ ͡°)',
     'usage' => '',
 ]);
 
+///////////////////////////////////////////////////////////
+$discord->registerCommand('lennyception', function($msg, $args) {
+    send($msg, "( (   ͡° ͜ʖ ͡° )
+ (   (   ͡° ͜ʖ ͡° )
+ (   ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° )
+ (   ͡° ͜ʖ ͡° )° )
+ (   ͡° ͜ʖ ͡° )
+ ( (   ͡° ͜ʖ ͡° )
+ (   (   ͡° ͜ʖ ͡° )
+ (   ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° )
+ (   ͡° ͜ʖ ͡° )° )
+ (   ͡° ͜ʖ ͡° ))
+ (   ͡° ͜ʖ ͡° )
+ ( (   ͡° ͜ʖ ͡° )
+ (   (   ͡° ͜ʖ ͡° )
+ (   ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° )
+ (   ͡° ͜ʖ ͡° )° )
+ (   ͡° ͜ʖ ͡° )
+ ( (   ͡° ͜ʖ ͡° )
+ (   (   ͡° ͜ʖ ͡° )
+ (   ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° )
+ (   ͡° ͜ʖ ͡° )° )
+ (   ͡° ͜ʖ ͡° ))
+ (   ͡° ͜ʖ ͡° )
+ ( (   ͡° ͜ʖ ͡° )
+ (   (   ͡° ͜ʖ ͡° )
+ (   ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° )
+ (   ͡° ͜ʖ ͡° )° )
+ (   ͡° ͜ʖ ͡° )
+ ( (   ͡° ͜ʖ ͡° )
+ (   (   ͡° ͜ʖ ͡° )
+ (   ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
+(   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
+ (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )");
+}, [
+    'description' => '( ͡° ͜ʖ ͡°)',
+    'usage' => '',
+]);
+
 
 ///////////////////////////////////////////////////////////
-$kaomoji = $discord->registerCommand('kaomoji', function($message, $params) use ($kaomojis) {
-    $message->channel->sendMessage($kaomojis[array_rand($kaomojis)]);
+$kaomoji = $discord->registerCommand('kaomoji', function($msg, $args) use ($kaomojis) {
+    send($msg, $kaomojis[array_rand($kaomojis)]);
 }, [
     'description' => 'sends random kaomoji',
     'usage' => '',
 ]);
 
-    $kaomoji->registerSubCommand('sad', function($message, $params) use($sad_kaomojis) {
-        $message->channel->sendMessage($sad_kaomojis[array_rand($sad_kaomojis)]);
+    $kaomoji->registerSubCommand('sad', function($msg, $args) use($sad_kaomojis) {
+        send($msg, $sad_kaomojis[array_rand($sad_kaomojis)]);
     }, [
         'description' => 'sends random sad kaomoji',
         'usage' => '',
     ]);
-    $kaomoji->registerSubCommand('happy', function($message, $params) use($happy_kaomojis) {
-        $message->channel->sendMessage($happy_kaomojis[array_rand($happy_kaomojis)]);
+    $kaomoji->registerSubCommand('happy', function($msg, $args) use($happy_kaomojis) {
+        send($msg, $happy_kaomojis[array_rand($happy_kaomojis)]);
     }, [
         'description' => 'sends random happy kaomoji',
         'usage' => '',
     ]);
-    $kaomoji->registerSubCommand('angry', function($message, $params) use($angry_kaomojis) {
-        $message->channel->sendMessage($angry_kaomojis[array_rand($angry_kaomojis)]);
+    $kaomoji->registerSubCommand('angry', function($msg, $args) use($angry_kaomojis) {
+        send($msg, $angry_kaomojis[array_rand($angry_kaomojis)]);
     }, [
         'description' => 'sends random angry kaomoji',
         'usage' => '',
     ]);
-    $kaomoji->registerSubCommand('confused', function($message, $params) use($confused_kaomojis) {
-        $message->channel->sendMessage($confused_kaomojis[array_rand($confused_kaomojis)]);
+    $kaomoji->registerSubCommand('confused', function($msg, $args) use($confused_kaomojis) {
+        send($msg, $confused_kaomojis[array_rand($confused_kaomojis)]);
     }, [
         'description' => 'sends random confused kaomoji',
         'usage' => '',
     ]);
-    $kaomoji->registerSubCommand('surprised', function($message, $params) use($surprised_kaomojis) {
-        $message->channel->sendMessage($surprised_kaomojis[array_rand($surprised_kaomojis)]);
+    $kaomoji->registerSubCommand('surprised', function($msg, $args) use($surprised_kaomojis) {
+        send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)]);
     }, [
         'description' => 'sends random surprised kaomoji',
         'usage' => '',
     ]);
-    $kaomoji->registerSubCommand('embarrassed', function($message, $params) use($embarrassed_kaomojis) {
-        $message->channel->sendMessage($embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
+    $kaomoji->registerSubCommand('embarrassed', function($msg, $args) use($embarrassed_kaomojis) {
+        send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
     }, [
         'description' => 'sends random embarrassed kaomoji',
         'usage' => '',
@@ -240,31 +353,31 @@ $kaomoji = $discord->registerCommand('kaomoji', function($message, $params) use 
 
 
 ///////////////////////////////////////////////////////////
-$joke = $discord->registerCommand('joke', function($message, $params) use ($var) {
+$joke = $discord->registerCommand('joke', function($msg, $args) use ($var) {
     $json = json_decode(file_get_contents("http://tambal.azurewebsites.net/joke/random"));
-    $message->channel->sendMessage($json->joke);
+    send($msg, $json->joke);
 }, [
     'description' => 'tells a random joke',
     'usage' => '',
 ]);
 
-    $joke->registerSubCommand('chucknorris', function($message, $params) {
+    $joke->registerSubCommand('chucknorris', function($msg, $args) {
         $json = json_decode(file_get_contents("http://api.icndb.com/jokes/random1"));
-        $message->channel->sendMessage($json->value->joke);
+        send($msg, $json->value->joke);
     }, [
         'description' => 'get a random fact about chuck norris',
         'usage' => '',
     ]);
 
-    $joke->registerSubCommand('yomama', function($message, $params) {
+    $joke->registerSubCommand('yomama', function($msg, $args) {
         $json = json_decode(file_get_contents("http://api.yomomma.info/"));
-        $message->channel->sendMessage($json->joke);
+        send($msg, $json->joke);
     }, [
         'description' => 'yo mama jokes',
         'usage' => '',
     ]);
 
-    $joke->registerSubCommand('dad', function($message, $params) {
+    $joke->registerSubCommand('dad', function($msg, $args) {
         $opts = [
             'http' => [
                 'method' => 'GET',
@@ -272,7 +385,7 @@ $joke = $discord->registerCommand('joke', function($message, $params) use ($var)
             ]
         ];
         $context = stream_context_create($opts);
-        $message->channel->sendMessage(file_get_contents("https://icanhazdadjoke.com/", false, $context));
+        send($msg, file_get_contents("https://icanhazdadjoke.com/", false, $context));
     }, [
         'description' => 'tells a dad joke',
         'usage' => '',
@@ -280,8 +393,24 @@ $joke = $discord->registerCommand('joke', function($message, $params) use ($var)
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('meme', function($message, $params) use ($memes) {
+$discord->registerCommand('text', function($msg, $args) {
+    $pain = "！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
+    $res = "";
+    foreach (char_in_str(implode($args, " ")) as $char) {
+        $ord = ord($char);
+        if ($ord > 32 && $ord < 124) $res .= $pain[$ord - 33];
+        else $res .= $char;
+    }
+    send($msg, "$res");
+}, [
+    'description' => 'convert ASCII to Unicode for font effect',
+    'usage' => '<text to convert>',
+]);
 
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('meme', function($msg, $args) use ($memes) {
+    send($msg, 'dank');
 }, [
     'description' => 'get a meme',
     'usage' => '',
@@ -289,10 +418,77 @@ $discord->registerCommand('meme', function($message, $params) use ($memes) {
 
 
 
+$imgs = new Definitions(__DIR__.'/img_urls.json');
+///////////////////////////////////////////////////////////
+$img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
+    if (count($args) > 0) {
+        // look for image in uploaded_images
+        send($msg, $imgs->get($args[0]));
+    } else {
+        return;
+    }
+}, [
+    'description' => 'image tools',
+    'usage' => '<usage>',
+]);
 
+    $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
+        if (count($msg->attachments) > 0) {
+            foreach ($msg->attachments as $attachment) {
+                $pic = file_get_contents($attachment->url);
+                $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
+                $filename = __DIR__.'/uploaded_images/';
+                $filename .= isset($args[0]) ? $args[0].".$ext" : $attachment->filename;
+                file_put_contents($filename, $pic);
+            }
+        } else send($msg, "no image to save");
+    }, [
+        'description' => 'image tools',
+        'usage' => '<name to save as>',
+    ]);
 
+    $img->registerSubCommand('save', function($msg, $args) use ($imgs) {
+        if (count($msg->attachments) > 0) {
+            $i = 0;
+            foreach ($msg->attachments as $attachment)
+                $imgs->set($args[$i++], $attachment->url);
+        } else send($msg, "no image to save");
+    }, [
+        'description' => 'image tools',
+        'usage' => '<name to save as>',
+    ]);
 
+    $img->registerSubCommand('list2', function($msg, $args) use ($imgs) {
+        $dir = new DirectoryIterator(__DIR__.'/uploaded_images/');
+        foreach ($dir as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $ret[] = $fileinfo->getBasename(".".$dir->getExtension());
+            }
+        }
+        send($msg, "list of uploaded images:\n\n" . implode($ret, ", "));
+    }, [
+        'description' => 'saved image list',
+        'usage' => '',
+    ]);
 
+    $img->registerSubCommand('list', function($msg, $args) use ($imgs) {
+        send($msg, "list of uploaded images:\n\n" . implode($imgs->list_keys(), ", "));
+    }, [
+        'description' => 'saved image list',
+        'usage' => '',
+    ]);
+
+    $img->registerSubCommand('asciiart', function($msg, $args) {
+        if (count($msg->attachments) > 0) {
+            $imgpath = $msg->attachments[0]->url;
+        } else {
+            $imgpath = $msg->author->user->avatar;
+        }
+        send($msg, ascii_from_img($imgpath));
+    }, [
+        'description' => 'converts image to ascii art',
+        'usage' => '<image>',
+    ]);
 
 
 

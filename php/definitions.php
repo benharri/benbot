@@ -27,6 +27,10 @@ class Definitions {
         $this->save();
     }
 
+    public function list_keys() {
+        return array_keys((array)$this->definitions);
+    }
+
     public function save() {
         file_put_contents($this->filepath, json_encode($this->definitions));
     }
