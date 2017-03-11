@@ -14,7 +14,7 @@ class Definitions {
     }
 
     public function get($key) {
-        return $this->definitions->$key;
+        return $this->definitions->$key ?? "**not set**";
     }
 
     public function set($key, $val) {

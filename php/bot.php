@@ -5,6 +5,7 @@
 ///////////////////////////////////////////////////////////
 
 include __DIR__.'/vendor/autoload.php';
+include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
 
 $start_time = microtime(true);
@@ -12,7 +13,7 @@ $definitions = new Definitions();
 
 $discord = new \Discord\DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
-    'prefix' => '!',
+    'prefix' => ';',
     'description' => "benh's bot made with DiscordPHP",
 ]);
 
@@ -30,24 +31,31 @@ $discord = new \Discord\DiscordCommandClient([
 $discord->registerCommand('ping', function($message) {
     $message->channel->sendMessage('pong');
 }, [
-    'description' => 'pong!',
+    'description' => 'ping pong',
+    'usage' => '',
 ]);
-
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('hello', [
-    'hey there',
-    'how are you',
-    'sup',
-    'thanks'
+$discord->registerCommand('ding', function($message, $params) {
+    $message->channel->sendMessage('dong');
+}, [
+    'description' => 'dong',
+    'usage' => '',
 ]);
+
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('hi', [
     'hey',
     'hello',
     'wussup'
+], [
+    'description' => 'greeting',
+    'usage' => '',
 ]);
+
+
+
 
 
 ///////////////////////////////////////////////////////////
@@ -170,6 +178,121 @@ $discord->registerCommand('8ball',  [
     'description' => 'tells your fortune',
     'usage' => '',
 ]);
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('lenny', function($message, $params) {
+    $message->channel->sendMessage("( ͡° ͜ʖ ͡°)");
+    $channel = $message->channel;
+    $channel->deleteMessages([$message]);
+}, [
+    'description' => 'lenny face ( ͡° ͜ʖ ͡°)',
+    'usage' => '',
+]);
+
+
+///////////////////////////////////////////////////////////
+$kaomoji = $discord->registerCommand('kaomoji', function($message, $params) use ($kaomojis) {
+    $message->channel->sendMessage($kaomojis[array_rand($kaomojis)]);
+}, [
+    'description' => 'sends random kaomoji',
+    'usage' => '',
+]);
+
+    $kaomoji->registerSubCommand('sad', function($message, $params) use($sad_kaomojis) {
+        $message->channel->sendMessage($sad_kaomojis[array_rand($sad_kaomojis)]);
+    }, [
+        'description' => 'sends random sad kaomoji',
+        'usage' => '',
+    ]);
+    $kaomoji->registerSubCommand('happy', function($message, $params) use($happy_kaomojis) {
+        $message->channel->sendMessage($happy_kaomojis[array_rand($happy_kaomojis)]);
+    }, [
+        'description' => 'sends random happy kaomoji',
+        'usage' => '',
+    ]);
+    $kaomoji->registerSubCommand('angry', function($message, $params) use($angry_kaomojis) {
+        $message->channel->sendMessage($angry_kaomojis[array_rand($angry_kaomojis)]);
+    }, [
+        'description' => 'sends random angry kaomoji',
+        'usage' => '',
+    ]);
+    $kaomoji->registerSubCommand('confused', function($message, $params) use($confused_kaomojis) {
+        $message->channel->sendMessage($confused_kaomojis[array_rand($confused_kaomojis)]);
+    }, [
+        'description' => 'sends random confused kaomoji',
+        'usage' => '',
+    ]);
+    $kaomoji->registerSubCommand('surprised', function($message, $params) use($surprised_kaomojis) {
+        $message->channel->sendMessage($surprised_kaomojis[array_rand($surprised_kaomojis)]);
+    }, [
+        'description' => 'sends random surprised kaomoji',
+        'usage' => '',
+    ]);
+    $kaomoji->registerSubCommand('embarrassed', function($message, $params) use($embarrassed_kaomojis) {
+        $message->channel->sendMessage($embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
+    }, [
+        'description' => 'sends random embarrassed kaomoji',
+        'usage' => '',
+    ]);
+
+
+
+
+///////////////////////////////////////////////////////////
+$joke = $discord->registerCommand('joke', function($message, $params) use ($var) {
+    $json = json_decode(file_get_contents("http://tambal.azurewebsites.net/joke/random"));
+    $message->channel->sendMessage($json->joke);
+}, [
+    'description' => 'tells a random joke',
+    'usage' => '',
+]);
+
+    $joke->registerSubCommand('chucknorris', function($message, $params) {
+        $json = json_decode(file_get_contents("http://api.icndb.com/jokes/random1"));
+        $message->channel->sendMessage($json->value->joke);
+    }, [
+        'description' => 'get a random fact about chuck norris',
+        'usage' => '',
+    ]);
+
+    $joke->registerSubCommand('yomama', function($message, $params) {
+        $json = json_decode(file_get_contents("http://api.yomomma.info/"));
+        $message->channel->sendMessage($json->joke);
+    }, [
+        'description' => 'yo mama jokes',
+        'usage' => '',
+    ]);
+
+    $joke->registerSubCommand('dad', function($message, $params) {
+        $opts = [
+            'http' => [
+                'method' => 'GET',
+                'header' => 'Accept: text/plain'
+            ]
+        ];
+        $context = stream_context_create($opts);
+        $message->channel->sendMessage(file_get_contents("https://icanhazdadjoke.com/", false, $context));
+    }, [
+        'description' => 'tells a dad joke',
+        'usage' => '',
+    ]);
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('meme', function($message, $params) use ($memes) {
+
+}, [
+    'description' => 'get a meme',
+    'usage' => '',
+]);
+
+
+
+
+
+
+
 
 
 
