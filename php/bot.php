@@ -115,13 +115,11 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime) {
     // $diff = $now->diff($starttime);
     $diff = $starttime->diff(new DateTime());
     print_r($diff);
-    echo $diff->d;
-    echo $diff->h;
-    $ret = "Up for";
-    $ret .= " {$diff->d} day" . $diff->d == 1 ?: "s";
-    $ret .= " {$diff->h} hour" . $diff->h == 1 ?: "s";
-    $ret .= " {$diff->m} minute" . $diff->m == 1 ?: "s";
-    $ret .= " {$diff->s} second" . $diff->s == 1 ?: "s";
+    $ret = "Up for ";
+    $ret .= $diff->format("%a") . " day" . $diff->d == 1 ? ", " : "s, ";
+    $ret .= $diff->format("%h") . " hour" . $diff->h == 1 ? ", " : "s, ";
+    $ret .= $diff->format("%i") . " minute" . $diff->m == 1 ? ", and " : "s, and ";
+    $ret .= $diff->format("%s") . " second" . $diff->s == 1 ? "" : "s";
     echo $ret;
     send($msg, $ret);
 }, [
