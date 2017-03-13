@@ -161,7 +161,7 @@ $discord->registerCommand('unset', function($msg, $args) use ($defs) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('listdefs', function($msg, $args) use ($defs) {
-    send($msg, (string)$defs);
+    send($msg, $defs->print());
 }, [
     'description' => 'lists all definitions',
     'usage' => '',
@@ -529,6 +529,8 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
+    print_r($msg);
+    print_r($args);
     if ($defs->get(strtolower($args[0])))
     send($msg, $defs->get(strtolower($args[0]), true) ?? $imgs->get(strtolower($args[0]), true) ?? "**not found**");
 }, [
