@@ -424,16 +424,16 @@ $discord->registerCommand('block', function($msg, $args) use ($include_in_scope)
         if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
         else if (ctype_digit($char)) {
             switch ($char) {
-                case 0: $ret .= ":zero: ";
-                case 1: $ret .= ":one: ";
-                case 2: $ret .= ":two: ";
-                case 3: $ret .= ":three: ";
-                case 4: $ret .= ":four: ";
-                case 5: $ret .= ":five: ";
-                case 6: $ret .= ":six: ";
-                case 7: $ret .= ":seven: ";
-                case 8: $ret .= ":eight: ";
-                case 9: $ret .= ":nine: ";
+                case 0: $ret .= ":zero: "; break;
+                case 1: $ret .= ":one: "; break;
+                case 2: $ret .= ":two: "; break;
+                case 3: $ret .= ":three: "; break;
+                case 4: $ret .= ":four: "; break;
+                case 5: $ret .= ":five: "; break;
+                case 6: $ret .= ":six: "; break;
+                case 7: $ret .= ":seven: "; break;
+                case 8: $ret .= ":eight: "; break;
+                case 9: $ret .= ":nine: "; break;
             }
         }
     }
