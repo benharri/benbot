@@ -15,14 +15,10 @@ $defs = new Definitions();
 
 $discord = new \Discord\DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
-    'prefix' => '/',
+    'prefix' => ';',
     'description' => "benh's bot made with DiscordPHP",
 ]);
 
-// $game = $discord->factory(\Discord\Parts\User\Game::class, [
-//     'name' => ';help'
-// ]);
-// $discord->updatePresence($game);
 
 
 
@@ -57,6 +53,10 @@ $discord->registerCommand('hi', [
 ], [
     'description' => 'greeting',
     'usage' => '',
+    'aliases' => [
+        'hello',
+        'sup',
+    ],
 ]);
 
 
@@ -161,7 +161,7 @@ $discord->registerCommand('unset', function($msg, $args) use ($defs) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('listdefs', function($msg, $args) use ($defs) {
-    send($msg, $defs->print());
+    send($msg, "**definitions**:\n\n" . $defs->print());
 }, [
     'description' => 'lists all definitions',
     'usage' => '',
@@ -181,6 +181,8 @@ $discord->registerCommand('weather', [
     'description' => 'gets weather for a location',
     'usage' => '<location>',
 ]);
+
+
 
 $fortunes = [
     "It is certain",
@@ -223,7 +225,7 @@ $discord->registerCommand('lenny', function($msg, $args) {
     $channel = $msg->channel;
     $channel->deleteMessages([$msg]);
 }, [
-    'description' => 'lenny face ( ͡° ͜ʖ ͡°)',
+    'description' => 'you should know what this does',
     'usage' => '',
 ]);
 
@@ -367,6 +369,9 @@ $joke = $discord->registerCommand('joke', function($msg, $args) use ($var) {
 }, [
     'description' => 'tells a random joke',
     'usage' => '',
+    'aliases' => [
+        'Joke',
+    ],
 ]);
 
     $joke->registerSubCommand('chucknorris', function($msg, $args) {
@@ -466,6 +471,11 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 }, [
     'description' => 'image tools',
     'usage' => '<image to show>',
+    'aliases' => [
+        'Img',
+        'image',
+        'Image',
+    ],
 ]);
 
     $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
@@ -528,14 +538,13 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 
 
 ///////////////////////////////////////////////////////////
+// look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
-    print_r($msg);
-    print_r($args);
     if ($defs->get(strtolower($args[0])))
     send($msg, $defs->get(strtolower($args[0]), true) ?? $imgs->get(strtolower($args[0]), true) ?? "**not found**");
 }, [
-    'description' => 'description here',
-    'usage' => '<usage>',
+    'description' => 'looks up def or img',
+    'usage' => '<def or img name>',
 ]);
 
 
