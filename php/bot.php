@@ -107,11 +107,10 @@ $discord->registerCommand('avatar', function($msg, $args) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function($msg, $args) use ($starttime, $start_time) {
+$discord->registerCommand('up', function($msg, $args) use ($starttime) {
     $now = new DateTime();
     $interval = $now->diff($starttime);
-    print_r($interval);
-    send($msg, "Up for " . gmdate('H:i:s', microtime(true) - $start_time));
+    send($msg, "Up for " . $interval->format("%a days, %h hours, %i minutes, and %s seconds"));
 }, [
     'description' => 'bot uptime',
     'usage' => '',
