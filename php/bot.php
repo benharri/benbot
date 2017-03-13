@@ -15,7 +15,7 @@ $defs = new Definitions();
 
 $discord = new \Discord\DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
-    'prefix' => ';',
+    'prefix' => '/',
     'description' => "benh's bot made with DiscordPHP",
 ]);
 
@@ -406,7 +406,7 @@ $joke = $discord->registerCommand('joke', function($msg, $args) use ($var) {
 $discord->registerCommand('text', function($msg, $args) {
     $pain = "！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
     $res = "";
-    foreach (char_in_str(implode($args, " ")) as $char) {
+    foreach (char_in(implode($args, " ")) as $char) {
         $ord = ord($char);
         if ($ord > 32 && $ord < 124) $res .= $pain[$ord - 33];
         else $res .= $char;
@@ -415,6 +415,32 @@ $discord->registerCommand('text', function($msg, $args) {
 }, [
     'description' => 'convert ASCII to Unicode for font effect',
     'usage' => '<text to convert>',
+]);
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('block', function($msg, $args) use ($include_in_scope) {
+    $ret = "";
+    foreach (char_in(strtolower(implode($args, " "))) as $char) {
+        if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
+        else if (ctype_digit($char)) {
+            switch ($char) {
+                case 0: $ret .= ":zero: ";
+                case 1: $ret .= ":one: ";
+                case 2: $ret .= ":two: ";
+                case 3: $ret .= ":three: ";
+                case 4: $ret .= ":four: ";
+                case 5: $ret .= ":five: ";
+                case 6: $ret .= ":six: ";
+                case 7: $ret .= ":seven: ";
+                case 8: $ret .= ":eight: ";
+                case 9: $ret .= ":nine: ";
+            }
+        }
+    }
+    send($msg, $ret);
+}, [
+    'description' => 'block text',
+    'usage' => '<msg>',
 ]);
 
 

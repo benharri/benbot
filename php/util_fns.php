@@ -1,6 +1,6 @@
 <?php
 
-function char_in_str($str) {
+function char_in($str) {
     for ($i = 0; $i <= strlen($str); $i++)
         yield substr($str, $i, 1);
 }
