@@ -19,7 +19,7 @@ $discord = new \Discord\DiscordCommandClient([
     'description' => "benh's bot made with DiscordPHP",
 ]);
 
-$game = $discord->factory(\Discord\Parts\User\Game::class, [
+$game = $discord->factory(\Discord\Parts\Game::class, [
     'name' => ';help'
 ]);
 $discord->updatePresence($game);
