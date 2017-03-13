@@ -429,7 +429,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     }
 }, [
     'description' => 'image tools',
-    'usage' => '<usage>',
+    'usage' => '<image to show>',
 ]);
 
     $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
@@ -444,7 +444,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
         } else send($msg, "no image to save");
     }, [
         'description' => 'image tools',
-        'usage' => '<name to save as>',
+        'usage' => '<save as>',
     ]);
 
     $img->registerSubCommand('save', function($msg, $args) use ($imgs) {
@@ -454,8 +454,8 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
                 $imgs->set($args[$i++], $attachment->url);
         } else send($msg, "no image to save");
     }, [
-        'description' => 'image tools',
-        'usage' => '<name to save as>',
+        'description' => 'saves attached image as name',
+        'usage' => '<name>',
     ]);
 
     $img->registerSubCommand('list2', function($msg, $args) use ($imgs) {
