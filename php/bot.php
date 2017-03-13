@@ -19,10 +19,10 @@ $discord = new \Discord\DiscordCommandClient([
     'description' => "benh's bot made with DiscordPHP",
 ]);
 
-$game = $discord->factory(\Discord\Parts\Game::class, [
-    'name' => ';help'
-]);
-$discord->updatePresence($game);
+// $game = $discord->factory(\Discord\Parts\User\Game::class, [
+//     'name' => ';help'
+// ]);
+// $discord->updatePresence($game);
 
 
 
@@ -112,8 +112,13 @@ $discord->registerCommand('avatar', function($msg, $args) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('up', function($msg, $args) use ($starttime) {
     $now = new DateTime();
-    $interval = $now->diff($starttime);
-    send($msg, "Up for " . $interval->format("%a days, %h hours, %i minutes, and %s seconds"));
+    $diff = $now->diff($starttime);
+    $ret = "Up for ";
+    $ret .= $diff->d . $diff->d == 1 ? " day " : " days ";
+    $ret .= $diff->h . $diff->h == 1 ? " hour " : " hours ";
+    $ret .= $diff->m . $diff->m == 1 ? " minute " : " minutes ";
+    $ret .= $diff->s . $diff->s == 1 ? " second " : " seconds ";
+    send($msg, $ret);
 }, [
     'description' => 'bot uptime',
     'usage' => '',
