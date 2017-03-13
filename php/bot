@@ -1,0 +1,40 @@
+#!/bin/bash
+
+pid=$(ps -ef | grep bot.php | grep -v grep | awk '{print $2}')
+
+case "$1" in
+        start)
+            if [ "" == "$pid" ]; then
+                nohup php bot.php > bot.out &
+            else
+                echo "bot already running"
+            fi
+            ;;
+
+        stop)
+            if [ "" != "$pid" ]; then
+                echo "killing bot ($pid)"
+                kill $pid
+            fi
+            ;;
+
+        status)
+            if [ "" != "$pid" ]; then
+                echo "bot running with pid $pid"
+            else
+                echo "bot not running"
+            fi
+            ;;
+        restart)
+            if [ "" != "$pid" ]; then
+                echo "killing bot ($pid)"
+                kill $pid
+            fi
+            nohup php bot.php > bot.out &
+            ;;
+
+        *)
+            echo $"Usage: $0 {start|stop|restart|status}"
+            exit 1
+
+esac

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-pid=$(ps -ef | grep bot.php | grep -v grep | awk '{print $2}')
-
-if [ "" != "$pid" ]; then
-    echo "killing bot ($pid)"
-    kill $pid
-fi

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-ps -ef | grep bot.php | grep -v grep
