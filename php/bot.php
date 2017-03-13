@@ -10,6 +10,7 @@ include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
 
 $start_time = microtime(true);
+$starttime = new DateTime();
 $defs = new Definitions();
 
 $discord = new \Discord\DiscordCommandClient([
@@ -106,7 +107,10 @@ $discord->registerCommand('avatar', function($msg, $args) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function($msg, $args) use ($start_time) {
+$discord->registerCommand('up', function($msg, $args) use ($starttime, $start_time) {
+    $now = new DateTime();
+    $interval = $now->diff($starttime);
+    print_r($interval);
     send($msg, "Up for " . gmdate('H:i:s', microtime(true) - $start_time));
 }, [
     'description' => 'bot uptime',
