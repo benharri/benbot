@@ -2,3 +2,5 @@ uploaded_images/
 vendor/
 token
 bot.out
+*.json
+!composer.json
