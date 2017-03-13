@@ -527,6 +527,16 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     ]);
 
 
+///////////////////////////////////////////////////////////
+$discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
+    if ($defs->get(strtolower($args[0])))
+    send($msg, $defs->get(strtolower($args[0]), true) ?? $imgs->get(strtolower($args[0]), true) ?? "**not found**");
+}, [
+    'description' => 'description here',
+    'usage' => '<usage>',
+]);
+
+
 
 $discord->run();
 

@@ -13,8 +13,8 @@ class Definitions {
         return print_r($this->defs, true);
     }
 
-    public function get($key) {
-        return $this->defs[$key] ?? "**not set**";
+    public function get($key, $nullable = false) {
+        return $this->defs[$key] ?? ($nullable ? null : "**not set**");
     }
 
     public function set($key, $val) {
@@ -33,5 +33,12 @@ class Definitions {
 
     public function save() {
         file_put_contents($this->filepath, json_encode($this->defs));
+    }
+
+    public function print() {
+        $ret = "";
+        foreach ($this->defs as $key => $val)
+            $ret .= $key . ": " . $val . "\n";
+        return $ret;
     }
 }
