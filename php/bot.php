@@ -540,11 +540,10 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
-    echo $msg;
     if ($defs->get(strtolower($args[0])))
     send($msg, $defs->get(strtolower($args[0]), true) ?? $imgs->get(strtolower($args[0]), true) ?? "**not found**");
 }, [
-    'description' => 'looks up def or img',
+    'description' => 'looks up def or img (note the space). prefers definition if both exist.',
     'usage' => '<def or img name>',
 ]);
 
