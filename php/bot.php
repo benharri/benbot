@@ -436,6 +436,7 @@ $discord->registerCommand('block', function($msg, $args) use ($include_in_scope)
                 case 9: $ret .= ":nine: "; break;
             }
         }
+        else if ($char == " ") $ret .= "  ";
     }
     send($msg, $ret);
 }, [
