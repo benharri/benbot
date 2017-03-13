@@ -136,7 +136,7 @@ $discord->registerCommand('say', function($msg, $args) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('set', function($msg, $args) use ($defs) {
-    $def = array_shift($args);
+    $def = strtolower(array_shift($args));
     $defs->set($def, implode($args, " "));
     send($msg, $def . " set to: " . implode($args, " "));
 }, [
@@ -145,17 +145,15 @@ $discord->registerCommand('set', function($msg, $args) use ($defs) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($msg, $args) use ($defs) {
-    if (isset($args[0]))
-        send($msg, $args[0] . ": " . $defs->get($args[0]));
-    else
-        send($msg, "can't search for nothing");
+    if (isset($args[0])) send($msg, $args[0] . ": " . $defs->get(strtolower($args[0])));
+    else send($msg, "can't search for nothing");
 }, [
     'description' => 'gets a value from the definitions',
     'usage' => '<thing to get>',
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('unset', function($msg, $args) use ($defs) {
-    $defs->unset($args[0]);
+    $defs->unset(strtolower($args[0]));
     send($msg, $args[0] . " unset");
 }, [
     'description' => 'removes a definition',
@@ -443,6 +441,7 @@ $discord->registerCommand('block', function($msg, $args) use ($include_in_scope)
     'description' => 'block text',
     'usage' => '<msg>',
 ]);
+
 
 
 ///////////////////////////////////////////////////////////
