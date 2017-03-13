@@ -126,7 +126,7 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('say', function($msg, $args) {
-    send($msg, implode($args, ' '));
+    send($msg, implode($args, ' ') . "\n\n**love**, {$msg->author}");
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
@@ -406,19 +406,19 @@ $joke = $discord->registerCommand('joke', function($msg, $args) use ($var) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('text', function($msg, $args) {
-    $pain = "！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
-    $res = "";
-    foreach (char_in(implode($args, " ")) as $char) {
-        $ord = ord($char);
-        if ($ord > 32 && $ord < 124) $res .= $pain[$ord - 33];
-        else $res .= $char;
-    }
-    send($msg, "$res");
-}, [
-    'description' => 'convert ASCII to Unicode for font effect',
-    'usage' => '<text to convert>',
-]);
+// $discord->registerCommand('text', function($msg, $args) {
+//     $pain = "！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
+//     $res = "";
+//     foreach (char_in(implode($args, " ")) as $char) {
+//         $ord = ord($char);
+//         if ($ord > 32 && $ord < 124) $res .= $pain[$ord - 33];
+//         else $res .= $char;
+//     }
+//     send($msg, "$res");
+// }, [
+//     'description' => 'convert ASCII to Unicode for font effect',
+//     'usage' => '<text to convert>',
+// ]);
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('block', function($msg, $args) use ($include_in_scope) {
@@ -465,6 +465,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     if (count($args) > 0) {
         // look for image in uploaded_images
         send($msg, $imgs->get($args[0]));
+        $msg->channel->sendFile($imgs->get($args[0]), 'img');
     } else {
         return;
     }
@@ -478,44 +479,45 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     ],
 ]);
 
-    $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
-        if (count($msg->attachments) > 0) {
-            foreach ($msg->attachments as $attachment) {
-                $pic = file_get_contents($attachment->url);
-                $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
-                $filename = __DIR__.'/uploaded_images/';
-                $filename .= isset($args[0]) ? $args[0].".$ext" : $attachment->filename;
-                file_put_contents($filename, $pic);
-            }
-        } else send($msg, "no image to save");
-    }, [
-        'description' => 'image tools',
-        'usage' => '<save as>',
-    ]);
+    // $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
+    //     if (count($msg->attachments) > 0) {
+    //         foreach ($msg->attachments as $attachment) {
+    //             $pic = file_get_contents($attachment->url);
+    //             $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
+    //             $filename = __DIR__.'/uploaded_images/';
+    //             $filename .= isset($args[0]) ? $args[0].".$ext" : $attachment->filename;
+    //             file_put_contents($filename, $pic);
+    //         }
+    //     } else send($msg, "no image to save");
+    // }, [
+    //     'description' => 'image tools',
+    //     'usage' => '<save as>',
+    // ]);
 
     $img->registerSubCommand('save', function($msg, $args) use ($imgs) {
         if (count($msg->attachments) > 0) {
             $i = 0;
             foreach ($msg->attachments as $attachment)
                 $imgs->set($args[$i++], $attachment->url);
+            send($msg, "image saved as " . $args[$i]);
         } else send($msg, "no image to save");
     }, [
         'description' => 'saves attached image as name',
         'usage' => '<name>',
     ]);
 
-    $img->registerSubCommand('list2', function($msg, $args) use ($imgs) {
-        $dir = new DirectoryIterator(__DIR__.'/uploaded_images/');
-        foreach ($dir as $fileinfo) {
-            if (!$fileinfo->isDot()) {
-                $ret[] = $fileinfo->getBasename(".".$dir->getExtension());
-            }
-        }
-        send($msg, "list of uploaded images:\n\n" . implode($ret, ", "));
-    }, [
-        'description' => 'saved image list',
-        'usage' => '',
-    ]);
+    // $img->registerSubCommand('list2', function($msg, $args) use ($imgs) {
+    //     $dir = new DirectoryIterator(__DIR__.'/uploaded_images/');
+    //     foreach ($dir as $fileinfo) {
+    //         if (!$fileinfo->isDot()) {
+    //             $ret[] = $fileinfo->getBasename(".".$dir->getExtension());
+    //         }
+    //     }
+    //     send($msg, "list of uploaded images:\n\n" . implode($ret, ", "));
+    // }, [
+    //     'description' => 'saved image list',
+    //     'usage' => '',
+    // ]);
 
     $img->registerSubCommand('list', function($msg, $args) use ($imgs) {
         send($msg, "list of uploaded images:\n\n" . implode($imgs->list_keys(), ", "));
@@ -546,6 +548,9 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     'description' => 'looks up def or img (note the space). prefers definition if both exist.',
     'usage' => '<def or img name>',
 ]);
+
+
+
 
 
 

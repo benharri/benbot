@@ -1,4 +1,10 @@
 #!/bin/bash
+pid=$(ps -ef | grep bot.php | grep -v grep | awk '{print $2}')
 
-nohup php bot.php &
+if [ "" == "$pid" ]; then
+    nohup php bot.php > bot.out &
+else
+    echo "bot already running"
+fi
+
 
