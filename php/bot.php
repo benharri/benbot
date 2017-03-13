@@ -111,8 +111,10 @@ $discord->registerCommand('avatar', function($msg, $args) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('up', function($msg, $args) use ($starttime) {
-    $now = new DateTime();
-    $diff = $now->diff($starttime);
+    // $now = new DateTime();
+    // $diff = $now->diff($starttime);
+    $diff = $starttime->diff(new DateTime());
+    print_r($diff);
     $ret = "Up for ";
     $ret .= $diff->d . $diff->d == 1 ? " day " : " days ";
     $ret .= $diff->h . $diff->h == 1 ? " hour " : " hours ";
