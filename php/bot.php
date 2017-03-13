@@ -115,11 +115,11 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime) {
     // $diff = $now->diff($starttime);
     $diff = $starttime->diff(new DateTime());
     print_r($diff);
-    $ret = "Up for ";
-    $ret .= $diff->d . $diff->d == 1 ? " day " : " days ";
-    $ret .= $diff->h . $diff->h == 1 ? " hour " : " hours ";
-    $ret .= $diff->m . $diff->m == 1 ? " minute " : " minutes ";
-    $ret .= $diff->s . $diff->s == 1 ? " second " : " seconds ";
+    $ret = "Up for";
+    $ret .= " {$diff->d} day" . $diff->d == 1 ?: "s";
+    $ret .= " {$diff->h} hour" . $diff->h == 1 ?: "s";
+    $ret .= " {$diff->m} minute" . $diff->m == 1 ?: "s";
+    $ret .= " {$diff->s} second" . $diff->s == 1 ?: "s";
     send($msg, $ret);
 }, [
     'description' => 'bot uptime',
