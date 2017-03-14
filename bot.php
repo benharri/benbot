@@ -551,14 +551,31 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
-    if ($defs->get(strtolower($args[0])))
-    send($msg, $defs->get(strtolower($args[0]), true) ?? "**no def found**");
-    send($msg, $imgs->get(strtolower($args[0]), true) ?? "**no img found**");
+    if ($defs->get(strtolower($args[0]))) {
+        if ($defs->get(strtolower($args[0], true)))
+            send($msg, $defs->get(strtolower($args[0])));
+        if ($imgs->get(strtolower($args[0], true)))
+            send($msg, $imgs->get(strtolower($args[0])));
+    }
+    print_r($msg);
+    print_r($args);
 }, [
     'description' => 'looks up def or img (note the space)',
     'usage' => '<def or img name>',
 ]);
 
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_scope) {
+    $ret = count($msg->mentions) > 0 ? $msg->mentions[0] : $msg->author;
+    print_r($msg->mentions);
+    $ret .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!";
+    echo $ret;
+    $msg->channel->sendFile('img/bamboozled.jpg', 'bamboozle.jpg', $ret);
+}, [
+    'description' => 'bamboozles',
+    'usage' => '<user>(optional)',
+]);
 
 
 
