@@ -567,7 +567,10 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_scope) {
-    $ret = count($msg->mentions) > 0 ? $msg->mentions[0] : $msg->author;
+    if (count($msg->mentions) > 0) {
+        foreach ($msg->mentions as $key => $val)
+            $ret .= $key;
+    } else $ret = $msg->author;
     print_r($msg->mentions);
     $ret .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!";
     echo $ret;
