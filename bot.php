@@ -596,7 +596,13 @@ $discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_sc
 ]);
 
 
-
+///////////////////////////////////////////////////////////
+$discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
+    print_r($msg);
+}, [
+    'description' => 'debugging... only benh can use',
+    'usage' => '',
+]);
 
 
 $discord->run();
