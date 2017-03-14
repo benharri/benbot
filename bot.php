@@ -486,8 +486,12 @@ $imgs = new Definitions(__DIR__.'/img_urls.json');
 $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     if (count($args) > 0) {
         // look for image in uploaded_images
-        send($msg, $imgs->get($args[0]));
-        $msg->channel->sendFile($imgs->get($args[0]), 'img.jpg');
+        send($msg, $imgs->get($args[0]))->then(function($reason) { echo "link sent", PHP_EOL; });
+        $msg->channel->sendFile($imgs->get($args[0]), 'img.jpg')->then(function ($reason) {
+            echo $reason, PHP_EOL;
+        })->otherwise(function($reason) {
+            echo $reason, PHP_EOL;
+        });
     } else {
         return;
     }
