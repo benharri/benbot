@@ -545,7 +545,7 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     send($msg, $defs->get(strtolower($args[0]), true) ?? "**no def found**");
     send($msg, $imgs->get(strtolower($args[0]), true) ?? "**no img found**");
 }, [
-    'description' => 'looks up def or img (note the space). prefers definition if both exist.',
+    'description' => 'looks up def or img (note the space)',
     'usage' => '<def or img name>',
 ]);
 

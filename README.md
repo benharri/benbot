@@ -2,7 +2,7 @@
 
 [Add phpbot to your server](https://discordapp.com/api/oauth2/authorize?client_id=288416337057939456&scope=bot&permissions=0)
 
-This is a discord bot I've been working on. Under heavy development. Don't add to your server if you're expecting something reliable.
+This is a discord bot I've been working on. Under heavy development.
 
 Feel free to clone this project and try your hand at making a bot. 
 
