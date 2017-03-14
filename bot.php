@@ -19,7 +19,7 @@ $defs = new Definitions();
 $discord = new DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
     'prefix' => ';',
-    'description' => "benh's bot made with DiscordPHP",
+    'description' => "benh's bot made with DiscordPHP. avatar by hirose.",
 ]);
 
 $game = $discord->factory(Game::class, [
@@ -617,7 +617,7 @@ $discord->registerCommand('sys', function($msg, $args) {
         send($msg, "```\n" . shell_exec(implode($args, " ")) . "\n```");
     } else send($msg, "you're not allowed to use that command");
 }, [
-    'description' => 'runs command on local shell',
+    'description' => 'runs command on local shell... only benh can use',
     'usage' => '<cmd>',
 ]);
 
