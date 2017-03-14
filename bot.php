@@ -474,7 +474,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     if (count($args) > 0) {
         // look for image in uploaded_images
         send($msg, $imgs->get($args[0]));
-        $msg->channel->sendFile($imgs->get($args[0]), 'img');
+        $msg->channel->sendFile($imgs->get($args[0]), 'img.jpg');
     } else {
         return;
     }
@@ -551,14 +551,12 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
-    if ($defs->get(strtolower($args[0]))) {
-        if ($defs->get(strtolower($args[0], true)))
-            send($msg, $defs->get(strtolower($args[0])));
-        if ($imgs->get(strtolower($args[0], true)))
-            send($msg, $imgs->get(strtolower($args[0])));
-    }
-    print_r($msg);
-    print_r($args);
+    if ($defs->get(strtolower($args[0], true)))
+        send($msg, $defs->get(strtolower($args[0])));
+    if ($imgs->get(strtolower($args[0], true)))
+        send($msg, $imgs->get(strtolower($args[0])));
+    // print_r($msg);
+    // print_r($args);
 }, [
     'description' => 'looks up def or img (note the space)',
     'usage' => '<def or img name>',
@@ -576,7 +574,7 @@ $discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_sc
     echo $ret;
     $msg->channel->sendFile('img/bamboozled.jpg', 'bamboozle.jpg', $ret);
 }, [
-    'description' => 'bamboozles',
+    'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
     'usage' => '<user>(optional)',
 ]);
 

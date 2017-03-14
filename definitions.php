@@ -14,7 +14,7 @@ class Definitions {
     }
 
     public function get($key, $nullable = false) {
-        return $this->defs[$key] ?? ($nullable ? null : "**not set**");
+        return $this->defs[$key] ?? ($nullable ? false : "**not set**");
     }
 
     public function set($key, $val) {
