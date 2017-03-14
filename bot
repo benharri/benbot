@@ -43,7 +43,7 @@ case "$1" in
 
 
         *)
-            echo $"Usage: $0 {start|dbstart|stop|restart|status}"
+            echo $"Usage: $0 {start|nohup|stop|restart|status}"
             exit 1
 
 esac
