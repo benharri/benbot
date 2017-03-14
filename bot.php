@@ -7,6 +7,7 @@
 include __DIR__.'/vendor/autoload.php';
 use Discord\DiscordCommandClient;
 use Discord\Parts\User\Game;
+use Discord\Parts\Channel\Embed;
 
 include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
@@ -15,7 +16,7 @@ include __DIR__.'/util_fns.php';
 $starttime = new DateTime();
 $defs = new Definitions();
 
-$discord = new \Discord\DiscordCommandClient([
+$discord = new DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
     'prefix' => ';',
     'description' => "benh's bot made with DiscordPHP",
