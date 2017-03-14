@@ -532,7 +532,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
         } else {
             $imgpath = $msg->author->user->avatar;
         }
-        send($msg, ascii_from_img($imgpath));
+        send($msg, "```" . ascii_from_img($imgpath) . "```");
     }, [
         'description' => 'converts image to ascii art',
         'usage' => '<image>',
