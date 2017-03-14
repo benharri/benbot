@@ -599,8 +599,11 @@ $discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_sc
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
-    print_r($msg);
-    send($msg, "debugging. check logs.");
+    var_dump($msg->author->user->id);
+    if ($msg->author->user->id == 193011352275648514) {
+        print_r($msg);
+        send($msg, "debugging. check logs.");
+    } else send($msg, "you're not allowed to use that command");
 }, [
     'description' => 'debugging... only benh can use',
     'usage' => '',
