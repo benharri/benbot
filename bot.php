@@ -600,7 +600,7 @@ $discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_sc
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
     var_dump($msg->author->user->id);
-    if ($msg->author->user->id == 193011352275648514) {
+    if ($msg->author->user->id == "193011352275648514") {
         print_r($msg);
         send($msg, "debugging. check logs.");
     } else send($msg, "you're not allowed to use that command");
@@ -608,6 +608,20 @@ $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
     'description' => 'debugging... only benh can use',
     'usage' => '',
 ]);
+
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('sys', function($msg, $args) {
+    if ($msg->author->user->id == "193011352275648514") {
+        send($msg, "```\n" . shell_exec(implode($args, " ")) . "\n```");
+    } else send($msg, "you're not allowed to use that command");
+}, [
+    'description' => 'runs command on local shell',
+    'usage' => '<cmd>',
+]);
+
+
 
 
 $discord->run();
