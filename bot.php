@@ -9,7 +9,6 @@ include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
 
-$start_time = microtime(true);
 $starttime = new DateTime();
 $defs = new Definitions();
 
@@ -499,7 +498,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
             $i = 0;
             foreach ($msg->attachments as $attachment)
                 $imgs->set($args[$i++], $attachment->url);
-            send($msg, "image saved as " . $args[$i]);
+            send($msg, "image saved");
         } else send($msg, "no image to save");
     }, [
         'description' => 'saves attached image as name',
@@ -543,7 +542,8 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     if ($defs->get(strtolower($args[0])))
-    send($msg, $defs->get(strtolower($args[0]), true) ?? $imgs->get(strtolower($args[0]), true) ?? "**not found**");
+    send($msg, $defs->get(strtolower($args[0]), true) ?? "**no def found**");
+    send($msg, $imgs->get(strtolower($args[0]), true) ?? "**no img found**");
 }, [
     'description' => 'looks up def or img (note the space). prefers definition if both exist.',
     'usage' => '<def or img name>',
