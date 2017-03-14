@@ -32,6 +32,7 @@ $discord->on('ready', function($discord) use ($game, $defs) {
 
     $discord->on('message', function($msg, $args) use ($defs) {
         if (char_in($msg->content) == ';') {
+            echo "; found";
             foreach (char_in($msg->content) as $char) {
                 if ($char == " ") break;
                 $qu .= $char;
@@ -563,12 +564,11 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
-    if ($defs->get(strtolower($args[0]), true))
-        send($msg, $defs->get(strtolower($args[0])));
-    if ($imgs->get(strtolower($args[0]), true))
-        send($msg, $imgs->get(strtolower($args[0])));
-    // print_r($msg);
-    // print_r($args);
+    $qu = strtolower($args[0]);
+    if ($defs->get($qu, true))
+        send($msg, "$qu: " . $defs->get($qu));
+    if ($imgs->get($qu, true))
+        send($msg, "$qu: " . $imgs->get($qu));
 }, [
     'description' => 'looks up def or img (note the space)',
     'usage' => '<def or img name>',
