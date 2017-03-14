@@ -563,9 +563,9 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
-    if ($defs->get(strtolower($args[0], true)))
+    if ($defs->get(strtolower($args[0]), true))
         send($msg, $defs->get(strtolower($args[0])));
-    if ($imgs->get(strtolower($args[0], true)))
+    if ($imgs->get(strtolower($args[0]), true))
         send($msg, $imgs->get(strtolower($args[0])));
     // print_r($msg);
     // print_r($args);
