@@ -1,6 +1,10 @@
 uploaded_images/
 vendor/
+
 token
+phone_number
+weather_api_key
+
 bot.out
 *.json
 !composer.json

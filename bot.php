@@ -15,6 +15,7 @@ include __DIR__.'/util_fns.php';
 
 $starttime = new DateTime();
 $defs = new Definitions();
+$imgs = new Definitions(__DIR__.'/img_urls.json');
 
 $discord = new DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
@@ -26,20 +27,21 @@ $game = $discord->factory(Game::class, [
     'name' => ';help',
 ]);
 
-$discord->on('ready', function($discord) use ($game, $defs) {
-    echo "Bot is ready", PHP_EOL;
+$discord->on('ready', function($discord) use ($game, $defs, $imgs) {
     $discord->updatePresence($game);
 
-
-    $discord->on('message', function($msg, $args) use ($defs) {
-        if (char_in($msg->content) == ';') {
-            echo "; found";
-            foreach (char_in($msg->content) as $char) {
-                if ($char == " ") break;
-                $qu .= $char;
-            }
-            echo $qu;
-            send($msg, $defs->get($qu));
+    $discord->on('message', function($msg, $args) use ($defs, $imgs) {
+        $gen = char_in($msg->content);
+        $first_char = $gen->current();
+        if ($first_char == ';') {
+            $gen->next();
+            for ($qu = ""; $gen->current() != " " && $gen->valid(); $gen->next())
+                $qu .= $gen->current();
+            $qu = strtolower($qu);
+            if ($defs->get($qu, true))
+                send($msg, "$qu: " . $defs->get($qu));
+            if ($imgs->get($qu, true))
+                send($msg, "$qu: " . $imgs->get($qu));
         }
     });
 });
@@ -106,14 +108,20 @@ $discord->registerCommand('roll', function ($msg, $args) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('text_benh', function($msg, $args) {
     if (count($args) === 0) {
-        send($msg, 'missing message');
+        send($msg, 'can\'t send a blank message');
         return;
     }
-    if (mail("9068690061@vtext.com", "", implode($args, " "), "From: {$msg->author->user->username} <{$msg->author->user->username}@benharri.com>")) {
-        return "message sent";
+
+    $srvr = $msg->channel->guild->name;
+    $user = $msg->author->user->username;
+    $from = "From: {$srvr} Discord <{$srvr}@bot.benharris.ch>";
+    $msg_body = $user . ":\n\n" . implode(" ", $args);
+
+    if (mail(file_get_contents(__DIR__.'/phone_number') . "@vtext.com", "", $msg_body, $from)) {
+        return "message sent to benh";
     }
 }, [
-    'description' => 'send a message to benh off discord',
+    'description' => 'text a message to benh',
     'usage' => '<message>',
 ]);
 
@@ -149,7 +157,7 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('say', function($msg, $args) {
-    send($msg, implode($args, ' ') . "\n\n**love**, {$msg->author}");
+    send($msg, implode(" ", $args) . "\n\n**love**, {$msg->author}");
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
@@ -157,11 +165,15 @@ $discord->registerCommand('say', function($msg, $args) {
 
 
 
+
+
+///////////////////////////////////////////////////////////
+// DEFINITIONS STUFF
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('set', function($msg, $args) use ($defs) {
     $def = strtolower(array_shift($args));
-    $defs->set($def, implode($args, " "));
-    send($msg, $def . " set to: " . implode($args, " "));
+    $defs->set($def, implode(" ", $args));
+    send($msg, $def . " set to: " . implode(" ", $args));
 }, [
     'description' => 'sets this to that',
     'usage' => '<this> <that>',
@@ -191,19 +203,31 @@ $discord->registerCommand('listdefs', function($msg, $args) use ($defs) {
 ]);
 
 
+
+
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('dank', function($msg) {
     send($msg, 'memes');
 });
 
 
+
+
+
+
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('weather', [
-    "sunny", "cloudy", "bad"
-], [
+$discord->registerCommand('weather', function($msg, $args) {
+    $api_key = file_get_contents(__DIR__.'/weather_api_key');
+    $query = implode(" ", $args);
+    $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={Marquette}&APPID=$api_key"));
+
+}, [
     'description' => 'gets weather for a location',
     'usage' => '<location>',
 ]);
+
+
+
 
 
 
@@ -233,13 +257,14 @@ $fortunes = [
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('8ball', function($msg, $args) use ($fortunes) {
     $ret = "Your Question: *";
-    $ret .= count($args) == 0 ? "Why didn't {$msg->author} ask a question?" : implode($args, " ");
+    $ret .= count($args) == 0 ? "Why didn't {$msg->author} ask a question?" : implode(" ", $args);
     $ret .= "*\n\n**" . $fortunes[array_rand($fortunes)] . "**";
     send($msg, $ret);
 }, [
     'description' => 'tells your fortune',
     'usage' => '<question to ask the mighty 8ball>',
 ]);
+
 
 
 ///////////////////////////////////////////////////////////
@@ -251,88 +276,18 @@ $discord->registerCommand('lenny', function($msg, $args) {
     'description' => 'you should know what this does',
     'usage' => '',
 ]);
-
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('lennyception', function($msg, $args) {
-    send($msg, "( (   ͡° ͜ʖ ͡° )
- (   (   ͡° ͜ʖ ͡° )
- (   ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° )
- (   ͡° ͜ʖ ͡° )° )
- (   ͡° ͜ʖ ͡° )
- ( (   ͡° ͜ʖ ͡° )
- (   (   ͡° ͜ʖ ͡° )
- (   ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° )
- (   ͡° ͜ʖ ͡° )° )
- (   ͡° ͜ʖ ͡° ))
- (   ͡° ͜ʖ ͡° )
- ( (   ͡° ͜ʖ ͡° )
- (   (   ͡° ͜ʖ ͡° )
- (   ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° )
- (   ͡° ͜ʖ ͡° )° )
- (   ͡° ͜ʖ ͡° )
- ( (   ͡° ͜ʖ ͡° )
- (   (   ͡° ͜ʖ ͡° )
- (   ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° )
- (   ͡° ͜ʖ ͡° )° )
- (   ͡° ͜ʖ ͡° ))
- (   ͡° ͜ʖ ͡° )
- ( (   ͡° ͜ʖ ͡° )
- (   (   ͡° ͜ʖ ͡° )
- (   ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° )
- (   ͡° ͜ʖ ͡° )° )
- (   ͡° ͜ʖ ͡° )
- ( (   ͡° ͜ʖ ͡° )
- (   (   ͡° ͜ʖ ͡° )
- (   ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ (   ͡° ͜ʖ ͡° )
-(   ͡° ͜ʖ ͡° (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° ) (   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )(   ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͡° ͜ʖ ͡° )
- (   ͡° ͜ʖ ͡° )  ͜ʖ ͡° )");
+$discord->registerCommand('lennies', function($msg, $args) use ($lennyception) {
+    send($msg, $lennyception);
 }, [
     'description' => '( ͡° ͜ʖ ͡°)',
+    'usage' => '',
+]);
+///////////////////////////////////////////////////////////
+$discord->registerCommand('shrug', function($msg, $args) {
+    send($msg, "¯\\\_(ツ)\_/¯");
+}, [
+    'description' => 'meh',
     'usage' => '',
 ]);
 
@@ -386,7 +341,7 @@ $kaomoji = $discord->registerCommand('kaomoji', function($msg, $args) use ($kaom
 
 
 ///////////////////////////////////////////////////////////
-$joke = $discord->registerCommand('joke', function($msg, $args) use ($var) {
+$joke = $discord->registerCommand('joke', function($msg, $args) {
     $json = json_decode(file_get_contents("http://tambal.azurewebsites.net/joke/random"));
     send($msg, $json->joke);
 }, [
@@ -429,24 +384,24 @@ $joke = $discord->registerCommand('joke', function($msg, $args) use ($var) {
 
 
 ///////////////////////////////////////////////////////////
-// $discord->registerCommand('text', function($msg, $args) {
-//     $pain = "！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
-//     $res = "";
-//     foreach (char_in(implode($args, " ")) as $char) {
-//         $ord = ord($char);
-//         if ($ord > 32 && $ord < 124) $res .= $pain[$ord - 33];
-//         else $res .= $char;
-//     }
-//     send($msg, "$res");
-// }, [
-//     'description' => 'convert ASCII to Unicode for font effect',
-//     'usage' => '<text to convert>',
-// ]);
+$discord->registerCommand('text', function($msg, $args) {
+    $pain = str_split("！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ");
+    $res = "";
+    foreach (char_in(implode(" ", $args)) as $char) {
+        $ord = ord($char);
+        if ($ord > 32 && $ord < 124) $res .= $pain[$ord - 33];
+        else $res .= $char;
+    }
+    send($msg, "$res");
+}, [
+    'description' => 'convert ASCII to Unicode for font effect',
+    'usage' => '<text to convert>',
+]);
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('block', function($msg, $args) use ($include_in_scope) {
+$discord->registerCommand('block', function($msg, $args) {
     $ret = "";
-    foreach (char_in(strtolower(implode($args, " "))) as $char) {
+    foreach (char_in(strtolower(implode(" ", $args))) as $char) {
         if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
         else if (ctype_digit($char)) {
             switch ($char) {
@@ -473,7 +428,7 @@ $discord->registerCommand('block', function($msg, $args) use ($include_in_scope)
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('meme', function($msg, $args) use ($memes) {
+$discord->registerCommand('meme', function($msg, $args) {
     send($msg, 'dank');
 }, [
     'description' => 'get a meme',
@@ -482,7 +437,6 @@ $discord->registerCommand('meme', function($msg, $args) use ($memes) {
 
 
 
-$imgs = new Definitions(__DIR__.'/img_urls.json');
 ///////////////////////////////////////////////////////////
 $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     if (count($args) > 0) {
@@ -540,14 +494,14 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     //             $ret[] = $fileinfo->getBasename(".".$dir->getExtension());
     //         }
     //     }
-    //     send($msg, "list of uploaded images:\n\n" . implode($ret, ", "));
+    //     send($msg, "list of uploaded images:\n\n" . implode(", ", $ret));
     // }, [
     //     'description' => 'saved image list',
     //     'usage' => '',
     // ]);
 
     $img->registerSubCommand('list', function($msg, $args) use ($imgs) {
-        send($msg, "list of uploaded images:\n\n" . implode($imgs->list_keys(), ", "));
+        send($msg, "list of uploaded images:\n\n" . implode(", ", $imgs->list_keys()));
     }, [
         'description' => 'saved image list',
         'usage' => '',
@@ -575,13 +529,13 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     if ($imgs->get($qu, true))
         send($msg, "$qu: " . $imgs->get($qu));
 }, [
-    'description' => 'looks up def or img (note the space)',
+    'description' => 'looks up def or img',
     'usage' => '<def or img name>',
 ]);
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_scope) {
+$discord->registerCommand('bamboozle', function($msg, $args) {
     if (count($msg->mentions) > 0) {
         foreach ($msg->mentions as $key => $val)
             $ret .= "<@$key>";
@@ -614,7 +568,7 @@ $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('sys', function($msg, $args) {
     if ($msg->author->user->id == "193011352275648514") {
-        send($msg, "```\n" . shell_exec(implode($args, " ")) . "\n```");
+        send($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
     } else send($msg, "you're not allowed to use that command");
 }, [
     'description' => 'runs command on local shell... only benh can use',
