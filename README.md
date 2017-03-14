@@ -8,13 +8,14 @@ Feel free to clone this project and try your hand at making a bot.
 
 ## Set up
 
-1 `git clone https://github.com/benharri/testcord`
-1 `cd testcord/php`
-1 Install dependencies `composer install`
-1 Get your Discord API Key and save it as `/php/token` (no file extension)
-1 Run the bot `php bot.php`
+1. `git clone https://github.com/benharri/testcord && cd testcord`
+1. Install DiscordPHP and dependencies `composer install`
+1. Get your Discord API Key and save it as `/php/token` (no file extension)
+1. Run the bot `./bot start`
 
-* If you want to keep the bot running in the background, run it as `nohup php bot.php`
+>If you want to keep the bot running in the background, run it as `./bot nohup`
+
+>If bash isn't available, you can run the bot with just `php bot.php`
 
 
 ## Commands

@@ -3,12 +3,19 @@
 pid=$(ps -ef | grep bot.php | grep -v grep | awk '{print $2}')
 
 case "$1" in
-        start)
+        nohup)
             if [ "" == "$pid" ]; then
                 nohup php bot.php > bot.out &
             else
                 echo "bot already running"
             fi
+            ;;
+
+        start)
+            if [ "" != "$pid" ]; then
+                kill $pid
+            fi
+            php bot.php
             ;;
 
         stop)
@@ -25,6 +32,7 @@ case "$1" in
                 echo "bot not running"
             fi
             ;;
+
         restart)
             if [ "" != "$pid" ]; then
                 echo "killing bot ($pid)"
@@ -33,8 +41,9 @@ case "$1" in
             nohup php bot.php > bot.out &
             ;;
 
+
         *)
-            echo $"Usage: $0 {start|stop|restart|status}"
+            echo $"Usage: $0 {start|dbstart|stop|restart|status}"
             exit 1
 
 esac
