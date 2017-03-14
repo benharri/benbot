@@ -5,6 +5,9 @@
 ///////////////////////////////////////////////////////////
 
 include __DIR__.'/vendor/autoload.php';
+use Discord\DiscordCommandClient;
+use Discord\Parts\User\Game;
+
 include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
@@ -18,7 +21,14 @@ $discord = new \Discord\DiscordCommandClient([
     'description' => "benh's bot made with DiscordPHP",
 ]);
 
+$game = $discord->factory(Game::class, [
+    'name' => ';help',
+]);
 
+$discord->on('ready', function($discord) use ($game) {
+    echo "Bot is ready", PHP_EOL;
+    $discord->updatePresence($game);
+});
 
 
 
