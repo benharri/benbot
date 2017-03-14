@@ -25,9 +25,21 @@ $game = $discord->factory(Game::class, [
     'name' => ';help',
 ]);
 
-$discord->on('ready', function($discord) use ($game) {
+$discord->on('ready', function($discord) use ($game, $defs) {
     echo "Bot is ready", PHP_EOL;
     $discord->updatePresence($game);
+
+
+    $discord->on('message', function($msg, $args) use ($defs) {
+        if (char_in($msg->content) == ';') {
+            foreach (char_in($msg->content) as $char) {
+                if ($char == " ") break;
+                $qu .= $char;
+            }
+            echo $qu;
+            send($msg, $defs->get($qu));
+        }
+    });
 });
 
 
@@ -568,10 +580,11 @@ $discord->registerCommand('bamboozle', function($msg, $args) use ($include_in_sc
     if (count($msg->mentions) > 0) {
         foreach ($msg->mentions as $key => $val)
             $ret .= "<@$key>";
-    } else $ret = $msg->author;
-    print_r($msg->mentions);
+    }
+    else $ret = $msg->author;
+    // print_r($msg->mentions);
     $ret .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!";
-    echo $ret;
+    // echo $ret;
     $msg->channel->sendFile('img/bamboozled.jpg', 'bamboozle.jpg', $ret);
 }, [
     'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
