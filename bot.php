@@ -236,7 +236,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
     $json = json_decode(file_get_contents($url));
     // print_r($json);
     $fahr = $json->main->temp * 5 / 9 + 32;
-    $ret = "it's {$json->main->temp}°C ($fahr°F) in {$json->name}";
+    $ret = "it's {$json->main->temp}°C ({$fahr}°F) in {$json->name}";
     $msg->reply($ret);
 }, [
     'description' => 'gets weather for a location',
@@ -251,7 +251,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
         print_r($json);
         $cities->set($msg->author->id, $json->id);
         $fahr = $json->main->temp * 5 / 9 + 32;
-        $ret = "it's {$json->main->temp}°C ($fahr°F) in {$json->name}.\n\n{$json->name} saved as your preferred city.";
+        $ret = "it's {$json->main->temp}°C ({$fahr}°F) in {$json->name}.\n\n{$json->name} saved as your preferred city.";
         $msg->reply($ret);
     }, [
         'description' => 'saves your favorite city',
