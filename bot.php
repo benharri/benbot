@@ -16,6 +16,7 @@ include __DIR__.'/util_fns.php';
 $starttime = new DateTime();
 $defs = new Definitions();
 $imgs = new Definitions(__DIR__.'/img_urls.json');
+$cities = new Definitions(__DIR__.'/cities.json');
 
 $discord = new DiscordCommandClient([
     'token' => file_get_contents(__DIR__.'/token'),
@@ -218,17 +219,44 @@ $discord->registerCommand('dank', function($msg) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('weather', function($msg, $args) {
+$weather = $discord->registerCommand('weather', function($msg, $args) use ($cities) {
     $api_key = file_get_contents(__DIR__.'/weather_api_key');
-    $query = implode("%20", $args);
-    $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
-    print_r($json);
-    $ret = "it's {$json->main->temp}°C in {$json->name}";
+    $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric";
+    if (count($args) == 0) {
+        if ($cities->get($msg->author->id, true)) {
+            $url .= "&id={$cities->get($msg->author->id)}";
+        } else {
+            $msg->reply("you can set your preferred city with `;weather save <city>`");
+            return;
+        }
+    } else {
+        $query = implode("%20", $args);
+        $url .= "&q=$query";
+    }
+    $json = json_decode(file_get_contents($url));
+    // print_r($json);
+    $fahr = $json->main->temp * 5 / 9 + 32;
+    $ret = "it's {$json->main->temp}°C ($fahr°F) in {$json->name}";
     $msg->reply($ret);
 }, [
     'description' => 'gets weather for a location',
     'usage' => '<location>',
 ]);
+
+
+    $weather->registerSubCommand('save', function($msg, $args) use ($cities) {
+        $api_key = file_get_contents(__DIR__.'/weather_api_key');
+        $query = implode("%20", $args);
+        $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
+        print_r($json);
+        $cities->set($msg->author->id, $json->id);
+        $fahr = $json->main->temp * 5 / 9 + 32;
+        $ret = "it's {$json->main->temp}°C ($fahr°F) in {$json->name}.\n\n{$json->name} saved as your preferred city.";
+        $msg->reply($ret);
+    }, [
+        'description' => 'saves your favorite city',
+        'usage' => '<location>',
+    ])
 
 
 
