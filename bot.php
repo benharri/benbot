@@ -256,7 +256,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
     }, [
         'description' => 'saves your favorite city',
         'usage' => '<location>',
-    ])
+    ]);
 
 
 
