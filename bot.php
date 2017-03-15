@@ -31,17 +31,19 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
     $discord->updatePresence($game);
 
     $discord->on('message', function($msg, $args) use ($defs, $imgs) {
-        $gen = char_in($msg->content);
+        $text = $msg->content;
+        $gen = char_in($text);
         $first_char = $gen->current();
+
         if ($first_char == ';') {
-            $gen->next();
-            for ($qu = ""; $gen->current() != " " && $gen->valid(); $gen->next())
+            for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next())
                 $qu .= $gen->current();
             $qu = strtolower($qu);
             if ($defs->get($qu, true))
-                send($msg, "$qu: " . $defs->get($qu));
+                send($msg, "**$qu**: " . $defs->get($qu));
             if ($imgs->get($qu, true))
-                send($msg, "$qu: " . $imgs->get($qu));
+                send($msg, "**$qu**: " . $imgs->get($qu));
+
         }
     });
 });
@@ -180,7 +182,7 @@ $discord->registerCommand('set', function($msg, $args) use ($defs) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($msg, $args) use ($defs) {
-    if (isset($args[0])) send($msg, $args[0] . ": " . $defs->get(strtolower($args[0])));
+    if (isset($args[0])) send($msg, "**" . $args[0] . "**: " . $defs->get(strtolower($args[0])));
     else send($msg, "can't search for nothing");
 }, [
     'description' => 'gets a value from the definitions',
@@ -460,20 +462,20 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     ],
 ]);
 
-    // $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
-    //     if (count($msg->attachments) > 0) {
-    //         foreach ($msg->attachments as $attachment) {
-    //             $pic = file_get_contents($attachment->url);
-    //             $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
-    //             $filename = __DIR__.'/uploaded_images/';
-    //             $filename .= isset($args[0]) ? $args[0].".$ext" : $attachment->filename;
-    //             file_put_contents($filename, $pic);
-    //         }
-    //     } else send($msg, "no image to save");
-    // }, [
-    //     'description' => 'image tools',
-    //     'usage' => '<save as>',
-    // ]);
+    $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
+        if (count($msg->attachments) > 0) {
+            foreach ($msg->attachments as $attachment) {
+                $pic = file_get_contents($attachment->url);
+                $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
+                $filename = __DIR__.'/uploaded_images/';
+                $filename .= isset($args[0]) ? $args[0].".$ext" : $attachment->filename;
+                file_put_contents($filename, $pic);
+            }
+        } else send($msg, "no image to save");
+    }, [
+        'description' => 'image tools',
+        'usage' => '<save as>',
+    ]);
 
     $img->registerSubCommand('save', function($msg, $args) use ($imgs) {
         if (count($msg->attachments) > 0) {
@@ -509,10 +511,12 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 
     $img->registerSubCommand('asciiart', function($msg, $args) {
         if (count($msg->attachments) > 0) {
+            print_r($msg->attachments);
             $imgpath = $msg->attachments[0]->url;
         } else {
             $imgpath = $msg->author->user->avatar;
         }
+        echo $imgpath, PHP_EOL;
         send($msg, "```" . ascii_from_img($imgpath) . "```");
     }, [
         'description' => 'converts image to ascii art',
@@ -525,9 +529,9 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     $qu = strtolower($args[0]);
     if ($defs->get($qu, true))
-        send($msg, "$qu: " . $defs->get($qu));
+        send($msg, "**$qu**: " . $defs->get($qu));
     if ($imgs->get($qu, true))
-        send($msg, "$qu: " . $imgs->get($qu));
+        send($msg, "**$qu**: " . $imgs->get($qu));
 }, [
     'description' => 'looks up def or img',
     'usage' => '<def or img name>',

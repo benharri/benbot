@@ -36,9 +36,9 @@ class Definitions {
     }
 
     public function print() {
-        $ret = "";
+        $ret = [];
         foreach ($this->defs as $key => $val)
-            $ret .= $key . ": " . $val . "\n";
-        return $ret;
+            $ret[] = $key . ": " . $val;
+        return implode(", ", $ret);
     }
 }
