@@ -220,9 +220,11 @@ $discord->registerCommand('dank', function($msg) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('weather', function($msg, $args) {
     $api_key = file_get_contents(__DIR__.'/weather_api_key');
-    $query = implode(" ", $args);
-    $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={Marquette}&APPID=$api_key"));
-
+    $query = implode("%20", $args);
+    $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
+    print_r($json);
+    $ret = "it's {$json->main->temp}°C in {$json->name}";
+    $msg->reply($ret);
 }, [
     'description' => 'gets weather for a location',
     'usage' => '<location>',
