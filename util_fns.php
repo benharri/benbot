@@ -71,19 +71,19 @@ class Cleverbot_IO {
             ],
         ]);
 
-        $response = $this->client->request('POST', 'create', [
-            'form_params' => [
-                'user' => $this->user,
-                'key'  => $this->key,
-                'nick' => $this->nick,
-            ],
-        ]);
-        $json = json_decode($response->getBody());
-        if ($json->status == "success"){
-            $this->nick = $json->nick;
-            echo $this->nick, PHP_EOL;
-        }
-        else print_r($json);
+        // $response = $this->client->request('POST', 'create', [
+        //     'form_params' => [
+        //         'user' => $this->user,
+        //         'key'  => $this->key,
+        //         'nick' => $this->nick,
+        //     ],
+        // ]);
+        // $json = json_decode($response->getBody());
+        // if ($json->status == "success"){
+        //     $this->nick = $json->nick;
+        //     echo $this->nick, PHP_EOL;
+        // }
+        // else print_r($json);
     }
 
     public function ask($query) {
@@ -91,7 +91,7 @@ class Cleverbot_IO {
             'form_params' => [
                 'user' => $this->user,
                 'key'  => $this->key,
-                'nick' => $this->nick,
+                'nick' => 'jCXKoMm1',
                 'text' => $query,
             ],
         ]);
