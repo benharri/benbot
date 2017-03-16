@@ -49,7 +49,7 @@ EOD;
     return $ret;
 }
 
-function create_cleverbot_instance($nick) {
+function create_cleverbot_instance($nick = "benbot") {
     $json = json_decode(file_get_contents("https://cleverbot.io/1.0/create", false, stream_context_create([
         'http' => [
             'method' => 'POST',
@@ -57,7 +57,6 @@ function create_cleverbot_instance($nick) {
                 'Accept: */*',
                 'content-type: application/x-www-form-urlencoded',
                 'accept-encoding: gzip, deflate',
-                'content-length: 70',
             ],
             'content' => http_build_query([
                 'user' => file_get_contents(__DIR__.'/cleverbot.io.user'),
