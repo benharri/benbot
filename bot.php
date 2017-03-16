@@ -60,6 +60,10 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
                 echo $qu, ": ", $imgfile, PHP_EOL;
                 $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
             }
+        } else {
+            if (is_dm($msg)) {
+                send($msg, query_cleverbot($msg->content));
+            }
         }
     });
 
