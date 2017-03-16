@@ -60,10 +60,8 @@ class Cleverbot_IO {
     var $client;
 
     public function __construct($nick = "benbot") {
-        $this->user = file_get_contents(__DIR__.'/cleverbot.io.user');
-        echo $this->user, PHP_EOL;
-        $this->key = file_get_contents(__DIR__.'/cleverbot.io.api_key');
-        echo $this->key, PHP_EOL;
+        $this->user = get_thing('cleverbotuser');
+        $this->key = get_thing('cleverbotkey');
         $this->client = new GuzzleHttp\Client([
             'base_uri' => self::API_URL,
             'headers' => [
@@ -81,6 +79,7 @@ class Cleverbot_IO {
             ],
         ]);
         $json = json_decode($response->getBody());
+        print_r($json);
         if ($json->status == "success")
             $this->nick = $json->nick;
         else print_r($response);
@@ -96,6 +95,7 @@ class Cleverbot_IO {
             ],
         ]);
         $json = json_decode($response->getBody());
+        print_r($json);
         if ($json->status == "success")
             return $json->response;
         else print_r($response);
