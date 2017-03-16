@@ -4,6 +4,8 @@ vendor/
 token
 phone_number
 weather_api_key
+cleverbot.io.user
+cleverbot.io.api_key
 
 bot.out
 *.json
