@@ -38,6 +38,13 @@ function ascii_from_img($filepath) {
 }
 
 
+function format_weather($json) {
+    $fahr = round($json->main->temp * 5 / 9 + 32);
+    $ret = <<<EOD
+it's {$json->main->temp}°C ({$fahr}°F) with {$json->weather[0]->description} in {$json->name}, {$json->sys->country}
+EOD;
+    return $ret;
+}
 
 
 

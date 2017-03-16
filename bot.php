@@ -92,11 +92,57 @@ $discord->registerCommand('hi', [
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('time', function($msg) {
-    send($msg, "It's " . date('g:i A \o\n F j, Y'));
+$time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
+    $url = "http://api.geonames.org/timezoneJSON?username=benharri";
+    if (count($args) == 0) {
+        // lookup the person's time or tell them to save their time
+        if ($cities->get($msg->author->id, true)) {
+            $ci = $cities->get($msg->author->id);
+            $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
+            $json = json_decode(file_get_contents($newurl));
+            send($msg, "It's " . date('g:i A \o\n F j, Y', strotime($json->time)) . " in {$ci["city"]}.");
+
+        } else {
+            send($msg, "It's " . date('g:i A \o\n F j, Y') . ' Eastern Time.\n You can set a preferred time zone with ;time save or ;weather save.');
+        }
+    } else {
+        if (count($msg->mentions) > 0) {
+            // if users are mentioned
+            foreach ($msg->mentions as $mention) {
+                if ($cities->get($mention->id, true)) {
+                    $ci = $cities->get($mention->id);
+                    $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
+                    $json = json_decode(file_get_contents($newurl));
+
+                    send($msg, "It's " . date('g:i A \o\n F j, Y', strotime($json->time)) . " in {$ci["city"]} (<@{$mention->id}>).");
+                }
+            }
+        } else {
+            // look up the time for whatever they requested
+
+        }
+    }
 }, [
-    'description' => 'current time'
+    'description' => 'current time',
+    'usage' => '<city|user>',
 ]);
+
+    $time->registerSubCommand('save', function($msg, $args) use ($cities) {
+        $api_key = file_get_contents(__DIR__.'/weather_api_key');
+        $query = implode("%20", $args);
+        $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
+
+        $cities->set($msg->author->id, [
+            'id'   => $json->id,
+            'lat'  => $json->coord->lat,
+            'lon'  => $json->coord->lon,
+            'city' => $json->name,
+        ]);
+        $msg->reply("your preferred city has been set to {$json->name}");
+    }, [
+        'description' => 'saves a preferred city to use with ;weather and ;time',
+        'usage' => '<city>',
+    ]);
 
 
 ///////////////////////////////////////////////////////////
@@ -221,23 +267,19 @@ $discord->registerCommand('dank', function($msg) {
 ///////////////////////////////////////////////////////////
 $weather = $discord->registerCommand('weather', function($msg, $args) use ($cities) {
     $api_key = file_get_contents(__DIR__.'/weather_api_key');
-    $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric";
+    $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric&";
     if (count($args) == 0) {
         if ($cities->get($msg->author->id, true)) {
-            $url .= "&id={$cities->get($msg->author->id)}";
+            $url .= "id={$cities->get($msg->author->id)->id}";
         } else {
             $msg->reply("you can set your preferred city with `;weather save <city>`");
             return;
         }
     } else {
         $query = implode("%20", $args);
-        $url .= "&q=$query";
+        $url .= "q=$query";
     }
-    $json = json_decode(file_get_contents($url));
-    // print_r($json);
-    $fahr = $json->main->temp * 5 / 9 + 32;
-    $ret = "it's {$json->main->temp}°C ({$fahr}°F) in {$json->name}";
-    $msg->reply($ret);
+    $msg->reply(format_weather(json_decode(file_get_contents($url))));
 }, [
     'description' => 'gets weather for a location',
     'usage' => '<location>',
@@ -248,11 +290,14 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
         $api_key = file_get_contents(__DIR__.'/weather_api_key');
         $query = implode("%20", $args);
         $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
-        print_r($json);
-        $cities->set($msg->author->id, $json->id);
-        $fahr = $json->main->temp * 5 / 9 + 32;
-        $ret = "it's {$json->main->temp}°C ({$fahr}°F) in {$json->name}.\n\n{$json->name} saved as your preferred city.";
-        $msg->reply($ret);
+
+        $cities->set($msg->author->id, [
+            'id'   => $json->id,
+            'lat'  => $json->coord->lat,
+            'lon'  => $json->coord->lon,
+            'city' => $json->name,
+        ]);
+        $msg->reply(format_weather($json));
     }, [
         'description' => 'saves your favorite city',
         'usage' => '<location>',

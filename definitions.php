@@ -41,4 +41,11 @@ class Definitions {
             $ret[] = $key . ": " . $val;
         return implode(", ", $ret);
     }
+
+    public function iter() {
+        foreach ($this->defs as $key => $val)
+            yield $key => $val;
+    }
+
+
 }
