@@ -85,10 +85,13 @@ function query_cleverbot($query) {
                 'Accept: */*',
                 'content-type: application/x-www-form-urlencoded',
                 'accept-encoding: gzip, deflate',
-                'content-length: 70',
             ],
-            'content' => "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user') .
-                         "&key="  . file_get_contents(__DIR__.'/cleverbot.io.api_key') . "&nick=benbot&text=$query",
+            'content' => http_build_query([
+                'user' => file_get_contents(__DIR__.'/cleverbot.io.user'),
+                'key'  => file_get_contents(__DIR__.'/cleverbot.io.api_key'),
+                'nick' => 'benbot',
+                'text' => $query,
+            ]),
         ]
     ])));
     return $json->response;
