@@ -18,6 +18,7 @@ $discord = new DiscordCommandClient([
     'prefix'             => ';',
     'defaultHelpCommand' => false,
     'name'               => 'benbot',
+    'loggerLevel'        => 'DEBUG',
     'discordOptions'     => [
         'pmChannels' => true,
     ],
@@ -541,7 +542,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs, $disco
     // look for image in uploaded_images
     if ($imgs->get($qu, true)) {
         $imgfile = $imgs->get($qu);
-        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu)->then(function($m) use ($discord) {
+        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu)->then(function($m) use ($discord, $imgfile) {
             // echo "sent", PHP_EOL;
             $discord->logger->info("$imgfile sent");
         }, function ($e) use ($discord) {
