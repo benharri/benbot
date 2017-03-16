@@ -639,17 +639,18 @@ $discord->registerAlias('Img', 'img');
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
-    $qu = strtolower($args[0]);
-    if ($defs->get($qu, true))
-        send($msg, "**$qu**: " . $defs->get($qu));
-    if ($imgs->get($qu, true)) {
-        $imgfile = $imgs->get($qu);
-        echo $qu, ": ", $imgfile, PHP_EOL;
-        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
-    }
+    $msg->reply($cleverbot->ask(implode(" ", $args)));
+    // $qu = strtolower($args[0]);
+    // if ($defs->get($qu, true))
+    //     send($msg, "**$qu**: " . $defs->get($qu));
+    // if ($imgs->get($qu, true)) {
+    //     $imgfile = $imgs->get($qu);
+    //     echo $qu, ": ", $imgfile, PHP_EOL;
+    //     $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+    // }
 }, [
-    'description' => 'looks up def or img',
-    'usage' => '<def or img name>',
+    'description' => 'talk to ben',
+    'usage' => '<msg>',
 ]);
 
 
