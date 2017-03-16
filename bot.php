@@ -18,9 +18,9 @@ $discord = new DiscordCommandClient([
     'prefix'             => ';',
     'defaultHelpCommand' => false,
     'name'               => 'benbot',
-    'loggerLevel'        => 'DEBUG',
     'discordOptions'     => [
-        'pmChannels' => true,
+        'loggerLevel' => 'DEBUG',
+        'pmChannels'  => true,
     ],
 ]);
 
