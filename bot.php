@@ -7,31 +7,41 @@
 include __DIR__.'/vendor/autoload.php';
 use Discord\DiscordCommandClient;
 use Discord\Parts\User\Game;
-use Discord\Parts\Channel\Embed;
+use Discord\Parts\Embed\Embed;
+use Discord\Parts\Embed\Author;
+use Discord\Parts\Embed\Image;
+use Discord\Parts\Embed\Footer;
+
+
+$discord = new DiscordCommandClient([
+    'token' => file_get_contents(__DIR__.'/token'),
+    'prefix' => ';',
+    'defaultHelpCommand' => false,
+    'name' => 'benbot',
+]);
 
 include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
 
 $starttime = new DateTime();
-$defs = new Definitions();
+$defs = new Definitions(__DIR__.'/definitions.json');
 $imgs = new Definitions(__DIR__.'/img_urls.json');
 $cities = new Definitions(__DIR__.'/cities.json');
+$help = [];
 
-$discord = new DiscordCommandClient([
-    'token' => file_get_contents(__DIR__.'/token'),
-    'prefix' => ';',
-    'description' => "benh's bot made with DiscordPHP. avatar by hirose.",
-]);
 
 $game = $discord->factory(Game::class, [
     'name' => ';help',
 ]);
 
+
 $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
     $discord->updatePresence($game);
 
+
     $discord->on('message', function($msg, $args) use ($defs, $imgs) {
+        // for stuff that isn't a command
         $text = $msg->content;
         $gen = char_in($text);
         $first_char = $gen->current();
@@ -42,12 +52,16 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
             $qu = strtolower($qu);
             if ($defs->get($qu, true))
                 send($msg, "**$qu**: " . $defs->get($qu));
-            if ($imgs->get($qu, true))
-                send($msg, "**$qu**: " . $imgs->get($qu));
-
+            if ($imgs->get($qu, true)) {
+                $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img.jpg', $qu);
+            }
+            // if ($imgs->get($qu, true))
+                // send($msg, "**$qu**: " . $imgs->get($qu));
         }
     });
+
 });
+
 
 
 
@@ -56,38 +70,41 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
 ///////////////////////////////////////////////////////////
 
 
-///////////////////////////////////////////////////////////
-$discord->registerCommand('ping', function($msg) {
-    send($msg, 'pong');
-}, [
-    'description' => 'ping pong',
-    'usage' => '',
-]);
 
-///////////////////////////////////////////////////////////
-$discord->registerCommand('ding', function($msg, $args) {
-    send($msg, 'dong');
-}, [
-    'description' => 'dong',
-    'usage' => '',
-]);
 
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('hi', [
     'hey',
     'hello',
-    'wussup'
+    'wussup',
+    'soup',
 ], [
     'description' => 'greeting',
     'usage' => '',
-    'aliases' => [
-        'hello',
-        'sup',
-    ],
 ]);
+$discord->registerAlias('Hi', 'hi');
+$discord->registerAlias('Hello', 'hi');
+$discord->registerAlias('hello', 'hi');
 
 
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('embed', function($msg, $args) use ($discord) {
+    $embed = $discord->factory(Embed::class, [
+        'title'     => 'test',
+        'url'       => 'http://google.com',
+        'image'     => $discord->factory(Image::class, ['url' => __DIR__.'/img/bamboozled.jpg']),
+        'thumbnail' => $discord->factory(Image::class, ['url' => __DIR__.'/img/bamboozled.jpg']),
+        'author'    => $discord->factory(Author::class, ['name' => 'Ben']),
+        'footer'    => $discord->factory(Footer::class, ['text' => 'footer']),
+    ]);
+    $msg->channel->sendMessage('embed', false, $embed);
+}, [
+    'description' => 'non',
+    'usage' => '',
+]);
 
 
 
@@ -99,11 +116,13 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
         if ($cities->get($msg->author->id, true)) {
             $ci = $cities->get($msg->author->id);
             $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
+
             $json = json_decode(file_get_contents($newurl));
-            send($msg, "It's " . date('g:i A \o\n F j, Y', strotime($json->time)) . " in {$ci["city"]}.");
+            $jtime = strtotime($json->time);
+            send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$ci["city"]}.");
 
         } else {
-            send($msg, "It's " . date('g:i A \o\n F j, Y') . ' Eastern Time.\n You can set a preferred time zone with ;time save or ;weather save.');
+            send($msg, "It's " . date('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nset a preferred city with `;time save city` or `;weather save.`");
         }
     } else {
         if (count($msg->mentions) > 0) {
@@ -113,8 +132,10 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
                     $ci = $cities->get($mention->id);
                     $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
                     $json = json_decode(file_get_contents($newurl));
-
-                    send($msg, "It's " . date('g:i A \o\n F j, Y', strotime($json->time)) . " in {$ci["city"]} (<@{$mention->id}>).");
+                    $jtime = strtotime($json->time);
+                    send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$ci["city"]} (<@{$mention->id}>).");
+                } else {
+                    send($msg, "No city found for <@{$mention->id}>.\nset a preferred city with `;time save city` or `;weather save city`");
                 }
             }
         } else {
@@ -123,25 +144,124 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
         }
     }
 }, [
-    'description' => 'current time',
-    'usage' => '<city|user>',
+    'description' => 'looks up current time for a city, other user or yourself',
+    'usage' => '<city|@user>',
 ]);
+register_help('time');
+$discord->registerAlias('Time', 'time');
+
 
     $time->registerSubCommand('save', function($msg, $args) use ($cities) {
         $api_key = file_get_contents(__DIR__.'/weather_api_key');
         $query = implode("%20", $args);
         $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
 
-        $cities->set($msg->author->id, [
-            'id'   => $json->id,
-            'lat'  => $json->coord->lat,
-            'lon'  => $json->coord->lon,
-            'city' => $json->name,
-        ]);
-        $msg->reply("your preferred city has been set to {$json->name}");
+        if (count($msg->mentions) > 0) {
+            $ret = "the preferred city for ";
+            foreach ($msg->mentions as $mention) {
+                $cities->set($mention->id, [
+                    'id'   => $json->id,
+                    'lat'  => $json->coord->lat,
+                    'lon'  => $json->coord->lon,
+                    'city' => $json->name,
+                ]);
+                $mentions[] = "<@{$mention->id}>";
+            }
+            $ret .= implode(", ", $mentions);
+            $ret .= " has been set to {$json->name}";
+            send($msg, $ret);
+        } else {
+            $cities->set($msg->author->id, [
+                'id'   => $json->id,
+                'lat'  => $json->coord->lat,
+                'lon'  => $json->coord->lon,
+                'city' => $json->name,
+            ]);
+            $msg->reply("your preferred city has been set to {$json->name}");
+        }
     }, [
         'description' => 'saves a preferred city to use with ;weather and ;time',
         'usage' => '<city>',
+    ]);
+
+
+///////////////////////////////////////////////////////////
+$weather = $discord->registerCommand('weather', function($msg, $args) use ($cities) {
+    $api_key = file_get_contents(__DIR__.'/weather_api_key');
+    $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric&";
+    if (count($args) == 0) {
+        // look up for your saved city
+        if ($cities->get($msg->author->id, true)) {
+            $url .= "id=" . $cities->get($msg->author->id)["id"];
+            echo $url, PHP_EOL;
+            $json = json_decode(file_get_contents($url));
+            print_r($json);
+            $msg->reply(format_weather($json));
+        } else {
+            $msg->reply("you can set your preferred city with `;weather save <city>`");
+            return;
+        }
+    } else {
+        if (count($msg->mentions) > 0) {
+            // look up for another person
+            foreach ($msg->mentions as $mention) {
+                if ($cities->get($mention->id, true)) {
+                    $url .= "id=" . $cities->get($mention->id)["id"];
+                    echo $url, PHP_EOL;
+                    $json = json_decode(file_get_contents($url));
+                    print_r($json);
+                    send($msg, format_weather($json));
+                } else {
+                    // mentioned user not found
+                    send($msg, "no preferred city found for <@{$mention->id}>.\nset a preferred city with `;weather save city <@{$mention->id}>`.");
+                }
+            }
+        } else {
+            // look up any city
+            $query = implode("%20", $args);
+            $url .= "q=$query";
+            $msg->reply(format_weather(json_decode(file_get_contents($url))));
+        }
+    }
+}, [
+    'description' => 'looks up weather for a city, other user, or yourself',
+    'usage' => '<city|@user>',
+]);
+register_help('weather');
+$discord->registerAlias('Weather', 'weather');
+
+
+    $weather->registerSubCommand('save', function($msg, $args) use ($cities) {
+        $api_key = file_get_contents(__DIR__.'/weather_api_key');
+        $query = implode("%20", $args);
+        $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
+
+        if (count($msg->mentions) > 0) {
+            $ret = "the preferred city for ";
+            foreach ($msg->mentions as $mention) {
+                $cities->set($mention->id, [
+                    'id'   => $json->id,
+                    'lat'  => $json->coord->lat,
+                    'lon'  => $json->coord->lon,
+                    'city' => $json->name,
+                ]);
+                $mentions[] = "<@{$mention->id}>";
+            }
+            $ret .= implode(", ", $mentions);
+            $ret .= " has been set to {$json->name}";
+            send($msg, $ret);
+        } else {
+            $cities->set($msg->author->id, [
+                'id'   => $json->id,
+                'lat'  => $json->coord->lat,
+                'lon'  => $json->coord->lon,
+                'city' => $json->name,
+            ]);
+            $msg->reply("your preferred city has been set to {$json->name}");
+        }
+    }, [
+        'description' => 'saves your favorite city',
+        'usage' => '<location>',
     ]);
 
 
@@ -152,6 +272,8 @@ $discord->registerCommand('roll', function ($msg, $args) {
     'description' => 'rolls an n-sided die. defaults to 6.',
     'usage' => '<number of sides>',
 ]);
+register_help('roll');
+$discord->registerAlias('Roll', 'roll');
 
 
 ///////////////////////////////////////////////////////////
@@ -173,6 +295,9 @@ $discord->registerCommand('text_benh', function($msg, $args) {
     'description' => 'text a message to benh',
     'usage' => '<message>',
 ]);
+register_help('text_benh');
+$discord->registerAlias('Text_benh', 'text_benh');
+
 
 
 ///////////////////////////////////////////////////////////
@@ -187,6 +312,9 @@ $discord->registerCommand('avatar', function($msg, $args) {
     'description' => 'gets the avatar for a user',
     'usage' => '<@user>',
 ]);
+register_help('avatar');
+$discord->registerAlias('Avatar', 'avatar');
+
 
 
 ///////////////////////////////////////////////////////////
@@ -202,6 +330,8 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime) {
     'description' => 'bot uptime',
     'usage' => '',
 ]);
+$discord->registerAlias('Up', 'up');
+
 
 
 ///////////////////////////////////////////////////////////
@@ -211,6 +341,7 @@ $discord->registerCommand('say', function($msg, $args) {
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
 ]);
+$discord->registerAlias('Say', 'say');
 
 
 
@@ -227,14 +358,18 @@ $discord->registerCommand('set', function($msg, $args) use ($defs) {
     'description' => 'sets this to that',
     'usage' => '<this> <that>',
 ]);
+register_help('set');
+$discord->registerAlias('Set', 'set');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($msg, $args) use ($defs) {
     if (isset($args[0])) send($msg, "**" . $args[0] . "**: " . $defs->get(strtolower($args[0])));
     else send($msg, "can't search for nothing");
 }, [
-    'description' => 'gets a value from the definitions',
+    'description' => 'gets a value from the definitions. you can also omit get (;<thing to get>)',
     'usage' => '<thing to get>',
 ]);
+register_help('get');
+$discord->registerAlias('Get', 'get');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('unset', function($msg, $args) use ($defs) {
     $defs->unset(strtolower($args[0]));
@@ -243,93 +378,17 @@ $discord->registerCommand('unset', function($msg, $args) use ($defs) {
     'description' => 'removes a definition',
     'usage' => '<def to remove>',
 ]);
-///////////////////////////////////////////////////////////
-$discord->registerCommand('listdefs', function($msg, $args) use ($defs) {
-    send($msg, "**definitions**:\n\n" . $defs->print());
-}, [
-    'description' => 'lists all definitions',
-    'usage' => '',
-]);
-
-
-
-
-///////////////////////////////////////////////////////////
-$discord->registerCommand('dank', function($msg) {
-    send($msg, 'memes');
-});
+register_help('unset');
+$discord->registerAlias('Unset', 'unset');
 
 
 
 
 
 
-///////////////////////////////////////////////////////////
-$weather = $discord->registerCommand('weather', function($msg, $args) use ($cities) {
-    $api_key = file_get_contents(__DIR__.'/weather_api_key');
-    $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric&";
-    if (count($args) == 0) {
-        if ($cities->get($msg->author->id, true)) {
-            $url .= "id={$cities->get($msg->author->id)->id}";
-        } else {
-            $msg->reply("you can set your preferred city with `;weather save <city>`");
-            return;
-        }
-    } else {
-        $query = implode("%20", $args);
-        $url .= "q=$query";
-    }
-    $msg->reply(format_weather(json_decode(file_get_contents($url))));
-}, [
-    'description' => 'gets weather for a location',
-    'usage' => '<location>',
-]);
-
-
-    $weather->registerSubCommand('save', function($msg, $args) use ($cities) {
-        $api_key = file_get_contents(__DIR__.'/weather_api_key');
-        $query = implode("%20", $args);
-        $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
-
-        $cities->set($msg->author->id, [
-            'id'   => $json->id,
-            'lat'  => $json->coord->lat,
-            'lon'  => $json->coord->lon,
-            'city' => $json->name,
-        ]);
-        $msg->reply(format_weather($json));
-    }, [
-        'description' => 'saves your favorite city',
-        'usage' => '<location>',
-    ]);
 
 
 
-
-
-
-$fortunes = [
-    "It is certain",
-    "It is decidedly so",
-    "Without a doubt",
-    "Yes definitely",
-    "You may rely on it",
-    "As I see it, yes",
-    "Most likely",
-    "Outlook good",
-    "Yes",
-    "Signs point to yes",
-    "Reply hazy try again",
-    "Ask again later",
-    "Better not tell you now",
-    "Cannot predict now",
-    "Concentrate and ask again",
-    "Don't count on it",
-    "My reply is no",
-    "My sources say no",
-    "Outlook not so good",
-    "Very doubtful",
-];
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('8ball', function($msg, $args) use ($fortunes) {
@@ -341,6 +400,7 @@ $discord->registerCommand('8ball', function($msg, $args) use ($fortunes) {
     'description' => 'tells your fortune',
     'usage' => '<question to ask the mighty 8ball>',
 ]);
+register_help('8ball');
 
 
 
@@ -353,6 +413,7 @@ $discord->registerCommand('lenny', function($msg, $args) {
     'description' => 'you should know what this does',
     'usage' => '',
 ]);
+$discord->registerAlias('Lenny', 'lenny');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lennies', function($msg, $args) use ($lennyception) {
     send($msg, $lennyception);
@@ -360,6 +421,7 @@ $discord->registerCommand('lennies', function($msg, $args) use ($lennyception) {
     'description' => '( ͡° ͜ʖ ͡°)',
     'usage' => '',
 ]);
+$discord->registerAlias('Lennies', 'lennies');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('shrug', function($msg, $args) {
     send($msg, "¯\\\_(ツ)\_/¯");
@@ -367,6 +429,7 @@ $discord->registerCommand('shrug', function($msg, $args) {
     'description' => 'meh',
     'usage' => '',
 ]);
+$discord->registerAlias('Shrug', 'shrug');
 
 
 ///////////////////////////////////////////////////////////
@@ -376,6 +439,9 @@ $kaomoji = $discord->registerCommand('kaomoji', function($msg, $args) use ($kaom
     'description' => 'sends random kaomoji',
     'usage' => '',
 ]);
+// register_help('kaomoji');
+$discord->registerAlias('Kaomoji', 'kaomoji');
+
 
     $kaomoji->registerSubCommand('sad', function($msg, $args) use($sad_kaomojis) {
         send($msg, $sad_kaomojis[array_rand($sad_kaomojis)]);
@@ -428,6 +494,9 @@ $joke = $discord->registerCommand('joke', function($msg, $args) {
         'Joke',
     ],
 ]);
+register_help('joke');
+$discord->registerAlias('Joke', 'joke');
+
 
     $joke->registerSubCommand('chucknorris', function($msg, $args) {
         $json = json_decode(file_get_contents("http://api.icndb.com/jokes/random1"));
@@ -446,34 +515,18 @@ $joke = $discord->registerCommand('joke', function($msg, $args) {
     ]);
 
     $joke->registerSubCommand('dad', function($msg, $args) {
-        $opts = [
+        send($msg, file_get_contents("https://icanhazdadjoke.com/", false, stream_context_create([
             'http' => [
                 'method' => 'GET',
                 'header' => 'Accept: text/plain'
             ]
-        ];
-        $context = stream_context_create($opts);
-        send($msg, file_get_contents("https://icanhazdadjoke.com/", false, $context));
+        ])));
     }, [
         'description' => 'tells a dad joke',
         'usage' => '',
     ]);
 
 
-///////////////////////////////////////////////////////////
-$discord->registerCommand('text', function($msg, $args) {
-    $pain = str_split("！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ");
-    $res = "";
-    foreach (char_in(implode(" ", $args)) as $char) {
-        $ord = ord($char);
-        if ($ord > 32 && $ord < 124) $res .= $pain[$ord - 33];
-        else $res .= $char;
-    }
-    send($msg, "$res");
-}, [
-    'description' => 'convert ASCII to Unicode for font effect',
-    'usage' => '<text to convert>',
-]);
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('block', function($msg, $args) {
@@ -498,65 +551,59 @@ $discord->registerCommand('block', function($msg, $args) {
     }
     send($msg, $ret);
 }, [
-    'description' => 'block text',
+    'description' => 'turn a message into block text',
     'usage' => '<msg>',
 ]);
-
-
-
-///////////////////////////////////////////////////////////
-$discord->registerCommand('meme', function($msg, $args) {
-    send($msg, 'dank');
-}, [
-    'description' => 'get a meme',
-    'usage' => '',
-]);
+register_help('block');
+$discord->registerAlias('Block', 'block');
 
 
 
 ///////////////////////////////////////////////////////////
 $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
+    $qu = strtolower($args[0]);
     if (count($args) > 0) {
         // look for image in uploaded_images
-        send($msg, $imgs->get($args[0]))->then(function($reason) { echo "link sent", PHP_EOL; });
-        $msg->channel->sendFile($imgs->get($args[0]), 'img.jpg')->then(function ($reason) {
-            echo $reason, PHP_EOL;
-        })->otherwise(function($reason) {
-            echo $reason, PHP_EOL;
-        });
+        if ($imgs->get($qu, true)) {
+            $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img.jpg', $qu);
+        }
+        // send($msg, $imgs->get($args[0]));
     } else {
         return;
     }
 }, [
-    'description' => 'image tools',
+    'description' => 'image tools (;help img for more info)',
     'usage' => '<image to show>',
-    'aliases' => [
-        'Img',
-        'image',
-        'Image',
-    ],
 ]);
+register_help('img');
+$discord->registerAlias('Img', 'img');
 
-    $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
-        if (count($msg->attachments) > 0) {
-            foreach ($msg->attachments as $attachment) {
-                $pic = file_get_contents($attachment->url);
-                $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
-                $filename = __DIR__.'/uploaded_images/';
-                $filename .= isset($args[0]) ? $args[0].".$ext" : $attachment->filename;
-                file_put_contents($filename, $pic);
-            }
-        } else send($msg, "no image to save");
-    }, [
-        'description' => 'image tools',
-        'usage' => '<save as>',
-    ]);
+    // $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
+    //     if (count($msg->attachments) > 0) {
+    //         foreach ($msg->attachments as $attachment) {
+    //             $pic = file_get_contents($attachment->url);
+    //             $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
+    //             $filename = __DIR__.'/uploaded_images/';
+    //             $filename .= isset($args[0]) ? $args[0].".$ext" : $attachment->filename;
+    //             file_put_contents($filename, $pic);
+    //         }
+    //     } else send($msg, "no image to save");
+    // }, [
+    //     'description' => 'image tools',
+    //     'usage' => '<save as>',
+    // ]);
 
     $img->registerSubCommand('save', function($msg, $args) use ($imgs) {
+        if ($imgs->get($args[0], true)) {
+            send($msg, "img with this name already exists");
+            return;
+        }
         if (count($msg->attachments) > 0) {
-            $i = 0;
-            foreach ($msg->attachments as $attachment)
-                $imgs->set($args[$i++], $attachment->url);
+            foreach ($msg->attachments as $attachment) {
+                $imgs->set($args[0], $attachment->url);
+                file_put_contents(__DIR__."/uploaded_images/{$args[0]}", file_get_contents($attachment->url));
+            }
+
             send($msg, "image saved");
         } else send($msg, "no image to save");
     }, [
@@ -584,19 +631,19 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
         'usage' => '',
     ]);
 
-    $img->registerSubCommand('asciiart', function($msg, $args) {
-        if (count($msg->attachments) > 0) {
-            print_r($msg->attachments);
-            $imgpath = $msg->attachments[0]->url;
-        } else {
-            $imgpath = $msg->author->user->avatar;
-        }
-        echo $imgpath, PHP_EOL;
-        send($msg, "```" . ascii_from_img($imgpath) . "```");
-    }, [
-        'description' => 'converts image to ascii art',
-        'usage' => '<image>',
-    ]);
+    // $img->registerSubCommand('asciiart', function($msg, $args) {
+    //     if (count($msg->attachments) > 0) {
+    //         print_r($msg->attachments);
+    //         $imgpath = $msg->attachments[0]->url;
+    //     } else {
+    //         $imgpath = $msg->author->user->avatar;
+    //     }
+    //     echo $imgpath, PHP_EOL;
+    //     send($msg, "```" . ascii_from_img($imgpath) . "```");
+    // }, [
+    //     'description' => 'converts image to ascii art',
+    //     'usage' => '<image>',
+    // ]);
 
 
 ///////////////////////////////////////////////////////////
@@ -605,8 +652,11 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     $qu = strtolower($args[0]);
     if ($defs->get($qu, true))
         send($msg, "**$qu**: " . $defs->get($qu));
-    if ($imgs->get($qu, true))
-        send($msg, "**$qu**: " . $imgs->get($qu));
+    if ($imgs->get($qu, true)) {
+        $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img.jpg', $qu);
+    }
+    // if ($imgs->get($qu, true))
+        // send($msg, "**$qu**: " . $imgs->get($qu));
 }, [
     'description' => 'looks up def or img',
     'usage' => '<def or img name>',
@@ -628,8 +678,18 @@ $discord->registerCommand('bamboozle', function($msg, $args) {
     'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
     'usage' => '<user>(optional)',
 ]);
+$discord->registerAlias('Bamboozle', 'bamboozle');
 
 
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////
+// debugging commands
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
     var_dump($msg->author->user->id);
@@ -637,22 +697,48 @@ $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
         print_r($msg);
         send($msg, "debugging. check logs.");
     } else send($msg, "you're not allowed to use that command");
-}, [
-    'description' => 'debugging... only benh can use',
-    'usage' => '',
-]);
-
-
-
+});
+$discord->registerAlias('Dbg', 'dbg');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('sys', function($msg, $args) {
     if ($msg->author->user->id == "193011352275648514") {
         send($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
     } else send($msg, "you're not allowed to use that command");
-}, [
-    'description' => 'runs command on local shell... only benh can use',
-    'usage' => '<cmd>',
-]);
+});
+$discord->registerAlias('Sys', 'sys');
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
+    $ret = "```";
+    print_r($help);
+    if (count($args) == 1) {
+        if ($cmd = $discord->getCommand($args[0], true)) {
+            $ret .= $args[0] . " info\n\n";
+            $lookup_help = $cmd->getHelp(';');
+            $ret .= $lookup_help["text"];
+        } else {
+            $ret .= "command not found";
+        }
+    } else {
+        $ret .= "benbot - a bot made by benh. avatar by hirose.\n\n";
+        $ret .= implode("", $help);
+        $ret .= "\n;help <command> - get more information about a specific command";
+    }
+    $ret .= "```";
+    send($msg, $ret);
+});
+$discord->registerAlias('Help', 'help');
+
+
+
 
 
 

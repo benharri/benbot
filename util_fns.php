@@ -47,4 +47,10 @@ EOD;
 }
 
 
+function register_help($cmd_name) {
+    global $discord; global $help;
+    $help[$cmd_name] = $discord->getCommand($cmd_name)->getHelp(';')["text"];
+}
+
+
 

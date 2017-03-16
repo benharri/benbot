@@ -33,6 +33,14 @@ case "$1" in
             fi
             ;;
 
+	log)
+	    if [ "" != "$pid" ]; then
+		less bot.out
+	    else 
+		echo "bot not running"
+	    fi
+	    ;;
+
         restart)
             if [ "" != "$pid" ]; then
                 echo "killing bot ($pid)"
@@ -43,7 +51,7 @@ case "$1" in
 
 
         *)
-            echo $"Usage: $0 {start|nohup|stop|restart|status}"
+            echo $"Usage: $0 {start|nohup|stop|restart|log|status}"
             exit 1
 
 esac
