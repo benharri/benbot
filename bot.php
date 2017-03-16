@@ -51,12 +51,18 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
             $qu = strtolower($qu);
             if ($defs->get($qu, true))
                 send($msg, "**$qu**: " . $defs->get($qu));
-            if ($imgs->get($qu, true))
-                $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img', $qu);
+            if ($imgs->get($qu, true)) {
+                $imgfile = $imgs->get($qu);
+                echo $qu, ": ", $imgfile, PHP_EOL;
+                $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+            }
         }
     });
 
-    $discord->guilds->get('id','289410862907785216')->channels->get('id','289611811094003715')->sendMessage("<@193011352275648514>, bot started successfully");
+    $discord
+        ->guilds->get('id','289410862907785216')
+        ->channels->get('id','289611811094003715')
+        ->sendMessage("<@193011352275648514>, bot started successfully");
 });
 
 
@@ -78,7 +84,6 @@ $discord->registerCommand('hi', [
     'soup',
 ], [
     'description' => 'greeting',
-    'usage' => '',
 ]);
 $discord->registerAlias('Hi', 'hi');
 $discord->registerAlias('Hello', 'hi');
@@ -99,8 +104,7 @@ $discord->registerCommand('embed', function($msg, $args) use ($discord) {
     ]);
     $msg->channel->sendMessage('embed', false, $embed);
 }, [
-    'description' => 'non',
-    'usage' => '',
+    'description' => 'not working :(',
 ]);
 
 
@@ -325,7 +329,6 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime) {
     send($msg, $ret);
 }, [
     'description' => 'bot uptime',
-    'usage' => '',
 ]);
 $discord->registerAlias('Up', 'up');
 
@@ -408,7 +411,6 @@ $discord->registerCommand('lenny', function($msg, $args) {
     $channel->deleteMessages([$msg]);
 }, [
     'description' => 'you should know what this does',
-    'usage' => '',
 ]);
 $discord->registerAlias('Lenny', 'lenny');
 ///////////////////////////////////////////////////////////
@@ -416,7 +418,6 @@ $discord->registerCommand('lennies', function($msg, $args) use ($lennyception) {
     send($msg, $lennyception);
 }, [
     'description' => '( ͡° ͜ʖ ͡°)',
-    'usage' => '',
 ]);
 $discord->registerAlias('Lennies', 'lennies');
 ///////////////////////////////////////////////////////////
@@ -424,7 +425,6 @@ $discord->registerCommand('shrug', function($msg, $args) {
     send($msg, "¯\\\_(ツ)\_/¯");
 }, [
     'description' => 'meh',
-    'usage' => '',
 ]);
 $discord->registerAlias('Shrug', 'shrug');
 
@@ -535,14 +535,11 @@ $discord->registerAlias('Block', 'block');
 ///////////////////////////////////////////////////////////
 $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     $qu = strtolower($args[0]);
-    if (count($args) > 0) {
         // look for image in uploaded_images
-        if ($imgs->get($qu, true)) {
-            $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img', $qu);
-        }
-        // send($msg, $imgs->get($args[0]));
-    } else {
-        return;
+    if ($imgs->get($qu, true)) {
+        $imgfile = $imgs->get($qu);
+        echo $qu, ": ", $imgfile, PHP_EOL;
+        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
     }
 }, [
     'description' => 'image tools (;help img for more info)',
@@ -567,17 +564,19 @@ $discord->registerAlias('Img', 'img');
     // ]);
 
     $img->registerSubCommand('save', function($msg, $args) use ($imgs) {
-        if ($imgs->get($args[0], true)) {
+        $qu = strtolower($args[0]);
+        if ($imgs->get($qu, true)) {
             send($msg, "img with this name already exists");
             return;
         }
         if (count($msg->attachments) > 0) {
             foreach ($msg->attachments as $attachment) {
-                $imgs->set($args[0], $attachment->url);
-                file_put_contents(__DIR__."/uploaded_images/{$args[0]}", file_get_contents($attachment->url));
+                $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
+                $imgs->set($qu, "$qu.$ext");
+                file_put_contents(__DIR__."/uploaded_images/$qu.$ext", file_get_contents($attachment->url));
             }
 
-            send($msg, "image saved");
+            send($msg, "image saved as $qu");
         } else send($msg, "no image to save");
     }, [
         'description' => 'saves attached image as name',
@@ -594,14 +593,12 @@ $discord->registerAlias('Img', 'img');
     //     send($msg, "list of uploaded images:\n\n" . implode(", ", $ret));
     // }, [
     //     'description' => 'saved image list',
-    //     'usage' => '',
     // ]);
 
     $img->registerSubCommand('list', function($msg, $args) use ($imgs) {
         send($msg, "list of uploaded images:\n\n" . implode(", ", $imgs->list_keys()));
     }, [
         'description' => 'saved image list',
-        'usage' => '',
     ]);
 
     // $img->registerSubCommand('asciiart', function($msg, $args) {
@@ -625,8 +622,11 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     $qu = strtolower($args[0]);
     if ($defs->get($qu, true))
         send($msg, "**$qu**: " . $defs->get($qu));
-    if ($imgs->get($qu, true))
-        $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img', $qu);
+    if ($imgs->get($qu, true)) {
+        $imgfile = $imgs->get($qu);
+        echo $qu, ": ", $imgfile, PHP_EOL;
+        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+    }
 }, [
     'description' => 'looks up def or img',
     'usage' => '<def or img name>',
