@@ -70,7 +70,7 @@ class Cleverbot_IO {
             ],
         ]);
 
-        $request = $client->request('POST', 'create', [
+        $request = $this->client->request('POST', 'create', [
             'form_params' => [
                 'user' => $this->user,
                 'key'  => $this->key,
@@ -85,7 +85,7 @@ class Cleverbot_IO {
     }
 
     public function ask($query) {
-        $request = $client->request('POST', 'create', [
+        $request = $this->client->request('POST', 'create', [
             'form_params' => [
                 'user' => $this->user,
                 'key'  => $this->key,
