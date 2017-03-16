@@ -688,27 +688,24 @@ $discord->registerAlias('Sys', 'sys');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
     $ret = "```";
-    print_r($help);
     if (count($args) == 1) {
-        if ($cmd = $discord->getCommand($args[0], true)) {
-            $ret .= $args[0] . " info\n\n";
-            $lookup_help = $cmd->getHelp(';');
-            $ret .= $lookup_help["text"];
+        $qu = strtolower($args[0]);
+        if ($cmd = $discord->getCommand($qu, true)) {
+            $ret .= $qu . " info\n\n";
+            $ret .= $cmd->getHelp(';')["text"];
             $ret .= "```";
         } else {
-            $ret .= "command not found";
-            $ret .= "```";
+            $ret .= "$qu not found```";
         }
         send($msg, $ret);
     } else {
         $ret .= "benbot - a bot made by benh. avatar by hirose.\n\n";
         $ret .= implode("", $help);
-        $ret .= "\n;help <command> - get more information about a specific command";
-        $ret .= "```";
+        $ret .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
         $msg->author->user->sendMessage($ret);
         $msg->reply("check DMs!");
     }
-    // print_r($msg);
+    print_r($msg);
 });
 $discord->registerAlias('Help', 'help');
 
