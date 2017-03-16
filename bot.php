@@ -13,8 +13,9 @@ use Discord\Parts\Embed\Image;
 use Discord\Parts\Embed\Footer;
 
 
+include_once __DIR__.'/env_stuff.php';
 $discord = new DiscordCommandClient([
-    'token'              => file_get_contents(__DIR__.'/token'),
+    'token'              => get_thing('token'),
     'prefix'             => ';',
     'defaultHelpCommand' => false,
     'name'               => 'benbot',
@@ -166,7 +167,7 @@ $discord->registerAlias('Time', 'time');
 
 
     $time->registerSubCommand('save', function($msg, $args) use ($cities) {
-        $api_key = file_get_contents(__DIR__.'/weather_api_key');
+        $api_key = get_thing('weather_api_key');
         $query = implode("%20", $args);
         $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
 
@@ -201,7 +202,7 @@ $discord->registerAlias('Time', 'time');
 
 ///////////////////////////////////////////////////////////
 $weather = $discord->registerCommand('weather', function($msg, $args) use ($cities) {
-    $api_key = file_get_contents(__DIR__.'/weather_api_key');
+    $api_key = get_thing('weather_api_key');
     $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric&";
     if (count($args) == 0) {
         // look up for your saved city
@@ -246,7 +247,7 @@ $discord->registerAlias('Weather', 'weather');
 
 
     $weather->registerSubCommand('save', function($msg, $args) use ($cities) {
-        $api_key = file_get_contents(__DIR__.'/weather_api_key');
+        $api_key = get_thing('weather_api_key');
         $query = implode("%20", $args);
         $json = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
 
@@ -302,7 +303,7 @@ $discord->registerCommand('text_benh', function($msg, $args) {
     $from = "From: {$srvr} Discord <{$srvr}@bot.benharris.ch>";
     $msg_body = $user . ":\n\n" . implode(" ", $args);
 
-    if (mail(file_get_contents(__DIR__.'/phone_number') . "@vtext.com", "", $msg_body, $from)) {
+    if (mail(get_thing('phone_number') . "@vtext.com", "", $msg_body, $from)) {
         return "message sent to benh";
     }
 }, [

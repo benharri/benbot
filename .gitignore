@@ -1,6 +1,7 @@
 uploaded_images/
 vendor/
 
+env_stuff.php
 token
 phone_number
 weather_api_key

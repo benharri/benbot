@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__.'/vendor/autoload.php';
+include_once __DIR__.'/env_stuff.php';
 
 function char_in($str) {
     for ($i = 0; $i <= strlen($str); $i++)
@@ -79,11 +80,10 @@ class Cleverbot_IO {
                 'nick' => $this->nick,
             ],
         ]);
-        $response = $request->send();
-        $json = $response->json();
+        $json = $request->json();
         if ($json->status == "success")
             $this->nick = $json->nick;
-        else print_r($response);
+        else print_r($request);
     }
 
     public function ask($query) {
@@ -95,11 +95,10 @@ class Cleverbot_IO {
                 'text' => $query,
             ],
         ]);
-        $response = $request->send();
-        $json = $respons->json();
+        $json = $request->json();
         if ($json->status == "success")
             return $json->response;
-        else print_r($response);
+        else print_r($request);
     }
 }
 
