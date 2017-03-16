@@ -34,7 +34,8 @@ $imgs      = new Definitions(__DIR__.'/img_urls.json');
 $cities    = new Definitions(__DIR__.'/cities.json');
 $help      = [];
 
-$cleverbot_nick = create_cleverbot_instance('benbot');
+// $cleverbot_nick = create_cleverbot_instance('benbot');
+$cleverbot = new Cleverbot_IO();
 
 
 
@@ -43,10 +44,10 @@ $game = $discord->factory(Game::class, [
 ]);
 
 
-$discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot_nick) {
+$discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot) {
     $discord->updatePresence($game);
 
-    $discord->on('message', function($msg, $args) use ($defs, $imgs, $cleverbot_nick) {
+    $discord->on('message', function($msg, $args) use ($defs, $imgs, $cleverbot) {
         // for stuff that isn't a command
         $text = $msg->content;
         $gen = char_in($text);
@@ -66,7 +67,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot_ni
         } else {
             if (is_dm($msg)) {
                 if (!$msg->author->bot)
-                    send($msg, query_cleverbot($msg->content));
+                    send($msg, $cleverbot->ask($msg->content));
             }
         }
     });

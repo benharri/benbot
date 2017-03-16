@@ -10,6 +10,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "team-reflex/discord-php": "^4.0"
+        "team-reflex/discord-php": "^4.0",
+        "guzzlehttp/guzzle": "~6.0"
     }
 }

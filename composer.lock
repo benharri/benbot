@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "979859386b5fd38c19cb99e269b7b77d",
+    "hash": "3df12255e5c8d4deac127e6d60ed4a99",
+    "content-hash": "ea25c48a53716bdd7954183a9069052d",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -48,7 +49,7 @@
                 "stream",
                 "wrapper"
             ],
-            "time": "2016-01-13T22:50:58+00:00"
+            "time": "2016-01-13 22:50:58"
         },
         {
             "name": "cache/adapter-common",
@@ -103,7 +104,7 @@
                 "psr-6",
                 "tag"
             ],
-            "time": "2016-07-31T18:10:41+00:00"
+            "time": "2016-07-31 18:10:41"
         },
         {
             "name": "cache/array-adapter",
@@ -166,7 +167,7 @@
                 "psr-6",
                 "tag"
             ],
-            "time": "2016-08-07T15:04:55+00:00"
+            "time": "2016-08-07 15:04:55"
         },
         {
             "name": "cache/hierarchical-cache",
@@ -223,7 +224,7 @@
                 "psr-6",
                 "tag"
             ],
-            "time": "2016-08-07T14:49:33+00:00"
+            "time": "2016-08-07 14:49:33"
         },
         {
             "name": "cache/taggable-cache",
@@ -281,7 +282,7 @@
                 "psr6",
                 "tag"
             ],
-            "time": "2016-08-08T17:20:09+00:00"
+            "time": "2016-08-08 17:20:09"
         },
         {
             "name": "doctrine/inflector",
@@ -348,7 +349,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06T14:35:42+00:00"
+            "time": "2015-11-06 14:35:42"
         },
         {
             "name": "evenement/evenement",
@@ -394,7 +395,7 @@
                 "event-dispatcher",
                 "event-emitter"
             ],
-            "time": "2012-11-02T14:49:47+00:00"
+            "time": "2012-11-02 14:49:47"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -456,7 +457,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-02-28T22:50:30+00:00"
+            "time": "2017-02-28 22:50:30"
         },
         {
             "name": "guzzlehttp/promises",
@@ -507,7 +508,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2016-12-20T10:07:11+00:00"
+            "time": "2016-12-20 10:07:11"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -572,7 +573,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-02-27T10:51:17+00:00"
+            "time": "2017-02-27 10:51:17"
         },
         {
             "name": "illuminate/contracts",
@@ -614,7 +615,7 @@
             ],
             "description": "The Illuminate Contracts package.",
             "homepage": "https://laravel.com",
-            "time": "2017-02-21T14:21:59+00:00"
+            "time": "2017-02-21 14:21:59"
         },
         {
             "name": "illuminate/support",
@@ -671,7 +672,7 @@
             ],
             "description": "The Illuminate Support package.",
             "homepage": "https://laravel.com",
-            "time": "2017-02-15T19:29:24+00:00"
+            "time": "2017-02-15 19:29:24"
         },
         {
             "name": "monolog/monolog",
@@ -749,7 +750,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-11-26T00:15:39+00:00"
+            "time": "2016-11-26 00:15:39"
         },
         {
             "name": "nesbot/carbon",
@@ -802,7 +803,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2017-01-16T07:55:07+00:00"
+            "time": "2017-01-16 07:55:07"
         },
         {
             "name": "paragonie/random_compat",
@@ -850,7 +851,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2017-03-03T20:43:42+00:00"
+            "time": "2017-03-03 20:43:42"
         },
         {
             "name": "psr/cache",
@@ -896,7 +897,7 @@
                 "psr",
                 "psr-6"
             ],
-            "time": "2016-08-06T20:24:11+00:00"
+            "time": "2016-08-06 20:24:11"
         },
         {
             "name": "psr/http-message",
@@ -946,7 +947,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06T14:39:51+00:00"
+            "time": "2016-08-06 14:39:51"
         },
         {
             "name": "psr/log",
@@ -993,7 +994,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2016-10-10 12:19:37"
         },
         {
             "name": "ratchet/pawl",
@@ -1038,7 +1039,7 @@
                 "websocket",
                 "websocket client"
             ],
-            "time": "2016-04-14T21:43:44+00:00"
+            "time": "2016-04-14 21:43:44"
         },
         {
             "name": "ratchet/rfc6455",
@@ -1086,7 +1087,7 @@
                 "rfc6455",
                 "websocket"
             ],
-            "time": "2017-01-01T15:41:18+00:00"
+            "time": "2017-01-01 15:41:18"
         },
         {
             "name": "react/cache",
@@ -1120,7 +1121,7 @@
             "keywords": [
                 "cache"
             ],
-            "time": "2016-02-25T18:17:16+00:00"
+            "time": "2016-02-25 18:17:16"
         },
         {
             "name": "react/datagram",
@@ -1174,7 +1175,7 @@
                 "server",
                 "udp"
             ],
-            "time": "2017-01-23T20:47:30+00:00"
+            "time": "2017-01-23 20:47:30"
         },
         {
             "name": "react/dns",
@@ -1212,7 +1213,7 @@
                 "dns",
                 "dns-resolver"
             ],
-            "time": "2017-03-02T20:03:08+00:00"
+            "time": "2017-03-02 20:03:08"
         },
         {
             "name": "react/event-loop",
@@ -1256,7 +1257,7 @@
                 "asynchronous",
                 "event-loop"
             ],
-            "time": "2016-03-08T02:09:32+00:00"
+            "time": "2016-03-08 02:09:32"
         },
         {
             "name": "react/http-client",
@@ -1296,7 +1297,7 @@
             "keywords": [
                 "http"
             ],
-            "time": "2017-03-01T11:07:56+00:00"
+            "time": "2017-03-01 11:07:56"
         },
         {
             "name": "react/partial",
@@ -1338,7 +1339,7 @@
                 "functional-programming",
                 "partial"
             ],
-            "time": "2014-12-12T16:39:23+00:00"
+            "time": "2014-12-12 16:39:23"
         },
         {
             "name": "react/promise",
@@ -1381,7 +1382,7 @@
                 "promise",
                 "promises"
             ],
-            "time": "2016-12-22T14:09:01+00:00"
+            "time": "2016-12-22 14:09:01"
         },
         {
             "name": "react/promise-timer",
@@ -1431,7 +1432,7 @@
                 "timeout",
                 "timer"
             ],
-            "time": "2016-12-27T08:12:19+00:00"
+            "time": "2016-12-27 08:12:19"
         },
         {
             "name": "react/socket",
@@ -1473,7 +1474,7 @@
             "keywords": [
                 "Socket"
             ],
-            "time": "2017-03-09T12:13:07+00:00"
+            "time": "2017-03-09 12:13:07"
         },
         {
             "name": "react/socket-client",
@@ -1515,7 +1516,7 @@
             "keywords": [
                 "Socket"
             ],
-            "time": "2016-12-06T10:54:49+00:00"
+            "time": "2016-12-06 10:54:49"
         },
         {
             "name": "react/stream",
@@ -1559,7 +1560,7 @@
                 "pipe",
                 "stream"
             ],
-            "time": "2017-01-25T14:44:14+00:00"
+            "time": "2017-01-25 14:44:14"
         },
         {
             "name": "symfony/options-resolver",
@@ -1613,7 +1614,7 @@
                 "configuration",
                 "options"
             ],
-            "time": "2017-02-21T09:12:04+00:00"
+            "time": "2017-02-21 09:12:04"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1672,7 +1673,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14T01:06:16+00:00"
+            "time": "2016-11-14 01:06:16"
         },
         {
             "name": "symfony/translation",
@@ -1736,7 +1737,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-04T12:23:14+00:00"
+            "time": "2017-03-04 12:23:14"
         },
         {
             "name": "team-reflex/discord-php",
@@ -1803,7 +1804,7 @@
                 }
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
-            "time": "2016-12-28T21:41:47+00:00"
+            "time": "2016-12-28 21:41:47"
         },
         {
             "name": "wyrihaximus/react-guzzle-http-client",
@@ -1851,7 +1852,7 @@
                 }
             ],
             "description": "Asyncronous GuzzleRing adapter powered by react/http-client",
-            "time": "2016-09-24T12:35:05+00:00"
+            "time": "2016-09-24 12:35:05"
         },
         {
             "name": "wyrihaximus/react-guzzle-psr7",
@@ -1896,7 +1897,7 @@
                 }
             ],
             "description": "Asyncronous Guzzle (PSR7) adapter powered by react/http-client",
-            "time": "2015-08-09T20:04:16+00:00"
+            "time": "2015-08-09 20:04:16"
         }
     ],
     "packages-dev": [],
