@@ -9,6 +9,9 @@ function send($msg, $txt) {
     $msg->channel->sendMessage($txt);
 }
 
+function is_dm($msg) {
+    return $msg->author instanceOf Discord\Parts\User\User;
+}
 
 
 function ascii_from_img($filepath) {
