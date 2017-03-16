@@ -299,7 +299,7 @@ $discord->registerCommand('text_benh', function($msg, $args) {
     }
 
     $srvr = $msg->channel->guild->name;
-    $user = $msg->author->user->username;
+    $user = is_dm($msg) ? $msg->author->username : $msg->author->user->username;
     $from = "From: {$srvr} Discord <{$srvr}@bot.benharris.ch>";
     $msg_body = $user . ":\n\n" . implode(" ", $args);
 
@@ -318,7 +318,8 @@ $discord->registerAlias('Text_benh', 'text_benh');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('avatar', function($msg, $args) {
     if (count($msg->mentions) === 0) {
-        send($msg, $msg->author->user->avatar);
+        if (is_dm($msg)) send($msg, $msg->author->avatar);
+        else send($msg, $msg->author->user->avatar);
         return;
     }
     foreach ($msg->mentions as $av)
@@ -679,7 +680,9 @@ $discord->registerAlias('Bamboozle', 'bamboozle');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
     var_dump($msg->author->user->id);
-    if ($msg->author->user->id == "193011352275648514") {
+    if (is_dm($msg)) $id = $msg->author->id;
+    else $id = $msg->author->user->id;
+    if ($id == "193011352275648514") {
         print_r($msg);
         send($msg, "debugging. check logs.");
     } else send($msg, "you're not allowed to use that command");
@@ -687,7 +690,9 @@ $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
 $discord->registerAlias('Dbg', 'dbg');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('sys', function($msg, $args) {
-    if ($msg->author->user->id == "193011352275648514") {
+    if (is_dm($msg)) $id = $msg->author->id;
+    else $id = $msg->author->user->id;
+    if ($id == "193011352275648514") {
         send($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
     } else send($msg, "you're not allowed to use that command");
 });
