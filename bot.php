@@ -39,7 +39,6 @@ $game = $discord->factory(Game::class, [
 $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
     $discord->updatePresence($game);
 
-
     $discord->on('message', function($msg, $args) use ($defs, $imgs) {
         // for stuff that isn't a command
         $text = $msg->content;
@@ -52,14 +51,12 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
             $qu = strtolower($qu);
             if ($defs->get($qu, true))
                 send($msg, "**$qu**: " . $defs->get($qu));
-            if ($imgs->get($qu, true)) {
-                $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img.jpg', $qu);
-            }
-            // if ($imgs->get($qu, true))
-                // send($msg, "**$qu**: " . $imgs->get($qu));
+            if ($imgs->get($qu, true))
+                $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img', $qu);
         }
     });
 
+    $discord->guilds->get('id','289410862907785216')->channels->get('id','289611811094003715')->sendMessage("<@193011352275648514>, bot started successfully");
 });
 
 
@@ -144,8 +141,8 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
         }
     }
 }, [
-    'description' => 'looks up current time for a city, other user or yourself',
-    'usage' => '<city|@user>',
+    'description' => 'looks up current time for yourself or another user',
+    'usage' => '<@user>',
 ]);
 register_help('time');
 $discord->registerAlias('Time', 'time');
@@ -437,48 +434,30 @@ $kaomoji = $discord->registerCommand('kaomoji', function($msg, $args) use ($kaom
     send($msg, $kaomojis[array_rand($kaomojis)]);
 }, [
     'description' => 'sends random kaomoji',
-    'usage' => '',
+    'usage' => '<sad|happy|angry|confused|surprised>',
 ]);
-// register_help('kaomoji');
+register_help('kaomoji');
 $discord->registerAlias('Kaomoji', 'kaomoji');
 
 
     $kaomoji->registerSubCommand('sad', function($msg, $args) use($sad_kaomojis) {
         send($msg, $sad_kaomojis[array_rand($sad_kaomojis)]);
-    }, [
-        'description' => 'sends random sad kaomoji',
-        'usage' => '',
-    ]);
+    }, ['description' => 'sad kaomoji']);
     $kaomoji->registerSubCommand('happy', function($msg, $args) use($happy_kaomojis) {
         send($msg, $happy_kaomojis[array_rand($happy_kaomojis)]);
-    }, [
-        'description' => 'sends random happy kaomoji',
-        'usage' => '',
-    ]);
+    }, ['description' => 'happy kaomoji']);
     $kaomoji->registerSubCommand('angry', function($msg, $args) use($angry_kaomojis) {
         send($msg, $angry_kaomojis[array_rand($angry_kaomojis)]);
-    }, [
-        'description' => 'sends random angry kaomoji',
-        'usage' => '',
-    ]);
+    }, ['description' => 'angry kaomoji']);
     $kaomoji->registerSubCommand('confused', function($msg, $args) use($confused_kaomojis) {
         send($msg, $confused_kaomojis[array_rand($confused_kaomojis)]);
-    }, [
-        'description' => 'sends random confused kaomoji',
-        'usage' => '',
-    ]);
+    }, ['description' => 'confused kaomoji']);
     $kaomoji->registerSubCommand('surprised', function($msg, $args) use($surprised_kaomojis) {
         send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)]);
-    }, [
-        'description' => 'sends random surprised kaomoji',
-        'usage' => '',
-    ]);
+    }, ['description' => 'surprised kaomoji']);
     $kaomoji->registerSubCommand('embarrassed', function($msg, $args) use($embarrassed_kaomojis) {
         send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
-    }, [
-        'description' => 'sends random embarrassed kaomoji',
-        'usage' => '',
-    ]);
+    }, ['description' => 'embarrassed kaomoji']);
 
 
 
@@ -500,7 +479,6 @@ $discord->registerAlias('Joke', 'joke');
         send($msg, $json->value->joke);
     }, [
         'description' => 'get a random fact about chuck norris',
-        'usage' => '',
     ]);
 
     $joke->registerSubCommand('yomama', function($msg, $args) {
@@ -508,7 +486,6 @@ $discord->registerAlias('Joke', 'joke');
         send($msg, $json->joke);
     }, [
         'description' => 'yo mama jokes',
-        'usage' => '',
     ]);
 
     $joke->registerSubCommand('dad', function($msg, $args) {
@@ -520,7 +497,6 @@ $discord->registerAlias('Joke', 'joke');
         ])));
     }, [
         'description' => 'tells a dad joke',
-        'usage' => '',
     ]);
 
 
@@ -562,7 +538,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     if (count($args) > 0) {
         // look for image in uploaded_images
         if ($imgs->get($qu, true)) {
-            $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img.jpg', $qu);
+            $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img', $qu);
         }
         // send($msg, $imgs->get($args[0]));
     } else {
@@ -649,11 +625,8 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     $qu = strtolower($args[0]);
     if ($defs->get($qu, true))
         send($msg, "**$qu**: " . $defs->get($qu));
-    if ($imgs->get($qu, true)) {
-        $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img.jpg', $qu);
-    }
-    // if ($imgs->get($qu, true))
-        // send($msg, "**$qu**: " . $imgs->get($qu));
+    if ($imgs->get($qu, true))
+        $msg->channel->sendFile(__DIR__."/uploaded_images/{$qu}", 'img', $qu);
 }, [
     'description' => 'looks up def or img',
     'usage' => '<def or img name>',
@@ -662,14 +635,11 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('bamboozle', function($msg, $args) {
-    if (count($msg->mentions) > 0) {
+    if (count($msg->mentions) > 0)
         foreach ($msg->mentions as $key => $val)
             $ret .= "<@$key>";
-    }
     else $ret = $msg->author;
-    // print_r($msg->mentions);
     $ret .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!";
-    // echo $ret;
     $msg->channel->sendFile('img/bamboozled.jpg', 'bamboozle.jpg', $ret);
 }, [
     'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
