@@ -19,7 +19,7 @@ $discord = new DiscordCommandClient([
     'defaultHelpCommand' => false,
     'name'               => 'benbot',
     'discordOptions'     => [
-        'loggerLevel' => 'DEBUG',
+        // 'loggerLevel' => 'DEBUG',
         'pmChannels'  => true,
     ],
 ]);
@@ -62,7 +62,8 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
             }
         } else {
             if (is_dm($msg)) {
-                send($msg, query_cleverbot($msg->content));
+                if (!$msg->author->bot)
+                    send($msg, query_cleverbot($msg->content));
             }
         }
     });
