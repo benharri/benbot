@@ -49,7 +49,7 @@ EOD;
     return $ret;
 }
 
-function create_cleverbot_instance() {
+function create_cleverbot_instance($nick) {
     $json = json_decode(file_get_contents("https://cleverbot.io/1.0/create", false, stream_context_create([
         'http' => [
             'method' => 'POST',

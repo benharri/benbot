@@ -34,7 +34,7 @@ $imgs      = new Definitions(__DIR__.'/img_urls.json');
 $cities    = new Definitions(__DIR__.'/cities.json');
 $help      = [];
 
-$cleverbot_nick = create_cleverbot_instance();
+$cleverbot_nick = create_cleverbot_instance('benbot');
 
 
 
