@@ -58,6 +58,12 @@ function create_cleverbot_instance() {
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
             'method' => 'PUT',
+            'header' => [
+                'Accept: */*',
+                'content-type: application/x-www-form-urlencoded',
+                'accept-encoding: gzip, deflate',
+                'content-length: 70',
+            ],
         ]
     ])));
     return $json->nick;
@@ -67,12 +73,18 @@ function query_cleverbot($query) {
     $url = "https://cleverbot.io/1.0/ask";
     $url .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
     $url .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
-    $url .= "&nick=" . create_cleverbot_instance();
+    $url .= "&nick=benbot";// . create_cleverbot_instance();
     $url .= "&text=$query";
     echo $url, PHP_EOL;
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
             'method' => 'PUT',
+            'header' => [
+                'Accept: */*',
+                'content-type: application/x-www-form-urlencoded',
+                'accept-encoding: gzip, deflate',
+                'content-length: 70',
+            ],
         ]
     ])));
     return $json->response;
