@@ -649,9 +649,10 @@ $discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
     //     $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
     // }
 }, [
-    'description' => 'talk to ben',
+    'description' => 'talk to ben (you can do this in a DM with me too!)',
     'usage' => '<msg>',
 ]);
+register_help('');
 
 
 ///////////////////////////////////////////////////////////
