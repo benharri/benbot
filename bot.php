@@ -545,7 +545,7 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
         $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu)->then(function($m) {
             echo "sent", PHP_EOL;
         }, function ($e) {
-            echo e->getMessage(), PHP_EOL;
+            echo $e->getMessage(), PHP_EOL;
         });
     }
 }, [
