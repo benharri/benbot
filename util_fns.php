@@ -82,7 +82,7 @@ class Cleverbot_IO {
         print_r($json);
         if ($json->status == "success")
             $this->nick = $json->nick;
-        else print_r($response);
+        else print_r($json);
     }
 
     public function ask($query) {
@@ -98,7 +98,7 @@ class Cleverbot_IO {
         print_r($json);
         if ($json->status == "success")
             return $json->response;
-        else print_r($response);
+        else print_r($json);
     }
 }
 
