@@ -5,8 +5,8 @@ function char_in($str) {
         yield substr($str, $i, 1);
 }
 
-function send($msg, $txt) {
-    $msg->channel->sendMessage($txt);
+function send($msg, $txt, $embed = null) {
+    return $msg->channel->sendMessage($txt, false, $embed);
 }
 
 function is_dm($msg) {
