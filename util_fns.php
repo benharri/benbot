@@ -52,6 +52,20 @@ EOD;
     return $ret;
 }
 
+
+
+function register_help($cmd_name) {
+    global $discord; global $help;
+    $help[$cmd_name] = $discord->getCommand($cmd_name)->getHelp(';')["text"];
+}
+
+
+
+
+
+
+
+
 class Cleverbot_IO {
     const API_URL = "https://cleverbot.io/1.0/";
     var $user;
@@ -103,61 +117,8 @@ class Cleverbot_IO {
 }
 
 
-function create_cleverbot_instance($nick = "benbot") {
-    $json = json_decode(file_get_contents("https://cleverbot.io/1.0/create", false, stream_context_create([
-        'http' => [
-            'method' => 'POST',
-            'header' => [
-                'Accept: */*',
-                'content-type: application/x-www-form-urlencoded',
-                'accept-encoding: gzip, deflate',
-            ],
-            'content' => http_build_query([
-                'user' => file_get_contents(__DIR__.'/cleverbot.io.user'),
-                'key'  => file_get_contents(__DIR__.'/cleverbot.io.api_key'),
-                'nick' => $nick,
-            ]),
-        ]
-    ])));
-    if ($json->status == "success")
-        return $json->nick;
-    else return "```invalid response\n{$json->status}```";
-}
 
 
-function query_cleverbot($query, $nick = "benbot") {
-    $content = http_build_query([
-        'user' => file_get_contents(__DIR__.'/cleverbot.io.user'),
-        'key'  => file_get_contents(__DIR__.'/cleverbot.io.api_key'),
-        'nick' => $nick,
-        'text' => $query,
-    ]);
-    print_r($content);
-    $context = stream_context_create([
-        'http' => [
-            'method' => 'POST',
-            'header' => [
-                'Accept: */*',
-                'content-type: application/x-www-form-urlencoded',
-                'accept-encoding: gzip, deflate',
-            ],
-            'content' => $content,
-        ]
-    ]);
-    print_r($context);
-
-    $json = json_decode(file_get_contents("https://cleverbot.io/1.0/ask", false, $context));
-
-    if ($json->status == "success")
-        return $json->response;
-    else return "```invalid response\n{$json->status}```";
-}
-
-
-function register_help($cmd_name) {
-    global $discord; global $help;
-    $help[$cmd_name] = $discord->getCommand($cmd_name)->getHelp(';')["text"];
-}
 
 
 
