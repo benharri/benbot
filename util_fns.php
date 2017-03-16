@@ -57,7 +57,7 @@ function create_cleverbot_instance() {
     echo $query, PHP_EOL;
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
-            'method' => 'PUT',
+            'method' => 'POST',
             'header' => [
                 'Accept: */*',
                 'content-type: application/x-www-form-urlencoded',
@@ -80,7 +80,7 @@ function query_cleverbot($query) {
     echo $query, PHP_EOL;
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
-            'method' => 'PUT',
+            'method' => 'POST',
             'header' => [
                 'Accept: */*',
                 'content-type: application/x-www-form-urlencoded',
