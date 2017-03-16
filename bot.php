@@ -536,7 +536,7 @@ $discord->registerAlias('Block', 'block');
 
 
 ///////////////////////////////////////////////////////////
-$img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
+$img = $discord->registerCommand('img', function($msg, $args) use ($imgs, $discord) {
     $qu = strtolower($args[0]);
     // look for image in uploaded_images
     if ($imgs->get($qu, true)) {
