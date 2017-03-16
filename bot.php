@@ -694,18 +694,21 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
             $ret .= $args[0] . " info\n\n";
             $lookup_help = $cmd->getHelp(';');
             $ret .= $lookup_help["text"];
+            $ret .= "```";
         } else {
             $ret .= "command not found";
+            $ret .= "```";
         }
+        send($msg, $ret);
     } else {
         $ret .= "benbot - a bot made by benh. avatar by hirose.\n\n";
         $ret .= implode("", $help);
         $ret .= "\n;help <command> - get more information about a specific command";
+        $ret .= "```";
+        $msg->author->user->sendMessage($ret);
+        $msg->reply("check DMs!");
     }
-    $ret .= "```";
-    print_r($msg);
-    $msg->author->user->sendMessage($ret);
-    send($msg, $ret);
+    // print_r($msg);
 });
 $discord->registerAlias('Help', 'help');
 
