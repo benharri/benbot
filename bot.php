@@ -541,10 +541,10 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs, $disco
     // look for image in uploaded_images
     if ($imgs->get($qu, true)) {
         $imgfile = $imgs->get($qu);
-        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu)->then(function($m) {
+        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu)->then(function($m) use ($discord) {
             // echo "sent", PHP_EOL;
             $discord->logger->info("$imgfile sent");
-        }, function ($e) {
+        }, function ($e) use ($discord) {
             // echo $e->getMessage(), PHP_EOL;
             $discord->logger->info($e->getMessage());
         });
