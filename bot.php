@@ -538,14 +538,15 @@ $discord->registerAlias('Block', 'block');
 ///////////////////////////////////////////////////////////
 $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     $qu = strtolower($args[0]);
-        // look for image in uploaded_images
+    // look for image in uploaded_images
     if ($imgs->get($qu, true)) {
         $imgfile = $imgs->get($qu);
-        echo $qu, ": ", $imgfile, PHP_EOL;
         $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu)->then(function($m) {
-            echo "sent", PHP_EOL;
+            // echo "sent", PHP_EOL;
+            $discord->logger->info("$imgfile sent");
         }, function ($e) {
-            echo $e->getMessage(), PHP_EOL;
+            // echo $e->getMessage(), PHP_EOL;
+            $discord->logger->info($e->getMessage());
         });
     }
 }, [
