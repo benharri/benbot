@@ -638,7 +638,7 @@ $discord->registerAlias('Img', 'img');
 
 ///////////////////////////////////////////////////////////
 // look up defs or images!
-$discord->registerCommand('', function($msg, $args) use ($defs, $imgs) {
+$discord->registerCommand('', function($msg, $args) use ($cleverbot) {
     $msg->reply($cleverbot->ask(implode(" ", $args)));
     // $qu = strtolower($args[0]);
     // if ($defs->get($qu, true))
