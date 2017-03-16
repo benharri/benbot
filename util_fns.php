@@ -52,15 +52,15 @@ EOD;
 }
 
 class Cleverbot_IO {
-    const API_URL = "https://cleverbot.io/1.0";
+    const API_URL = "https://cleverbot.io/1.0/";
     var $user;
-    var $api_key;
+    var $key;
     var $nick;
     var $client;
 
     public function __construct($nick = "benbot") {
         $this->user = file_get_contents(__DIR__.'/cleverbot.io.user');
-        $this->api_key = file_get_contents(__DIR__.'/cleverbot.io.api_key');
+        $this->key = file_get_contents(__DIR__.'/cleverbot.io.api_key');
         $this->client = new GuzzleHttp\Client([
             'base_uri' => self::API_URL,
             'headers' => [
