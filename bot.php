@@ -691,7 +691,7 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
     if (count($args) == 1) {
         $qu = strtolower($args[0]);
         if ($cmd = $discord->getCommand($qu, true)) {
-            $ret .= "$qu info\n\n";
+            // $ret .= "$qu info\n\n";
             $ret .= $cmd->getHelp(';')["text"];
             $ret .= "```";
         } else {
@@ -702,7 +702,7 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
         $ret .= "benbot - a bot made by benh. avatar by hirose.\n\n";
         $ret .= implode("", $help);
         $ret .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
-        if ($msg->author instanceOf Discord\Parts\User\User) send($msg, $ret); //$msg->author->sendMessage($ret);
+        if ($msg->author instanceOf Discord\Parts\User\User) send($msg, $ret);
         else {
             $msg->author->user->sendMessage($ret);
             $msg->reply("check DMs!");
