@@ -656,6 +656,23 @@ register_help('');
 
 
 ///////////////////////////////////////////////////////////
+$discord->registerCommand('dm', function($msg, $args) {
+    if (is_dm($msg)) send($msg, "you're already in a dm, silly");
+    if (count($msg->mentions) == 0) {
+        $msg->author->user->sendMessage("hi\ntry typing `;help` or just have a conversation with me");
+    } else {
+        foreach ($msg->mentions as $mention) {
+            $mention->sendMessage("hi\ntry typing `;help` or just have a conversation with me");
+        }
+    }
+}, [
+    'description' => 'start a DM conversation with yourself or someone else',
+    'usage' => '<@user>',
+]);
+register_help('dm');
+
+
+///////////////////////////////////////////////////////////
 $discord->registerCommand('bamboozle', function($msg, $args) {
     if (count($msg->mentions) > 0)
         foreach ($msg->mentions as $key => $val)
