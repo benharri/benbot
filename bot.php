@@ -489,10 +489,7 @@ $joke = $discord->registerCommand('joke', function($msg, $args) {
     send($msg, $json->joke);
 }, [
     'description' => 'tells a random joke',
-    'usage' => '',
-    'aliases' => [
-        'Joke',
-    ],
+    'usage' => '<chucknorris|yomama|dad>',
 ]);
 register_help('joke');
 $discord->registerAlias('Joke', 'joke');
