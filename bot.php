@@ -703,6 +703,7 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
         $ret .= "\n;help <command> - get more information about a specific command";
     }
     $ret .= "```";
+    $msg->author->sendMessage($ret);
     send($msg, $ret);
 });
 $discord->registerAlias('Help', 'help');
