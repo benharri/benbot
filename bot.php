@@ -43,10 +43,10 @@ $game = $discord->factory(Game::class, [
 ]);
 
 
-$discord->on('ready', function($discord) use ($game, $defs, $imgs) {
+$discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot_nick) {
     $discord->updatePresence($game);
 
-    $discord->on('message', function($msg, $args) use ($defs, $imgs) {
+    $discord->on('message', function($msg, $args) use ($defs, $imgs, $cleverbot_nick) {
         // for stuff that isn't a command
         $text = $msg->content;
         $gen = char_in($text);
@@ -66,7 +66,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
         } else {
             if (is_dm($msg)) {
                 if (!$msg->author->bot)
-                    send($msg, query_cleverbot($msg->content, $cleverbot_nick));
+                    send($msg, query_cleverbot($msg->content));
             }
         }
     });
