@@ -36,7 +36,7 @@ $cities    = new Definitions(__DIR__.'/cities.json');
 $help      = [];
 
 // $cleverbot_nick = create_cleverbot_instance('benbot');
-$cleverbot = new Cleverbot_IO();
+$cleverbot = new Cleverbot_IO('benbot');
 
 
 
