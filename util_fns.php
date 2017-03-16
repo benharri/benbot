@@ -93,7 +93,7 @@ class Cleverbot_IO {
                 'text' => $query,
             ],
         ]);
-        $response = request->send();
+        $response = $request->send();
         $json = $respons->json();
         if ($json->status == "success")
             return $json->response;
