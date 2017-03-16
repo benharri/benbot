@@ -14,10 +14,13 @@ use Discord\Parts\Embed\Footer;
 
 
 $discord = new DiscordCommandClient([
-    'token' => file_get_contents(__DIR__.'/token'),
-    'prefix' => ';',
+    'token'              => file_get_contents(__DIR__.'/token'),
+    'prefix'             => ';',
     'defaultHelpCommand' => false,
-    'name' => 'benbot',
+    'name'               => 'benbot',
+    'discordOptions'     => [
+        'pmChannels' => true,
+    ],
 ]);
 
 include __DIR__.'/kaomoji.php';
@@ -25,10 +28,10 @@ include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
 
 $starttime = new DateTime();
-$defs = new Definitions(__DIR__.'/definitions.json');
-$imgs = new Definitions(__DIR__.'/img_urls.json');
-$cities = new Definitions(__DIR__.'/cities.json');
-$help = [];
+$defs      = new Definitions(__DIR__.'/definitions.json');
+$imgs      = new Definitions(__DIR__.'/img_urls.json');
+$cities    = new Definitions(__DIR__.'/cities.json');
+$help      = [];
 
 
 $game = $discord->factory(Game::class, [
