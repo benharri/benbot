@@ -54,6 +54,7 @@ function create_cleverbot_instance() {
     $url .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
     $url .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
     $url .= "&nick=benbot";
+    echo $url, PHP_EOL;
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
             'method' => 'PUT',
@@ -68,6 +69,7 @@ function query_cleverbot($query) {
     $url .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
     $url .= "&nick=" . create_cleverbot_instance();
     $url .= "&text=$query";
+    echo $url, PHP_EOL;
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
             'method' => 'PUT',
