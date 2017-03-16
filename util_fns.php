@@ -51,10 +51,10 @@ EOD;
 
 function create_cleverbot_instance() {
     $url = "https://cleverbot.io/1.0/create";
-    $content .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
-    $content .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
-    $content .= "&nick=benbot";
-    echo $url, PHP_EOL;
+    // $content .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
+    // $content .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
+    // $content .= "&nick=benbot";
+    echo $query, PHP_EOL;
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
             'method' => 'PUT',
@@ -64,7 +64,8 @@ function create_cleverbot_instance() {
                 'accept-encoding: gzip, deflate',
                 'content-length: 70',
             ],
-            'content' => $content,
+            'content' => "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user') .
+                         "&key="  . file_get_contents(__DIR__.'/cleverbot.io.api_key') . "&nick=benbot",
         ]
     ])));
     return $json->nick;
@@ -72,11 +73,11 @@ function create_cleverbot_instance() {
 
 function query_cleverbot($query) {
     $url = "https://cleverbot.io/1.0/ask";
-    $content .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
-    $content .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
-    $content .= "&nick=benbot";// . create_cleverbot_instance();
-    $content .= "&text=$query";
-    echo $url, PHP_EOL;
+    // $content .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
+    // $content .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
+    // $content .= "&nick=benbot&text=$query";
+    // echo $url, PHP_EOL;
+    echo $query, PHP_EOL;
     $json = json_decode(file_get_contents($url, false, stream_context_create([
         'http' => [
             'method' => 'PUT',
@@ -86,7 +87,8 @@ function query_cleverbot($query) {
                 'accept-encoding: gzip, deflate',
                 'content-length: 70',
             ],
-            'content' => $content,
+            'content' => "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user') .
+                         "&key="  . file_get_contents(__DIR__.'/cleverbot.io.api_key') . "&nick=benbot&text=$query",
         ]
     ])));
     return $json->response;
