@@ -50,12 +50,7 @@ EOD;
 }
 
 function create_cleverbot_instance() {
-    $url = "https://cleverbot.io/1.0/create";
-    // $content .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
-    // $content .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
-    // $content .= "&nick=benbot";
-    echo $query, PHP_EOL;
-    $json = json_decode(file_get_contents($url, false, stream_context_create([
+    $json = json_decode(file_get_contents("https://cleverbot.io/1.0/create", false, stream_context_create([
         'http' => [
             'method' => 'POST',
             'header' => [
@@ -68,17 +63,14 @@ function create_cleverbot_instance() {
                          "&key="  . file_get_contents(__DIR__.'/cleverbot.io.api_key') . "&nick=benbot",
         ]
     ])));
-    return $json->nick;
+    if ($json->status == "success")
+        return $json->nick;
+    else return "```invalid response```";
 }
 
-function query_cleverbot($query) {
-    $url = "https://cleverbot.io/1.0/ask";
-    // $content .= "?user=" . file_get_contents(__DIR__.'/cleverbot.io.user');
-    // $content .= "&key=" . file_get_contents(__DIR__.'/cleverbot.io.api_key');
-    // $content .= "&nick=benbot&text=$query";
-    // echo $url, PHP_EOL;
-    echo $query, PHP_EOL;
-    $json = json_decode(file_get_contents($url, false, stream_context_create([
+
+function query_cleverbot($query, $nick) {
+    $json = json_decode(file_get_contents("https://cleverbot.io/1.0/ask", false, stream_context_create([
         'http' => [
             'method' => 'POST',
             'header' => [
@@ -89,12 +81,14 @@ function query_cleverbot($query) {
             'content' => http_build_query([
                 'user' => file_get_contents(__DIR__.'/cleverbot.io.user'),
                 'key'  => file_get_contents(__DIR__.'/cleverbot.io.api_key'),
-                'nick' => 'benbot',
+                'nick' => $nick,
                 'text' => $query,
             ]),
         ]
     ])));
-    return $json->response;
+    if ($json->status == "success")
+        return $json->response;
+    else return "```invalid response```";
 }
 
 

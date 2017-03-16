@@ -34,6 +34,9 @@ $imgs      = new Definitions(__DIR__.'/img_urls.json');
 $cities    = new Definitions(__DIR__.'/cities.json');
 $help      = [];
 
+$cleverbot_nick = create_cleverbot_instance();
+
+
 
 $game = $discord->factory(Game::class, [
     'name' => ';help',
@@ -63,7 +66,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
         } else {
             if (is_dm($msg)) {
                 if (!$msg->author->bot)
-                    send($msg, query_cleverbot($msg->content));
+                    send($msg, query_cleverbot($msg->content, $cleverbot_nick));
             }
         }
     });
