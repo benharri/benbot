@@ -542,7 +542,11 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs) {
     if ($imgs->get($qu, true)) {
         $imgfile = $imgs->get($qu);
         echo $qu, ": ", $imgfile, PHP_EOL;
-        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+        $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu)->then(function($m) {
+            echo "sent", PHP_EOL;
+        }, function ($e) {
+            echo e->getMessage(), PHP_EOL;
+        });
     }
 }, [
     'description' => 'image tools (;help img for more info)',
@@ -691,13 +695,11 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
     if (count($args) == 1) {
         $qu = strtolower($args[0]);
         if ($cmd = $discord->getCommand($qu, true)) {
-            // $ret .= "$qu info\n\n";
             $ret .= $cmd->getHelp(';')["text"];
-            $ret .= "```";
         } else {
-            $ret .= "$qu not found```";
+            $ret .= "$qu not found";
         }
-        send($msg, $ret);
+        send($msg, "$ret```");
     } else {
         $ret .= "benbot - a bot made by benh. avatar by hirose.\n\n";
         $ret .= implode("", $help);
