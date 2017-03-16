@@ -79,8 +79,10 @@ class Cleverbot_IO {
             ],
         ]);
         $json = json_decode($response->getBody());
-        if ($json->status == "success")
+        if ($json->status == "success"){
             $this->nick = $json->nick;
+            echo $this->nick, PHP_EOL;
+        }
         else print_r($json);
     }
 
