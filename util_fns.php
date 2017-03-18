@@ -9,6 +9,11 @@ function char_in($str) {
 }
 
 function send($msg, $txt, $embed = null) {
+    if (strlen($txt) > 2000) {
+        foreach (str_split($txt, 2000) as $split) {
+            $msg->channel->sendMessage($split, false, $embed);
+        }
+    }
     return $msg->channel->sendMessage($txt, false, $embed);
 }
 

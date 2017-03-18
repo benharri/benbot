@@ -28,6 +28,7 @@ $discord = new DiscordCommandClient([
 include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
+include __DIR__.'/cmd_music.php';
 
 $starttime = new DateTime();
 $defs      = new Definitions(__DIR__.'/definitions.json');
@@ -110,15 +111,23 @@ $discord->registerAlias('hello', 'hi');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('embed', function($msg, $args) use ($discord) {
-    $embed = $discord->factory(Embed::class, [
-        'title'     => 'test',
-        'url'       => 'http://google.com',
-        'image'     => $discord->factory(Image::class, ['url' => __DIR__.'/img/bamboozled.jpg']),
-        'thumbnail' => $discord->factory(Image::class, ['url' => __DIR__.'/img/bamboozled.jpg']),
-        'author'    => $discord->factory(Author::class, ['name' => 'Ben']),
-        'footer'    => $discord->factory(Footer::class, ['text' => 'footer']),
-    ]);
-    $msg->channel->sendMessage('embed', false, $embed);
+    // $embed = $discord->factory(Embed::class, [
+    //     'title'     => 'test',
+    //     'url'       => 'http://google.com',
+    //     'image'     => $discord->factory(Image::class, ['url' => __DIR__.'/img/bamboozled.jpg']),
+    //     'thumbnail' => $discord->factory(Image::class, ['url' => __DIR__.'/img/bamboozled.jpg']),
+    //     'author'    => $discord->factory(Author::class, ['name' => 'Ben']),
+    //     'footer'    => $discord->factory(Footer::class, ['text' => 'footer']),
+    // ]);
+    // $msg->channel->sendMessage('embed', false, $embed);
+
+
+    $msg->channel->sendMessage("test", false, $discord->factory(Embed::class, [
+        'title' => 'test title',
+        'description' => 'testing embed',
+        'url' => 'http://discordapp.com'
+    ]));
+
 }, [
     'description' => 'not working :(',
 ]);
@@ -707,6 +716,22 @@ $discord->registerCommand('bamboozle', function($msg, $args) {
 ]);
 $discord->registerAlias('Bamboozle', 'bamboozle');
 
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('music', function($msg, $args) use ($discord) {
+    $music = new cmd_music($discord, $msg, 'music', implode(" ", $args));
+    print_r($music);
+    print_r($msg);
+}, [
+    'description' => 'music player',
+    'usage' => '<song>',
+]);
 
 
 
