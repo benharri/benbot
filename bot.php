@@ -55,6 +55,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot) {
         $first_char = $gen->current();
 
         if ($first_char == ';') {
+
             for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next())
                 $qu .= $gen->current();
             $qu = strtolower($qu);
@@ -62,10 +63,11 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot) {
                 send($msg, "**$qu**: " . $defs->get($qu));
             if ($imgs->get($qu, true)) {
                 $imgfile = $imgs->get($qu);
-                echo $qu, ": ", $imgfile, PHP_EOL;
                 $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
             }
+
         } else {
+
             if (is_dm($msg)) {
                 if (!$msg->author->bot)
                     send($msg, $cleverbot->ask($msg->content));
@@ -155,6 +157,20 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
             }
         } else {
             // look up the time for whatever they requested
+            $msg->channel->broadcastTyping();
+
+            $api_key = get_thing('weather_api_key');
+            $query = implode("%20", $args);
+            $jsoncoords = json_decode(file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric"));
+            $coord = $jsoncoords->coord;
+
+
+            $url = "http://api.geonames.org/timezoneJSON?username=benharri";
+            $newurl = "$url&lat={$coord->lat}&lng={$coord->lon}";
+
+            $json = json_decode(file_get_contents($newurl));
+            $jtime = strtotime($json->time);
+            send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$jsoncoords->name}.");
 
         }
     }
@@ -351,7 +367,12 @@ $discord->registerAlias('Up', 'up');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('say', function($msg, $args) {
-    send($msg, implode(" ", $args) . "\n\n**love**, {$msg->author}");
+    $a = implode(" ", $args);
+    if ((strpos($a, '@everyone') !== false) || (strpos($a, '@here') !== false)) {
+        $msg->reply("sry, can't do that! :P");
+        return;
+    }
+    send($msg, "$a\n\n**love**, {$msg->author}");
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
@@ -479,8 +500,8 @@ $discord->registerAlias('Kaomoji', 'kaomoji');
 
 ///////////////////////////////////////////////////////////
 $joke = $discord->registerCommand('joke', function($msg, $args) {
-    $json = json_decode(file_get_contents("http://tambal.azurewebsites.net/joke/random"));
-    send($msg, $json->joke);
+    $joke_arr = explode("-----------------------------------------------------------------------------", file_get_contents(__DIR__.'/miscjokes.txt'));
+    send($msg, $joke_arr[array_rand($joke_arr)]);
 }, [
     'description' => 'tells a random joke',
     'usage' => '<chucknorris|yomama|dad>',
@@ -497,8 +518,8 @@ $discord->registerAlias('Joke', 'joke');
     ]);
 
     $joke->registerSubCommand('yomama', function($msg, $args) {
-        $json = json_decode(file_get_contents("http://api.yomomma.info/"));
-        send($msg, $json->joke);
+        $jokes = file("yomamajokes.txt");
+        send($msg, $jokes[array_rand($jokes)]);
     }, [
         'description' => 'yo mama jokes',
     ]);
