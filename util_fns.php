@@ -10,8 +10,10 @@ function char_in($str) {
 
 function send($msg, $txt, $embed = null) {
     if (strlen($txt) > 2000) {
-        foreach (str_split($txt, 2000) as $split) {
-            $msg->channel->sendMessage($split, false, $embed);
+        $split = str_split($txt, 2000);
+        print_r($split);
+        foreach ($split as $part) {
+            $msg->channel->sendMessage($part, false, $embed);
         }
     }
     return $msg->channel->sendMessage($txt, false, $embed);
@@ -65,9 +67,14 @@ function register_help($cmd_name) {
 }
 
 
+function ask_cleverbot($input) {
+    $url = "https://www.cleverbot.com/getreply";
+    $key = get_thing('cleverbot');
+    $input = rawurlencode($input);
+    $apidata = json_decode(file_get_contents("$url?input=$input&key=$key"));
 
-
-
+    return $apidata->output;
+}
 
 
 

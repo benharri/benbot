@@ -44,10 +44,10 @@ $game = $discord->factory(Game::class, [
 ]);
 
 
-$discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot) {
+$discord->on('ready', function($discord) use ($game, $defs, $imgs) {
     $discord->updatePresence($game);
 
-    $discord->on('message', function($msg, $args) use ($defs, $imgs, $cleverbot) {
+    $discord->on('message', function($msg, $args) use ($defs, $imgs) {
         // for stuff that isn't a command
         $text = $msg->content;
         $gen = char_in($text);
@@ -69,7 +69,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $cleverbot) {
 
             if (is_dm($msg)) {
                 if (!$msg->author->bot)
-                    send($msg, $cleverbot->ask($msg->content));
+                    send($msg, ask_cleverbot(implode(' ', $args)));
             }
         }
     });
@@ -418,6 +418,10 @@ $discord->registerCommand('sing', function($msg, $args) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('set', function($msg, $args) use ($defs) {
     $def = strtolower(array_shift($args));
+    if ($def == "san" && $msg->author->id != 190933157430689792) {
+        $msg->reply("you're not san");
+        return;
+    }
     $defs->set($def, implode(" ", $args));
     send($msg, $def . " set to: " . implode(" ", $args));
 }, [
@@ -513,6 +517,21 @@ $discord->registerCommand('shrug', function($msg, $args) {
     'description' => 'meh',
 ]);
 $discord->registerAlias('Shrug', 'shrug');
+///////////////////////////////////////////////////////////
+$discord->registerCommand('noice', function($msg, $args) use ($bs) {
+    send($msg, $bs);
+}, [
+    'description' => 'ayyy',
+]);
+
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('copypasta', function($msg, $args) {
+    $copypastas = explode("---", file_get_contents(__DIR__.'/copypasta.txt'));
+    send($msg, $copypastas[array_rand($copypastas)]);
+}, [
+    'description' => 'gets random copypasta',
+]);
 
 
 ///////////////////////////////////////////////////////////
@@ -710,12 +729,7 @@ $discord->registerAlias('Img', 'img');
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('', function($msg, $args) {
-    $url = "https://www.cleverbot.com/getreply";
-    $key = get_thing('cleverbot');
-    $input = rawurlencode(implode(' ', $args));
-    $apidata = json_decode(file_get_contents("$url?input=$input&key=$key"));
-
-    $msg->reply($apidata->output);
+    $msg->reply(ask_cleverbot(implode(' ', $args)));
 }, [
     'description' => 'talk to ben (you can do this in a DM with me too!)',
     'usage' => '<msg>',

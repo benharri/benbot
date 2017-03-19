@@ -309,3 +309,30 @@ $fortunes = [
     "Outlook not so good",
     "Very doubtful",
 ];
+
+
+
+
+$bs = ":ok_hand:　:joy:
+   :ok_hand::joy:
+　 :joy:
+   :joy::ok_hand:
+ :joy:　:ok_hand:
+:joy:　　:ok_hand:
+:joy:　　:ok_hand:
+ :joy:　:ok_hand:
+  :joy: :ok_hand:
+　  :ok_hand:
+　:ok_hand: :joy:
+ :ok_hand:　 :joy:
+:ok_hand:　　:joy:
+:ok_hand:　:joy:
+   :ok_hand::joy:
+　 :joy:
+   :joy::ok_hand:
+ :joy:　:ok_hand:
+:joy:　　:ok_hand:
+:joy:　　:ok_hand:
+ :joy:　:ok_hand:
+  :joy: :ok_hand:
+　  :ok_hand:";
