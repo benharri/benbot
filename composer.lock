@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3df12255e5c8d4deac127e6d60ed4a99",
-    "content-hash": "ea25c48a53716bdd7954183a9069052d",
+    "hash": "d906e3866bcca96bf5ccd3499f0eb169",
+    "content-hash": "59165afaf3f2d641d998c46d7a4af594",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -1745,20 +1745,20 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "v4.0.3",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/teamreflex/DiscordPHP.git",
-                "reference": "b44c4be11281827ec493c80d1a319eca3f46d849"
+                "reference": "613c04a1aa9e39d8f3c77465095d626c5ea119f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/b44c4be11281827ec493c80d1a319eca3f46d849",
-                "reference": "b44c4be11281827ec493c80d1a319eca3f46d849",
+                "url": "https://api.github.com/repos/teamreflex/DiscordPHP/zipball/613c04a1aa9e39d8f3c77465095d626c5ea119f6",
+                "reference": "613c04a1aa9e39d8f3c77465095d626c5ea119f6",
                 "shasum": ""
             },
             "require": {
-                "cache/array-adapter": "^0.4.0",
+                "cache/array-adapter": "^0.4.2",
                 "guzzlehttp/guzzle": "~5.3|~6.0",
                 "illuminate/support": "^4.0|^5.0",
                 "monolog/monolog": "^1.19",
@@ -1808,7 +1808,7 @@
                 }
             ],
             "description": "An unofficial API to interact with the voice and text service Discord.",
-            "time": "2016-12-28 21:41:47"
+            "time": "2017-02-14 07:16:32"
         },
         {
             "name": "wyrihaximus/react-guzzle-http-client",
@@ -1907,7 +1907,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "team-reflex/discord-php": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
