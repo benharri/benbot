@@ -36,8 +36,6 @@ $imgs      = new Definitions(__DIR__.'/img_urls.json');
 $cities    = new Definitions(__DIR__.'/cities.json');
 $help      = [];
 
-// $cleverbot_nick = create_cleverbot_instance('benbot');
-$cleverbot = new Cleverbot_IO('benbot');
 
 
 
@@ -105,6 +103,8 @@ $discord->registerCommand('hi', [
 $discord->registerAlias('Hi', 'hi');
 $discord->registerAlias('Hello', 'hi');
 $discord->registerAlias('hello', 'hi');
+$discord->registerAlias('henlo', 'hi');
+$discord->registerAlias('Hello', 'hi');
 
 
 
@@ -122,11 +122,17 @@ $discord->registerCommand('embed', function($msg, $args) use ($discord) {
     // $msg->channel->sendMessage('embed', false, $embed);
 
 
-    $msg->channel->sendMessage("test", false, $discord->factory(Embed::class, [
+    $msg->channel->sendMessage("test", false, $discord->factory(\Discord\Parts\Embed\Embed::class, [
         'title' => 'test title',
         'description' => 'testing embed',
         'url' => 'http://discordapp.com'
     ]));
+
+
+    $this->discord->loop->addTimer(15, function($timer) use ($msg)
+    {
+        $msg->delete();
+    });
 
 }, [
     'description' => 'not working :(',
@@ -393,6 +399,21 @@ $discord->registerAlias('Say', 'say');
 
 
 ///////////////////////////////////////////////////////////
+$discord->registerCommand('sing', function($msg, $args) {
+    $a = implode(" ", $args);
+    if ((strpos($a, '@everyone') !== false) || (strpos($a, '@here') !== false)) {
+        $msg->reply("sry, can't do that! :P");
+        return;
+    }
+    send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}");
+}, [
+    'description' => 'sing sing sing',
+    'usage' => '<sing>',
+]);
+
+
+
+///////////////////////////////////////////////////////////
 // DEFINITIONS STUFF
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('set', function($msg, $args) use ($defs) {
@@ -427,7 +448,26 @@ register_help('unset');
 $discord->registerAlias('Unset', 'unset');
 
 
+///////////////////////////////////////////////////////////
+$discord->registerCommand('listdefs', function($msg, $args) use ($defs) {
+    $ret = "benbot definitions:\n\n";
+    foreach ($defs->iter() as $key => $val) {
+        $ret .= "**$key**: $val\n";
+    }
 
+    if (is_dm($msg)) send($msg, $ret);
+    else {
+        if (strlen($ret) > 2000) {
+            foreach (str_split($ret, 2000) as $split) {
+                $msg->author->user->sendMessage($split);
+            }
+        }
+        $msg->reply("check DMs!");
+    }
+}, [
+    'description' => 'lists all defs',
+    'usage' => '',
+]);
 
 
 
@@ -452,8 +492,9 @@ register_help('8ball');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lenny', function($msg, $args) {
     send($msg, "( ͡° ͜ʖ ͡°)");
-    $channel = $msg->channel;
-    $channel->deleteMessages([$msg]);
+    // $channel = $msg->channel;
+    // $channel->deleteMessages([$msg]);
+    $msg->delete();
 }, [
     'description' => 'you should know what this does',
 ]);
@@ -668,16 +709,13 @@ $discord->registerAlias('Img', 'img');
 
 ///////////////////////////////////////////////////////////
 // look up defs or images!
-$discord->registerCommand('', function($msg, $args) use ($cleverbot) {
-    $msg->reply($cleverbot->ask(implode(" ", $args)));
-    // $qu = strtolower($args[0]);
-    // if ($defs->get($qu, true))
-    //     send($msg, "**$qu**: " . $defs->get($qu));
-    // if ($imgs->get($qu, true)) {
-    //     $imgfile = $imgs->get($qu);
-    //     echo $qu, ": ", $imgfile, PHP_EOL;
-    //     $msg->channel->sendFile(__DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
-    // }
+$discord->registerCommand('', function($msg, $args) {
+    $url = "https://www.cleverbot.com/getreply";
+    $key = get_thing('cleverbot');
+    $input = rawurlencode(implode(' ', $args));
+    $apidata = json_decode(file_get_contents("$url?input=$input&key=$key"));
+
+    $msg->reply($apidata->output);
 }, [
     'description' => 'talk to ben (you can do this in a DM with me too!)',
     'usage' => '<msg>',
@@ -725,9 +763,9 @@ $discord->registerAlias('Bamboozle', 'bamboozle');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('music', function($msg, $args) use ($discord) {
+    print_r($msg);
     $music = new cmd_music($discord, $msg, 'music', implode(" ", $args));
     print_r($music);
-    print_r($msg);
 }, [
     'description' => 'music player',
     'usage' => '<song>',
