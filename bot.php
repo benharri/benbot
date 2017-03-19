@@ -121,13 +121,24 @@ $discord->registerCommand('embed', function($msg, $args) use ($discord) {
 
 
 }, [
-    'description' => 'not working :(',
+    'description' => 'fixed it!',
 ]);
 
 
 
 ///////////////////////////////////////////////////////////
-$time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
+$discord->registerCommand('http', function($msg, $args) use ($discord) {
+    $url = "http://api.icndb.com/jokes/random1";
+    $result = $discord->http->get($url);
+    print_r($result->result);
+}, [
+    'description' => 'test',
+    'usage' => 'd',
+]);
+
+
+///////////////////////////////////////////////////////////
+$time = $discord->registerCommand('time', function($msg, $args) use ($cities, $discord) {
     $url = "http://api.geonames.org/timezoneJSON?username=benharri";
     if (count($args) == 0) {
         // lookup the person's time or tell them to save their time
@@ -136,6 +147,8 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities) {
             $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
 
             $json = json_decode(file_get_contents($newurl));
+            // $json = $discord->http->get($newurl);
+            // print_r($json);
             $jtime = strtotime($json->time);
             send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$ci["city"]}.");
 
@@ -769,13 +782,14 @@ $discord->registerAlias('Bamboozle', 'bamboozle');
 ///////////////////////////////////////////////////////////
 // debugging commands
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs) {
+$discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs, $discord) {
     var_dump($msg->author->user->id);
     if (is_dm($msg)) $id = $msg->author->id;
     else $id = $msg->author->user->id;
     if ($id == "193011352275648514") {
         print_r($msg);
         send($msg, "debugging. check logs.");
+        print_r($discord);
     } else send($msg, "you're not allowed to use that command");
 });
 $discord->registerAlias('Dbg', 'dbg');
