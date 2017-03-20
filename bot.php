@@ -120,7 +120,7 @@ $discord->registerCommand('hi', [
 $discord->registerCommand('http', function($msg, $args) use ($discord) {
     $url = "http://api.icndb.com/jokes/random1";
     $result = $discord->http->get($url)->then(function($stff) {
-        var_dump($stff);
+        send($msg, $stff->value->joke);
     }, function ($e) {
         $e->getMessage();
     });
