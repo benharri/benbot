@@ -382,7 +382,7 @@ register_help('avatar');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('up', function($msg, $args) use ($start_time) {
-    send($msg, "benbot has been up for {$start_time->diffForHumans(Carbon::now(), true)}");
+    send($msg, "benbot has been up for {$start_time->diffForHumans(Carbon::now(), true)}.");
 }, [
     'description' => 'bot uptime',
     'aliases' => [
