@@ -32,6 +32,7 @@ include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
 
 $starttime = new DateTime();
+$start_time = Carbon::now();
 $defs      = new Definitions(__DIR__.'/definitions.json');
 $imgs      = new Definitions(__DIR__.'/img_urls.json');
 $cities    = new Definitions(__DIR__.'/cities.json');
@@ -380,14 +381,15 @@ register_help('avatar');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function($msg, $args) use ($starttime) {
+$discord->registerCommand('up', function($msg, $args) use ($starttime, $start_time) {
     $diff = $starttime->diff(new DateTime());
     $ret = "Up for ";
     $ret .= $diff->format("%a") . " day" . ($diff->d == 1 ? ", " : "s, ");
     $ret .= $diff->format("%h") . " hour" . ($diff->h == 1 ? ", " : "s, ");
     $ret .= $diff->format("%i") . " minute" . ($diff->i == 1 ? ", and " : "s, and ");
     $ret .= $diff->format("%s") . " second" . ($diff->s == 1 ? "" : "s");
-    send($msg, $ret);
+    // send($msg, $ret);
+    send($msg, $start_time->diffForHumans());
 }, [
     'description' => 'bot uptime',
     'aliases' => [
