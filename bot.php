@@ -813,7 +813,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             'url' => $guild->icon
         ]),
         // 'description' => "server info:\n",
-        'fields' =>  [
+        'fields' => [
             $discord->factory(Field::class, [
                 'name' => 'Member Count',
                 'value' => $guild->member_count,
@@ -822,10 +822,12 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             $discord->factory(Field::class, [
                 'name' => 'Region',
                 'value' => $guild->region,
+                'inline' => true,
             ]),
             $discord->factory(Field::class, [
                 'name' => 'Owner',
                 'value' => $guild->owner,
+                'inline' => true,
             ]),
             // $discord->factory(Field::class, [
             //     'name' => 'Is large?',
@@ -834,6 +836,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             $discord->factory(Field::class, [
                 'name' => 'Verification level',
                 'value' => $guild->verification_level,
+                'inline' => true,
             ]),
         ],
     ]);
