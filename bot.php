@@ -119,10 +119,10 @@ $discord->registerCommand('hi', [
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('http', function($msg, $args) use ($discord) {
     $url = "http://api.icndb.com/jokes/random1";
-    $result = $discord->http->get($url)->then(function($stff) {
+    $result = $discord->http->get($url)->then(function($stff) use ($msg) {
         send($msg, $stff->value->joke);
     }, function ($e) {
-        $e->getMessage();
+        send($msg, $e->getMessage());
     });
     // print_r($result->result);
 }, [
@@ -636,7 +636,11 @@ register_help('joke');
         ],
     ]);
 
-    $joke->registerSubCommand('dad', function($msg, $args) {
+    $joke->registerSubCommand('dad', function($msg, $args) use ($discord) {
+
+        $discord->http->get('https://icanhazdadjoke.com', ['Accept' => 'text/plain'])->then(function ($result) use ($msg) {
+            send($msg, $result);
+        });
         send($msg, file_get_contents("https://icanhazdadjoke.com/", false, stream_context_create([
             'http' => [
                 'method' => 'GET',
