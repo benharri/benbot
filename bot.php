@@ -31,8 +31,7 @@ include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
 
-$starttime = new DateTime();
-$start_time = Carbon::now();
+$starttime = null;// = Carbon::now();
 $defs      = new Definitions(__DIR__.'/definitions.json');
 $imgs      = new Definitions(__DIR__.'/img_urls.json');
 $cities    = new Definitions(__DIR__.'/cities.json');
@@ -46,7 +45,7 @@ $game = $discord->factory(Game::class, [
 ]);
 
 
-$discord->on('ready', function($discord) use ($game, $defs, $imgs) {
+$discord->on('ready', function($discord) use ($game, $defs, $imgs, $starttime) {
     $discord->updatePresence($game);
 
     $discord->on('message', function($msg, $args) use ($defs, $imgs) {
@@ -80,6 +79,9 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs) {
         ->guilds->get('id','289410862907785216')
         ->channels->get('id','289611811094003715')
         ->sendMessage("<@193011352275648514>, bot started successfully");
+
+    $starttime = Carbon::now();
+
 });
 
 
@@ -381,8 +383,8 @@ register_help('avatar');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function($msg, $args) use ($start_time) {
-    send($msg, "benbot has been up for {$start_time->diffForHumans(Carbon::now(), true)}.");
+$discord->registerCommand('up', function($msg, $args) use ($starttime) {
+    send($msg, "benbot has been up for {$starttime->diffForHumans(Carbon::now(), true)}.");
 }, [
     'description' => 'bot uptime',
     'aliases' => [
