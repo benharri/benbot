@@ -17,6 +17,17 @@ use Carbon\Carbon;
 
 
 include_once __DIR__.'/env_stuff.php';
+include __DIR__.'/kaomoji.php';
+include __DIR__.'/definitions.php';
+include __DIR__.'/util_fns.php';
+
+$starttime = Carbon::now();
+$defs      = new Definitions(__DIR__.'/definitions.json');
+$imgs      = new Definitions(__DIR__.'/img_urls.json');
+$cities    = new Definitions(__DIR__.'/cities.json');
+$help      = [];
+
+
 $discord = new DiscordCommandClient([
     'token'              => get_thing('token'),
     'prefix'             => ';',
@@ -26,18 +37,6 @@ $discord = new DiscordCommandClient([
         'pmChannels'  => true,
     ],
 ]);
-
-include __DIR__.'/kaomoji.php';
-include __DIR__.'/definitions.php';
-include __DIR__.'/util_fns.php';
-
-$starttime = null;// = Carbon::now();
-$defs      = new Definitions(__DIR__.'/definitions.json');
-$imgs      = new Definitions(__DIR__.'/img_urls.json');
-$cities    = new Definitions(__DIR__.'/cities.json');
-$help      = [];
-
-
 
 
 $game = $discord->factory(Game::class, [
