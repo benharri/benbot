@@ -1,0 +1,11 @@
+stages:
+    - deploy
+    
+job_deploy_master:
+    stage: deploy
+    only: 
+        - master
+    script:
+        - cd /home/ben/workspace/benbot/ && git pull
+        - /home/ben/workspace/benbot/bot restart
+        
