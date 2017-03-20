@@ -808,33 +808,33 @@ $discord->registerAlias('Sys', 'sys');
 $discord->registerCommand('server', function($msg, $args) use ($discord) {
     $guild = $msg->channel->guild;
     $embed = $discord->factory(Embed::class, [
-        'title' => $guild->name,
+        'title' => "{$guild->name} server info",
         'thumbnail' => $discord->factory(Image::class, [
             'url' => $guild->icon
         ]),
-        'description' => "server info:\n",
+        // 'description' => "server info:\n",
         'fields' =>  [
             $discord->factory(Field::class, [
                 'name' => 'Member Count',
                 'value' => $guild->member_count,
                 'inline' => true,
             ]),
-            // $discord->factory(Field::class, [
-            //     'name' => 'Region',
-            //     'value' => $guild->region,
-            // ]),
-            // $discord->factory(Field::class, [
-            //     'name' => 'Owner',
-            //     'value' => $guild->owner,
-            // ]),
+            $discord->factory(Field::class, [
+                'name' => 'Region',
+                'value' => $guild->region,
+            ]),
+            $discord->factory(Field::class, [
+                'name' => 'Owner',
+                'value' => $guild->owner,
+            ]),
             // $discord->factory(Field::class, [
             //     'name' => 'Is large?',
             //     'value' => $guild->large,
             // ]),
-            // $discord->factory(Field::class, [
-            //     'name' => 'Verification level',
-            //     'value' => $guild->verification_level,
-            // ]),
+            $discord->factory(Field::class, [
+                'name' => 'Verification level',
+                'value' => $guild->verification_level,
+            ]),
         ],
     ]);
     print_r($embed);
