@@ -842,7 +842,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             ]),
             $discord->factory(Field::class, [
                 'name' => 'Server created',
-                'value' => $guild->joined_at->format('g:i A \o\n l F j, Y') . "\n(" . $guild->joined_at->diffForHumans(Carbon::now()) . ")",
+                'value' => $guild->joined_at->format('g:i A \o\n l F j, Y') . "\n(" . Carbon::now()->diffForHumans($guild->joined_at) . ")",
             ]),
         ],
         'timestamp' => date(),
