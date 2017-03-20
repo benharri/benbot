@@ -813,7 +813,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             'url' => $guild->icon
         ]),
         'description' => "server info:\n",
-        'fields' => $discord->factory(Collection::class, [
+        'fields' =>  [
             $discord->factory(Field::class, [
                 'name' => 'Member Count',
                 'value' => $guild->member_count,
@@ -835,7 +835,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             //     'name' => 'Verification level',
             //     'value' => $guild->verification_level,
             // ]),
-        ]),
+        ],
     ]);
     print_r($embed);
     print_r($guild);
