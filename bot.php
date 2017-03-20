@@ -855,12 +855,13 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
     'description' => 'server info',
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('listroles', function($msg, $args) {
+$discord->registerCommand('role', function($msg, $args) {
     $ret = "```\nroles for {$msg->channel->guild->name}\n\n";
     foreach ($msg->channel->guild->roles as $role) {
         $ret .= "{$role->name} ({$role->id})\n";
     }
     $ret .= "```";
+    send($msg, $ret);
 }, [
     'description' => 'lists all roles for the server',
 ]);
