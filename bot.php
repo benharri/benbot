@@ -23,7 +23,6 @@ $discord = new DiscordCommandClient([
     'defaultHelpCommand' => false,
     'name'               => 'benbot',
     'discordOptions'     => [
-        // 'loggerLevel' => 'DEBUG',
         'pmChannels'  => true,
     ],
 ]);
@@ -101,12 +100,14 @@ $discord->registerCommand('hi', [
     'soup',
 ], [
     'description' => 'greeting',
+    'aliases' => [
+        'Hi',
+        'Hello',
+        'hello',
+        'henlo',
+        'Henlo',
+    ],
 ]);
-$discord->registerAlias('Hi', 'hi');
-$discord->registerAlias('Hello', 'hi');
-$discord->registerAlias('hello', 'hi');
-$discord->registerAlias('henlo', 'hi');
-$discord->registerAlias('Hello', 'hi');
 
 
 
@@ -194,9 +195,11 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
 }, [
     'description' => 'looks up current time for yourself or another user',
     'usage' => '<@user>',
+    'aliases' => [
+        'Time',
+    ],
 ]);
 register_help('time');
-$discord->registerAlias('Time', 'time');
 
 
     $time->registerSubCommand('save', function($msg, $args) use ($cities) {
@@ -274,9 +277,11 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
 }, [
     'description' => 'looks up weather for a city, other user, or yourself',
     'usage' => '<city|@user>',
+    'aliases' => [
+        'Weather',
+    ],
 ]);
 register_help('weather');
-$discord->registerAlias('Weather', 'weather');
 
 
     $weather->registerSubCommand('save', function($msg, $args) use ($cities) {
@@ -319,9 +324,11 @@ $discord->registerCommand('roll', function ($msg, $args) {
 }, [
     'description' => 'rolls an n-sided die. defaults to 6.',
     'usage' => '<number of sides>',
+    'aliases' => [
+        'Roll',
+    ],
 ]);
 register_help('roll');
-$discord->registerAlias('Roll', 'roll');
 
 
 ///////////////////////////////////////////////////////////
@@ -342,9 +349,13 @@ $discord->registerCommand('text_benh', function($msg, $args) {
 }, [
     'description' => 'text a message to benh',
     'usage' => '<message>',
+    'aliases' => [
+        'Text_benh',
+        'textben',
+        'Textben',
+    ],
 ]);
 register_help('text_benh');
-$discord->registerAlias('Text_benh', 'text_benh');
 
 
 
@@ -360,9 +371,11 @@ $discord->registerCommand('avatar', function($msg, $args) {
 }, [
     'description' => 'gets the avatar for a user',
     'usage' => '<@user>',
+    'aliases' => [
+        'Avatar',
+    ],
 ]);
 register_help('avatar');
-$discord->registerAlias('Avatar', 'avatar');
 
 
 
@@ -377,8 +390,10 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime) {
     send($msg, $ret);
 }, [
     'description' => 'bot uptime',
+    'aliases' => [
+        'Up',
+    ],
 ]);
-$discord->registerAlias('Up', 'up');
 
 
 
@@ -393,8 +408,10 @@ $discord->registerCommand('say', function($msg, $args) {
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
+    'aliases' => [
+        'Say',
+    ],
 ]);
-$discord->registerAlias('Say', 'say');
 
 
 
@@ -411,6 +428,9 @@ $discord->registerCommand('sing', function($msg, $args) {
 }, [
     'description' => 'sing sing sing',
     'usage' => '<sing>',
+    'aliases' => [
+        'Sing',
+    ],
 ]);
 
 
@@ -429,9 +449,11 @@ $discord->registerCommand('set', function($msg, $args) use ($defs) {
 }, [
     'description' => 'sets this to that',
     'usage' => '<this> <that>',
+    'aliases' => [
+        'Set',
+    ],
 ]);
 register_help('set');
-$discord->registerAlias('Set', 'set');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('get', function($msg, $args) use ($defs) {
     if (isset($args[0])) send($msg, "**" . $args[0] . "**: " . $defs->get(strtolower($args[0])));
@@ -439,9 +461,11 @@ $discord->registerCommand('get', function($msg, $args) use ($defs) {
 }, [
     'description' => 'gets a value from the definitions. you can also omit get (;<thing to get>)',
     'usage' => '<thing to get>',
+    'aliases' => [
+        'Get',
+    ],
 ]);
 register_help('get');
-$discord->registerAlias('Get', 'get');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('unset', function($msg, $args) use ($defs) {
     $defs->unset(strtolower($args[0]));
@@ -449,9 +473,11 @@ $discord->registerCommand('unset', function($msg, $args) use ($defs) {
 }, [
     'description' => 'removes a definition',
     'usage' => '<def to remove>',
+    'aliases' => [
+        'Unset',
+    ],
 ]);
 register_help('unset');
-$discord->registerAlias('Unset', 'unset');
 
 
 ///////////////////////////////////////////////////////////
@@ -471,8 +497,11 @@ $discord->registerCommand('listdefs', function($msg, $args) use ($defs) {
         $msg->reply("check DMs!");
     }
 }, [
-    'description' => 'lists all defs',
+    'description' => 'lists all defs (sends dm)',
     'usage' => '',
+    'aliases' => [
+        'Listdefs',
+    ],
 ]);
 
 
@@ -490,6 +519,10 @@ $discord->registerCommand('8ball', function($msg, $args) use ($fortunes) {
 }, [
     'description' => 'tells your fortune',
     'usage' => '<question to ask the mighty 8ball>',
+    'aliases' => [
+        'ask',
+        'Ask',
+    ],
 ]);
 register_help('8ball');
 
@@ -498,32 +531,43 @@ register_help('8ball');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lenny', function($msg, $args) {
     send($msg, "( ͡° ͜ʖ ͡°)");
-    // $channel = $msg->channel;
-    // $channel->deleteMessages([$msg]);
     $msg->delete();
 }, [
     'description' => 'you should know what this does',
+    'aliases' => [
+        'Lenny',
+    ],
 ]);
-$discord->registerAlias('Lenny', 'lenny');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lennies', function($msg, $args) use ($lennyception) {
     send($msg, $lennyception);
 }, [
     'description' => '( ͡° ͜ʖ ͡°)',
+    'aliases' => [
+        'Lennies',
+        'lennyception',
+        'Lennyception',
+    ],
 ]);
-$discord->registerAlias('Lennies', 'lennies');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('shrug', function($msg, $args) {
     send($msg, "¯\\\_(ツ)\_/¯");
 }, [
     'description' => 'meh',
+    'aliases' => [
+        'Shrug',
+        'meh',
+        'Meh',
+    ],
 ]);
-$discord->registerAlias('Shrug', 'shrug');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('noice', function($msg, $args) use ($bs) {
     send($msg, $bs);
 }, [
     'description' => 'ayyy',
+    'aliases' => [
+        'Noice',
+    ],
 ]);
 
 
@@ -533,6 +577,9 @@ $discord->registerCommand('copypasta', function($msg, $args) {
     send($msg, $copypastas[array_rand($copypastas)]);
 }, [
     'description' => 'gets random copypasta',
+    'aliases' => [
+        'Copypasta',
+    ],
 ]);
 
 
@@ -542,9 +589,11 @@ $kaomoji = $discord->registerCommand('kaomoji', function($msg, $args) use ($kaom
 }, [
     'description' => 'sends random kaomoji',
     'usage' => '<sad|happy|angry|confused|surprised>',
+    'aliases' => [
+        'Kaomoji',
+    ],
 ]);
 register_help('kaomoji');
-$discord->registerAlias('Kaomoji', 'kaomoji');
 
 
     $kaomoji->registerSubCommand('sad', function($msg, $args) use($sad_kaomojis) {
@@ -576,9 +625,11 @@ $joke = $discord->registerCommand('joke', function($msg, $args) {
 }, [
     'description' => 'tells a random joke',
     'usage' => '<chucknorris|yomama|dad>',
+    'aliases' => [
+        'Joke',
+    ],
 ]);
 register_help('joke');
-$discord->registerAlias('Joke', 'joke');
 
 
     $joke->registerSubCommand('chucknorris', function($msg, $args) {
@@ -586,6 +637,9 @@ $discord->registerAlias('Joke', 'joke');
         send($msg, $json->value->joke);
     }, [
         'description' => 'get a random fact about chuck norris',
+        'aliases' => [
+            'chuck',
+        ],
     ]);
 
     $joke->registerSubCommand('yomama', function($msg, $args) {
@@ -593,6 +647,9 @@ $discord->registerAlias('Joke', 'joke');
         send($msg, $jokes[array_rand($jokes)]);
     }, [
         'description' => 'yo mama jokes',
+        'aliases' => [
+            'mom',
+        ],
     ]);
 
     $joke->registerSubCommand('dad', function($msg, $args) {
@@ -633,9 +690,11 @@ $discord->registerCommand('block', function($msg, $args) {
 }, [
     'description' => 'turn a message into block text',
     'usage' => '<msg>',
+    'aliases' => [
+        'Block',
+    ],
 ]);
 register_help('block');
-$discord->registerAlias('Block', 'block');
 
 
 
@@ -656,9 +715,11 @@ $img = $discord->registerCommand('img', function($msg, $args) use ($imgs, $disco
 }, [
     'description' => 'image tools (;help img for more info)',
     'usage' => '<image to show>',
+    'aliases' => [
+        'Img',
+    ],
 ]);
 register_help('img');
-$discord->registerAlias('Img', 'img');
 
     // $img->registerSubCommand('save2', function($msg, $args) use ($imgs) {
     //     if (count($msg->attachments) > 0) {
@@ -735,6 +796,10 @@ $discord->registerCommand('', function($msg, $args) {
 }, [
     'description' => 'talk to ben (you can do this in a DM too!)',
     'usage' => '<msg>',
+    'aliases' => [
+        'chat',
+        'cleverbot',
+    ],
 ]);
 register_help('');
 
@@ -752,6 +817,9 @@ $discord->registerCommand('dm', function($msg, $args) {
 }, [
     'description' => 'start a DM conversation with yourself or someone else',
     'usage' => '<@user>',
+    'aliases' => [
+        'Dm',
+    ],
 ]);
 register_help('dm');
 
@@ -767,8 +835,10 @@ $discord->registerCommand('bamboozle', function($msg, $args) {
 }, [
     'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
     'usage' => '<user>(optional)',
+    'aliases' => [
+        'Bamboozle',
+    ],
 ]);
-$discord->registerAlias('Bamboozle', 'bamboozle');
 
 
 
@@ -794,8 +864,11 @@ $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs, $disco
         send($msg, "debugging. check logs.");
         print_r($discord);
     } else send($msg, "you're not allowed to use that command");
-});
-$discord->registerAlias('Dbg', 'dbg');
+}, [
+    'aliases' => [
+        'Dbg',
+    ],
+]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('sys', function($msg, $args) {
     if (is_dm($msg)) $id = $msg->author->id;
@@ -803,8 +876,11 @@ $discord->registerCommand('sys', function($msg, $args) {
     if ($id == "193011352275648514") {
         send($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
     } else send($msg, "you're not allowed to use that command");
-});
-$discord->registerAlias('Sys', 'sys');
+}, [
+    'aliases' => [
+        'Sys',
+    ],
+]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('server', function($msg, $args) use ($discord) {
     $verify_lvls = [
@@ -906,8 +982,11 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
             $msg->reply("check DMs!");
         }
     }
-});
-$discord->registerAlias('Help', 'help');
+}, [
+    'aliases' => [
+        'Help',
+    ],
+]);
 
 
 
