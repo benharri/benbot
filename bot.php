@@ -853,9 +853,15 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
     send($msg, "", $embed);
 }, [
     'description' => 'server info',
+    'aliases' => [
+        'Server',
+        'guild',
+        'Guild',
+    ],
 ]);
+register_help('server');
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('role', function($msg, $args) {
+$discord->registerCommand('roles', function($msg, $args) {
     $ret = "```\nroles for {$msg->channel->guild->name}\n\n";
     foreach ($msg->channel->guild->roles as $role) {
         $ret .= "{$role->name} ({$role->id})\n";
@@ -864,14 +870,13 @@ $discord->registerCommand('role', function($msg, $args) {
     send($msg, $ret);
 }, [
     'description' => 'lists all roles for the server',
+    'aliases' => [
+        'Roles',
+        'role',
+        'Role',
+    ],
 ]);
-///////////////////////////////////////////////////////////
-$discord->registerCommand('roleinfo', function($msg, $args) {
-
-}, [
-    'description' => 'gets info for a role',
-    'usage' => '<role>',
-]);
+register_help('roles');
 
 
 
