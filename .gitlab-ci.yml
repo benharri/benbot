@@ -6,6 +6,6 @@ job_deploy_master:
     only: 
         - master
     script:
-        - cd /home/ben/workspace/benbot/ && git pull
-        - /home/ben/workspace/benbot/bot restart
+        - composer install
+        - bot start
         
