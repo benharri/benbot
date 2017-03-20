@@ -7,5 +7,6 @@ job_deploy_master:
         - master
     script:
         - composer install
+        - cp /home/ben/workspace/benbot/env_stuff.php .
         - ./bot start
         
