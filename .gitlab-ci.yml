@@ -7,5 +7,5 @@ job_deploy_master:
         - master
     script:
         - composer install
-        - bot start
+        - ./bot start
         
