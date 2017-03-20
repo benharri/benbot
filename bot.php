@@ -119,8 +119,12 @@ $discord->registerCommand('hi', [
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('http', function($msg, $args) use ($discord) {
     $url = "http://api.icndb.com/jokes/random1";
-    $result = $discord->http->get($url);
-    print_r($result->result);
+    $result = $discord->http->get($url)->then(function($stff) {
+        print_r($stff);
+    }, function ($e) {
+        print_r($e);
+    });
+    // print_r($result->result);
 }, [
     'description' => 'test',
     'usage' => 'd',
