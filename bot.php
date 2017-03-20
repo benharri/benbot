@@ -389,7 +389,7 @@ $discord->registerCommand('up', function($msg, $args) use ($starttime, $start_ti
     $ret .= $diff->format("%i") . " minute" . ($diff->i == 1 ? ", and " : "s, and ");
     $ret .= $diff->format("%s") . " second" . ($diff->s == 1 ? "" : "s");
     // send($msg, $ret);
-    send($msg, $start_time->diffForHumans());
+    send($msg, "benbot was started {$start_time->diffForHumans()}");
 }, [
     'description' => 'bot uptime',
     'aliases' => [
