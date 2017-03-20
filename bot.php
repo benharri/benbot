@@ -381,15 +381,8 @@ register_help('avatar');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function($msg, $args) use ($starttime, $start_time) {
-    $diff = $starttime->diff(new DateTime());
-    $ret = "Up for ";
-    $ret .= $diff->format("%a") . " day" . ($diff->d == 1 ? ", " : "s, ");
-    $ret .= $diff->format("%h") . " hour" . ($diff->h == 1 ? ", " : "s, ");
-    $ret .= $diff->format("%i") . " minute" . ($diff->i == 1 ? ", and " : "s, and ");
-    $ret .= $diff->format("%s") . " second" . ($diff->s == 1 ? "" : "s");
-    // send($msg, $ret);
-    send($msg, "benbot was started {$start_time->diffForHumans()}");
+$discord->registerCommand('up', function($msg, $args) use ($start_time) {
+    send($msg, "benbot has been up for {$start_time->diffForHumans(Carbon::now(), true)}");
 }, [
     'description' => 'bot uptime',
     'aliases' => [
