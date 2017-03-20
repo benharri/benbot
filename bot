@@ -5,7 +5,7 @@ pid=$(ps -ef | grep bot.php | grep -v grep | awk '{print $2}')
 case "$1" in
         nohup)
             if [ "" == "$pid" ]; then
-                nohup php bot.php > bot.out &
+                nohup php bot.php > bot.out 2> bot.err < /dev/null &
             else
                 echo "bot already running"
             fi
@@ -46,7 +46,7 @@ case "$1" in
                 echo "killing bot ($pid)"
                 kill $pid
             fi
-            nohup php bot.php > bot.out &
+            nohup php bot.php > bot.out 2> bot.err < /dev/null &
             ;;
 
 
