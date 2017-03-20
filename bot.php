@@ -841,7 +841,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
                 'value' => $guild->id,
             ]),
             $discord->factory(Field::class, [
-                'name' => 'Server created',
+                'name' => 'benbot joined',
                 'value' => $guild->joined_at->format('g:i A \o\n l F j, Y') . "\n(" . $guild->joined_at->diffForHumans() . ")",
             ]),
         ],
