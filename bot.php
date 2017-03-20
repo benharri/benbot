@@ -807,10 +807,10 @@ $discord->registerAlias('Sys', 'sys');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('server', function($msg, $args) use ($discord) {
     $verify_lvls = [
-        0 => "None\nmust have discord account",
-        1 => "Low\nmust have verified email",
-        2 => "Medium\nmust have verified email for more than 5 minutes",
-        3 => "(╯°□°）╯︵ ┻━┻\nmust have verified email, be registered on discord for more than 5 minutes, and must wait 10 minutes before speaking in any channel",
+        0 => "None: must have discord account",
+        1 => "Low: must have verified email",
+        2 => "Medium: must have verified email for more than 5 minutes",
+        3 => "(╯°□°）╯︵ ┻━┻: must have verified email, be registered on discord for more than 5 minutes, and must wait 10 minutes before speaking in any channel",
     ];
     $guild = $msg->channel->guild;
     $embed = $discord->factory(Embed::class, [
@@ -823,17 +823,17 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             $discord->factory(Field::class, [
                 'name' => 'Member Count',
                 'value' => $guild->member_count,
-                'inline' => true,
+                // 'inline' => true,
             ]),
             $discord->factory(Field::class, [
                 'name' => 'Region',
                 'value' => $guild->region,
-                'inline' => true,
+                // 'inline' => true,
             ]),
             $discord->factory(Field::class, [
                 'name' => 'Owner',
                 'value' => "@{$guild->owner->username}#{$guild->owner->discriminator}",
-                'inline' => true,
+                // 'inline' => true,
             ]),
             // $discord->factory(Field::class, [
             //     'name' => 'Is large?',
@@ -842,7 +842,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             $discord->factory(Field::class, [
                 'name' => 'Verification level',
                 'value' => $verify_lvls[$guild->verification_level],
-                'inline' => true,
+                // 'inline' => true,
             ]),
         ],
     ]);
