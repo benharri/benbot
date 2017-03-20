@@ -802,7 +802,7 @@ $discord->registerCommand('eval', function($msg, $args) use ($discord) {
 
     if ($id == "193011352275648514") {
         $command = implode(' ', $args);
-        $result = "${$command}";
+        $result = "{$command}";
         send($msg, "$result");
     } else send($msg, "you're not allowed to use that command");
 }, [
