@@ -838,6 +838,8 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
         ]),
     ]);
     print_r($embed);
+    print_r($guild);
+    echo "things", PHP_EOL;
     send($msg, "", $embed);
 }, [
     'description' => 'server info',
