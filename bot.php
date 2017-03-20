@@ -787,6 +787,7 @@ $discord->registerAlias('Bamboozle', 'bamboozle');
 $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs, $discord) {
     if (is_dm($msg)) $id = $msg->author->id;
     else $id = $msg->author->user->id;
+
     if ($id == "193011352275648514") {
         print_r($msg);
         send($msg, "debugging. check logs.");
@@ -798,9 +799,11 @@ $discord->registerAlias('Dbg', 'dbg');
 $discord->registerCommand('eval', function($msg, $args) use ($discord) {
     if (is_dm($msg)) $id = $msg->author->id;
     else $id = $msg->author->user->id;
+
     if ($id == "193011352275648514") {
         $command = implode(' ', $args);
-        send($msg, "${$command}");
+        $result = "${$command}";
+        send($msg, "$result");
     } else send($msg, "you're not allowed to use that command");
 }, [
     'description' => 'eval',
