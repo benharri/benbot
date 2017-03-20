@@ -818,36 +818,36 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
         'thumbnail' => $discord->factory(Image::class, [
             'url' => $guild->icon
         ]),
-        // 'description' => "server info:\n",
         'fields' => [
             $discord->factory(Field::class, [
                 'name' => 'Member Count',
                 'value' => $guild->member_count,
-                // 'inline' => true,
             ]),
             $discord->factory(Field::class, [
                 'name' => 'Region',
                 'value' => $guild->region,
-                // 'inline' => true,
             ]),
             $discord->factory(Field::class, [
                 'name' => 'Owner',
                 'value' => "@{$guild->owner->username}#{$guild->owner->discriminator}",
-                // 'inline' => true,
             ]),
-            // $discord->factory(Field::class, [
-            //     'name' => 'Is large?',
-            //     'value' => $guild->large,
-            // ]),
             $discord->factory(Field::class, [
                 'name' => 'Verification level',
                 'value' => $verify_lvls[$guild->verification_level],
-                // 'inline' => true,
+            ]),
+            $discord->factory(Field::class, [
+                'name' => 'Server ID',
+                'value' => $guild->id,
+            ]),
+            $discord->factory(Field::class, [
+                'name' => 'Server created',
+                'value' => $guild->joined_at,
             ]),
         ],
+        'timestamp' => date(),
     ]);
-    print_r($embed);
-    print_r($guild);
+    // print_r($embed);
+    // print_r($guild);
     echo "things", PHP_EOL;
     send($msg, "", $embed);
 }, [
