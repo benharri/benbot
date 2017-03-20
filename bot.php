@@ -814,6 +814,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
         ]),
         'description' => "server info:\n",
         'fields' => $discord->factory(Collection::class, [
+            'items' => [
             $discord->factory(Field::class, [
                 'name' => 'Member Count',
                 'value' => $guild->member_count,
@@ -834,6 +835,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
                 'name' => 'Verification level',
                 'value' => $guild->verification_level,
             ]),
+            ],
         ]),
         // 'url' => 'http://discordapp.com'
     ]);
