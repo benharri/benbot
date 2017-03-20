@@ -785,7 +785,6 @@ $discord->registerAlias('Bamboozle', 'bamboozle');
 // debugging commands
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs, $discord) {
-    var_dump($msg->author->user->id);
     if (is_dm($msg)) $id = $msg->author->id;
     else $id = $msg->author->user->id;
     if ($id == "193011352275648514") {
@@ -795,6 +794,18 @@ $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs, $disco
     } else send($msg, "you're not allowed to use that command");
 });
 $discord->registerAlias('Dbg', 'dbg');
+///////////////////////////////////////////////////////////
+$discord->registerCommand('eval', function($msg, $args) use ($discord) {
+    if (is_dm($msg)) $id = $msg->author->id;
+    else $id = $msg->author->user->id;
+    if ($id == "193011352275648514") {
+        $command = implode(' ', $args);
+        send($msg, "${$command}");
+    } else send($msg, "you're not allowed to use that command");
+}, [
+    'description' => 'eval',
+    'usage' => '<thing to eval>',
+]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('sys', function($msg, $args) {
     if (is_dm($msg)) $id = $msg->author->id;
