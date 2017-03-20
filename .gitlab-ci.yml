@@ -8,5 +8,8 @@ job_deploy_master:
     script:
         - composer install
         - cp /home/ben/workspace/benbot/env_stuff.php .
+        - cp /home/ben/workspace/benbot/definitions.json .
+        - cp /home/ben/workspace/benbot/cities.json .
+        - cp /home/ben/workspace/benbot/img_urls.json .
         - ./bot start
         
