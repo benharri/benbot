@@ -815,29 +815,29 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
         'description' => "server info:\n",
         'fields' => $discord->factory(Collection::class, [
             'items' => [
-            $discord->factory(Field::class, [
-                'name' => 'Member Count',
-                'value' => $guild->member_count,
-            ]),
-            $discord->factory(Field::class, [
-                'name' => 'Region',
-                'value' => $guild->region,
-            ]),
-            $discord->factory(Field::class, [
-                'name' => 'Owner',
-                'value' => $guild->owner,
-            ]),
-            $discord->factory(Field::class, [
-                'name' => 'Is large?',
-                'value' => $guild->large,
-            ]),
-            $discord->factory(Field::class, [
-                'name' => 'Verification level',
-                'value' => $guild->verification_level,
-            ]),
+                $discord->factory(Field::class, [
+                    'name' => 'Member Count',
+                    'value' => $guild->member_count,
+                    'inline' => true,
+                ]),
+                // $discord->factory(Field::class, [
+                //     'name' => 'Region',
+                //     'value' => $guild->region,
+                // ]),
+                // $discord->factory(Field::class, [
+                //     'name' => 'Owner',
+                //     'value' => $guild->owner,
+                // ]),
+                // $discord->factory(Field::class, [
+                //     'name' => 'Is large?',
+                //     'value' => $guild->large,
+                // ]),
+                // $discord->factory(Field::class, [
+                //     'name' => 'Verification level',
+                //     'value' => $guild->verification_level,
+                // ]),
             ],
         ]),
-        // 'url' => 'http://discordapp.com'
     ]);
     send($msg, "", $embed);
 }, [
