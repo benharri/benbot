@@ -1,6 +1,6 @@
-# testcord
+# benbot
 
-[Add phpbot to your server](https://discordapp.com/api/oauth2/authorize?client_id=288416337057939456&scope=bot&permissions=0)
+[Add benbot to your server](https://discordapp.com/api/oauth2/authorize?client_id=288416337057939456&scope=bot&permissions=0)
 
 This is a discord bot I've been working on. Under heavy development.
 
@@ -9,14 +9,14 @@ Feel free to clone this project and try your hand at making a bot.
 ## Set up
 
 1. `git clone https://github.com/benharri/testcord && cd testcord`
-1. Install DiscordPHP and dependencies `composer install`
+1. Install DiscordPHP and dependencies: `composer install`
 1. Get your Discord API Key and save it in `env_stuff.php`
-2. --optional save your API keys in `env_stuff.php` for openweathermap.org, cleverbot.io, and a phone number for the text command
+2. --optional save your API keys in `env_stuff.php` for openweathermap.org, cleverbot.com, and a phone number for the text command
 1. Run the bot `./bot start`
 
 >If you want to keep the bot running in the background, run it as `./bot nohup`
 
->If bash isn't available, you can run the bot with just `php bot.php`
+>If bash isn't available, you can run the bot with just `php bot.php` (and `nohup php bot.php &` to run in the background)
 
 
 ## Commands

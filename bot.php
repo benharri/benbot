@@ -114,22 +114,6 @@ $discord->registerCommand('hi', [
 
 
 
-///////////////////////////////////////////////////////////
-$discord->registerCommand('embed', function($msg, $args) use ($discord) {
-
-
-
-    $msg->channel->sendMessage("", false, $discord->factory(\Discord\Parts\Embed\Embed::class, [
-        'title' => 'test title',
-        'description' => 'testing embed',
-        'url' => 'http://discordapp.com'
-    ]));
-
-
-}, [
-    'description' => 'fixed it!',
-]);
-
 
 
 ///////////////////////////////////////////////////////////
