@@ -11,6 +11,8 @@ use Discord\Parts\Embed\Embed;
 use Discord\Parts\Embed\Author;
 use Discord\Parts\Embed\Image;
 use Discord\Parts\Embed\Footer;
+use Discord\Parts\Embed\Field;
+use Discord\Helpers\Collection;
 
 
 include_once __DIR__.'/env_stuff.php';
@@ -802,7 +804,60 @@ $discord->registerCommand('sys', function($msg, $args) {
     } else send($msg, "you're not allowed to use that command");
 });
 $discord->registerAlias('Sys', 'sys');
+///////////////////////////////////////////////////////////
+$discord->registerCommand('server', function($msg, $args) use ($discord) {
+    $guild = $msg->channel->guild;
+    $embed = $discord->factory(Embed::class, [
+        'title' => $guild->name,
+        'thumbnail' => $discord->factory(Image::class, [
+            'url' => $guild->icon
+        ]),
+        'description' => "server info:\n",
+        'fields' => $discord->factory(Collection::class, [
+            $discord->factory(Field::class, [
+                'name' => 'Member Count',
+                'value' => $guild->member_count,
+            ]),
+            $discord->factory(Field::class, [
+                'name' => 'Region',
+                'value' => $guild->region,
+            ]),
+            $discord->factory(Field::class, [
+                'name' => 'Owner',
+                'value' => $guild->owner,
+            ]),
+            $discord->factory(Field::class, [
+                'name' => 'Is large?',
+                'value' => $guild->large,
+            ]),
+            $discord->factory(Field::class, [
+                'name' => 'Verification level',
+                'value' => $guild->verification_level,
+            ]),
+        ]),
+        // 'url' => 'http://discordapp.com'
+    ]);
+    send($msg, "", $embed);
+}, [
+    'description' => 'server info',
+]);
+///////////////////////////////////////////////////////////
+$discord->registerCommand('listroles', function($msg, $args) {
+    $ret = "```\nroles for {$msg->channel->guild->name}\n\n";
+    foreach ($msg->channel->guild->roles as $role) {
+        $ret .= "{$role->name} ({$role->id})\n";
+    }
+    $ret .= "```";
+}, [
+    'description' => 'lists all roles for the server',
+]);
+///////////////////////////////////////////////////////////
+$discord->registerCommand('roleinfo', function($msg, $args) {
 
+}, [
+    'description' => 'gets info for a role',
+    'usage' => '<role>',
+]);
 
 
 
