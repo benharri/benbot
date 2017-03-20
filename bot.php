@@ -837,6 +837,7 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             // ]),
         ]),
     ]);
+    print_r($embed);
     send($msg, "", $embed);
 }, [
     'description' => 'server info',
