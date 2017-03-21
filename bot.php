@@ -141,17 +141,17 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
     } else {
         if (count($msg->mentions) > 0) {
             // if users are mentioned
-            $msg->channel->broadcastTyping();
 
             foreach ($msg->mentions as $mention) {
                 if ($cities->get($mention->id, true)) {
+                    $msg->channel->broadcastTyping();
                     $ci = $cities->get($mention->id);
                     $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
 
                     $discord->http->get($newurl)->then(function($json) use ($mention, $ci) {
                         $jtime = strtotime($json->time);
                         send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$ci["city"]} (<@{$mention->id}>).");
-                    });
+                    }, function ($e) { echo $e->getMessage(), PHP_EOL; });
                 } else {
                     send($msg, "No city found for <@{$mention->id}>.\nset a preferred city with `;time save city` or `;weather save city`");
                 }
@@ -240,7 +240,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
         if ($cities->get($msg->author->id, true)) {
             $url .= "id=" . $cities->get($msg->author->id)["id"];
             $discord->http->get($url)->then(function($result) use ($msg) {
-                send($msg, format_weather($result));
+                send($msg, "", format_weather($result));
             });
         } else {
             $msg->reply("you can set your preferred city with `;weather save <city>`");
@@ -253,7 +253,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
                 if ($cities->get($mention->id, true)) {
                     $url .= "id=" . $cities->get($mention->id)["id"];
                     $discord->http->get($url)->then(function($result) use ($msg) {
-                        send($msg, format_weather($result));
+                        send($msg, "", format_weather($result));
                     });
                 } else {
                     // mentioned user not found
@@ -265,7 +265,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
             $query = implode("%20", $args);
             $url .= "q=$query";
             $discord->http->get($url)->then(function($result) use($msg) {
-                send($msg, format_weather($result));
+                send($msg, "", format_weather($result));
             });
         }
     }

@@ -2,6 +2,8 @@
 
 require __DIR__.'/vendor/autoload.php';
 use React\Promise\Deferred;
+use Discord\Parts\Embed\Embed;
+use Carbon\Carbon;
 
 include_once __DIR__.'/env_stuff.php';
 
@@ -54,13 +56,33 @@ function ascii_from_img($filepath) {
     return $ret;
 }
 
+function fahr($celsius) {return $celsius * 9 / 5 + 32;}
+function cels($fahrenh) {return $fahrenh * 5 / 9 - 32;}
 
 function format_weather($json) {
-    $fahr = round($json->main->temp * 5 / 9 + 32);
-    $ret = <<<EOD
-it's {$json->main->temp}°C ({$fahr}°F) with {$json->weather[0]->description} in {$json->name}, {$json->sys->country}
-EOD;
-    return $ret;
+    global $discord;
+
+    // $fahr = round($json->main->temp * 5 / 9 + 32);
+    return $discord->factory(Embed::class, [
+        'title' => "Weather in {$json->name}, {$json->sys->country}",
+        'thumbnail' => ['url' => "http://openweathermap.org/img/w/{$json->weather[0]->icon}.png"],
+        'fields' => [
+            ['name' => 'Current temperature', 'value' => "{$json->main->temp}°C (".fahr($json->main->temp)."°F)", 'inline' => true],
+            ['name' => 'Low/High Forecasted Temp', 'value' => "{$json->main->temp_min}/{$json->main->temp_max}°C  " . fahr($json->main->temp_min) . "/" . fahr($json->main->temp_max) . "°F", 'inline' => true],
+            ['name' => 'Current conditions', 'value' => $json->weather[0]->description, 'inline' => true],
+            ['name' => 'Atmospheric Pressure', 'value' => "{$json->main->pressure} hPa", 'inline' => true],
+            ['name' => 'Humidity', 'value' => "{$json->main->humidity} %", 'inline' => true],
+            ['name' => 'Wind', 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°", 'inline' => true],
+            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestamp($json->sys->sunrise)->toTimeString(), 'inline' => true],
+            ['name' => 'Sunset', 'value' => Carbon::createFromTimestamp($json->sys->sunset)->toTimeString(), 'inline' => true],
+        ],
+        'timestamp' => null,
+    ]);
+
+//     $ret = <<<EOD
+// it's {$json->main->temp}°C ({$fahr}°F) with {$json->weather[0]->description} in {$json->name}, {$json->sys->country}
+// EOD;
+//     return $ret;
 }
 
 
