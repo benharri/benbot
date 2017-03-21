@@ -50,7 +50,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $starttime) {
     $discord->on('message', function($msg, $args) use ($defs, $imgs) {
         // for stuff that isn't a command
         $text = $msg->content;
-        if (strpos($text, ':dib:') !== false) send($msg, ":dib:");
+        // if (strpos($text, ':dib:') !== false) send($msg, ":dib:");
         $gen = char_in($text);
         $first_char = $gen->current();
 
