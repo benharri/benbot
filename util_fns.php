@@ -1,6 +1,8 @@
 <?php
 
 require __DIR__.'/vendor/autoload.php';
+use React\Promise\Deferred;
+
 include_once __DIR__.'/env_stuff.php';
 
 function char_in($str) {
@@ -8,16 +10,18 @@ function char_in($str) {
         yield substr($str, $i, 1);
 }
 
+
 function send($msg, $txt, $embed = null) {
-    if (strlen($txt) > 2000) {
-        $split = str_split($txt, 2000);
-        print_r($split);
-        foreach ($split as $part) {
-            $msg->channel->sendMessage($part, false, $embed);
-        }
-    }
-    return $msg->channel->sendMessage($txt, false, $embed);
+    return $msg->channel->sendMessage($txt, false, $embed)
+        ->otherwise(function($e){echo $e->getMessage(), PHP_EOL;});
 }
+
+
+function sendfile($msg, $filepath, $filename, $txt) {
+    return $msg->channel->sendFile($filepath, $filename, $txt)
+        ->otherwise(function($e){echo $e->getMessage(), PHP_EOL;});
+}
+
 
 function is_dm($msg) {
     return $msg->author instanceOf Discord\Parts\User\User;
@@ -68,12 +72,20 @@ function register_help($cmd_name) {
 
 
 function ask_cleverbot($input) {
+    $deferred = new Deferred();
+    global $discord;
+
     $url = "https://www.cleverbot.com/getreply";
     $key = get_thing('cleverbot');
     $input = rawurlencode($input);
-    $apidata = json_decode(file_get_contents("$url?input=$input&key=$key"));
+    $discord->http->get("$url?input=$input&key=$key")->then(function($apidata) use ($deferred) {
+        // print_r($apidata);
+        $deferred->resolve($apidata);
+    }, function ($e) {
+        $deferred->reject($e);
+    });
 
-    return $apidata->output;
+    return $deferred->promise();
 }
 
 
