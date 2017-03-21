@@ -67,6 +67,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $starttime) {
             }
 
         } else {
+            if ($text === ":dib:") send($msg, ":dib:");
 
             if (is_dm($msg)) {
                 if (!$msg->author->bot){
