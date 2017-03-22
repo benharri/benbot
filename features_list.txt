@@ -1,0 +1,41 @@
+features list
+
+
+weather
+time
+fortunes
+roll dice
+cleverbot
+save images
+direct messages to user
+text me (actually SMS)
+get user profile photo
+get user info
+get server information
+get bot status/information
+save text and other values
+get jokes (write an API or use someone else's)
+unicode text transform
+block text transform (emojis)
+stream music to voice channels
+create and vote on polls
+games!
+
+
+
+
+
+what I'll learn
+
+
+APIs - using them, maybe write my own
+composer (PHP packages, namespacing, and class autoloading)
+server setup and maintenance
+security (tokens, ssl)
+source control
+PHP (I know PHP, but PHP7 is new to me)
+Python (I could just start over in python!)
+Async PHP
+Promises
+
+
