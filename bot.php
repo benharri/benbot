@@ -865,6 +865,24 @@ $discord->registerCommand('sys', function($msg, $args) {
     ],
 ]);
 ///////////////////////////////////////////////////////////
+$discord->registerCommand('status', function($msg, $args) use ($discord, $starttime) {
+    $embed = $discord->factory(Embed::class, [
+        'title' => 'Benbot status',
+        'thumbnail' => ['url' => $discord->avatar],
+        'fields' => [
+            ['name' => 'Uptime', 'value' => $starttime->diffForHumans(Carbon::now(), true) . " since " . $starttime->format('g:i A \o\n l F j, Y')],
+        ],
+    ]);
+    print_r($discord);
+    send($msg, "", $embed);
+}, [
+    'description' => 'bot status',
+    'usage' => '',
+    'aliases' => [
+        'Status',
+    ],
+]);
+///////////////////////////////////////////////////////////
 $discord->registerCommand('server', function($msg, $args) use ($discord) {
     if (is_dm($msg)) {
         send($msg, "you're not in a server right now");
