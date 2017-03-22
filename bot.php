@@ -40,7 +40,7 @@ $discord = new DiscordCommandClient([
 
 
 $game = $discord->factory(Game::class, [
-    'name' => ';help for more info',
+    'name' => 'with myself... type ;help for more info',
 ]);
 
 
