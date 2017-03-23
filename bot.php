@@ -1014,7 +1014,13 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
         //     'timestamp' => null,
         //     'fields' => $fields,
         // ]);
-        $ret .= "benbot - a bot made by benh. avatar by hirose.\n\n";
+        $ret .= "
+ , __             , __
+/|/  \           /|/  \
+ | __/ _   _  _   | __/ __ _|_
+ |   \|/  / |/ |  |   \/  \_|
+ |(__/|__/  |  |_/|(__/\__/ |_/
+                               \n - a bot made by benh. avatar by hirose.\n\n";
         $ret .= implode("", $help);
         $ret .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
         send($msg, $ret);
