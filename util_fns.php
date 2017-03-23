@@ -111,7 +111,7 @@ function ask_cleverbot($input) {
     $url = "https://www.cleverbot.com/getreply";
     $key = get_thing('cleverbot');
     $input = rawurlencode($input);
-    $discord->http->get("$url?input=$input&key=$key")->then(function($apidata) use ($deferred) {
+    $discord->http->get("$url?input=$input&key=$key", null, [], false)->then(function($apidata) use ($deferred) {
         // print_r($apidata);
         $deferred->resolve($apidata);
     }, function ($e) {
