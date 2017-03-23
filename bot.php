@@ -712,6 +712,32 @@ register_help('block');
 
 
 ///////////////////////////////////////////////////////////
+$ascii = $discord->registerCommand('ascii', function($msg, $args) {
+    send($msg, "```" . shell_exec("figlet " . implode(" ", $args)) . "```");
+}, [
+    'description' => 'ascii-ifies your message',
+    'usage' => '<msg>',
+    'aliases' => [
+        'Ascii',
+        'ASCII',
+    ],
+]);
+
+    $ascii->registerSubCommand('slant', function($msg, $args) {
+        send($msg, "```" . shell_exec("figlet -f smslant " . implode(" ", $args)) . "```");
+    }, [
+        'description' => 'different ascii',
+        'usage' => '<msg>',
+        'aliases' => [
+            'Slant',
+            'alt',
+            'other',
+        ],
+    ]);
+
+
+
+///////////////////////////////////////////////////////////
 $img = $discord->registerCommand('img', function($msg, $args) use ($imgs, $discord) {
     $qu = strtolower($args[0]);
     // look for image in uploaded_images
