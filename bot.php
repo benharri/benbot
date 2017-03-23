@@ -190,28 +190,13 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
 
             // if users are mentioned
             foreach ($msg->mentions as $mention) {
-
                 if ($cities->get($mention->id, true)) {
-
                     $msg->channel->broadcastTyping();
-
                     $ci = $cities->get($mention->id);
                     send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
-                    return;
-
-                    $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
-
-                    $discord->http->get($newurl)->then(function($json) use ($mention, $ci, $msg) {
-
-                        $jtime = strtotime($json->time);
-                        send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$ci["city"]} (<@{$mention->id}>).");
-
-                    })->otherwise(function ($e) { echo $e->getMessage(), PHP_EOL; });
-
                 } else {
                     send($msg, "No city found for <@{$mention->id}>.\nset a preferred city with `;time save city` or `;weather save city`");
                 }
-
             }
 
         } else {
@@ -224,21 +209,12 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
 
             $discord->http->get($url)->then(function($jsoncoords) use ($discord, $msg) {
                 $coord = $jsoncoords->coord;
-
                 $url = "http://api.geonames.org/timezoneJSON?username=benharri";
                 $newurl = "$url&lat={$coord->lat}&lng={$coord->lon}";
-
                 $discord->http->get($newurl)->then(function($json) use ($msg, $jsoncoords) {
-                    $jtime = strtotime($json->time);
-                    send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$jsoncoords->name}.");
-
+                    send($msg, "It's " . Carbon::now($json->timezoneId)->format('g:i A \o\n l F j, Y') . " in {$jsoncoords->name}.");
                 });
-
             });
-
-
-
-
         }
     }
 }, [
