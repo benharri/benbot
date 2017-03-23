@@ -181,19 +181,9 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
 
         if ($cities->get($id, true)) {
             $ci = $cities->get($id);
-            send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . "in {$ci["city"]}.");
-            return;
-
-            $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
-
-            $discord->http->get($newurl)->then(function($json) use ($ci, $msg) {
-
-                $jtime = strtotime($json->time);
-                send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$ci["city"]}.");
-            });
-
+            send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
         } else {
-            send($msg, "It's " . Carbon::now()->format('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nset a preferred city with `;time save city` or `;weather save.`");
+            send($msg, "It's " . Carbon::now()->format('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nyou can set a preferred city with `;time save city` or `;weather save.`");
         }
     } else {
         if (count($msg->mentions) > 0) {
@@ -204,7 +194,11 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
                 if ($cities->get($mention->id, true)) {
 
                     $msg->channel->broadcastTyping();
+
                     $ci = $cities->get($mention->id);
+                    send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
+                    return;
+
                     $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
 
                     $discord->http->get($newurl)->then(function($json) use ($mention, $ci, $msg) {
