@@ -15,13 +15,21 @@ function char_in($str) {
 
 function send($msg, $txt, $embed = null) {
     return $msg->channel->sendMessage($txt, false, $embed)
-        ->otherwise(function($e){echo $e->getMessage(), PHP_EOL;});
+        ->otherwise(function($e) use ($msg) {
+            echo $e->getMessage(), PHP_EOL;
+            ping_me($e->getMessage());
+            $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
+        });
 }
 
 
 function sendfile($msg, $filepath, $filename, $txt) {
     return $msg->channel->sendFile($filepath, $filename, $txt)
-        ->otherwise(function($e){echo $e->getMessage(), PHP_EOL;});
+        ->otherwise(function($e) use ($msg) {
+            echo $e->getMessage(), PHP_EOL;
+            ping_me($e->getMessage());
+            $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
+        });
 }
 
 
@@ -56,6 +64,8 @@ function ascii_from_img($filepath) {
     return $ret;
 }
 
+
+
 function fahr($celsius) {return $celsius * 9 / 5 + 32;}
 function cels($fahrenh) {return $fahrenh * 5 / 9 - 32;}
 
@@ -73,8 +83,8 @@ function format_weather($json) {
             ['name' => 'Atmospheric Pressure', 'value' => "{$json->main->pressure} hPa", 'inline' => true],
             ['name' => 'Humidity', 'value' => "{$json->main->humidity} %", 'inline' => true],
             ['name' => 'Wind', 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°", 'inline' => true],
-            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestamp($json->sys->sunrise)->toTimeString(), 'inline' => true],
-            ['name' => 'Sunset', 'value' => Carbon::createFromTimestamp($json->sys->sunset)->toTimeString(), 'inline' => true],
+            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestampUTC($json->sys->sunrise)->toTimeString(), 'inline' => true],
+            ['name' => 'Sunset', 'value' => Carbon::createFromTimestampUTC($json->sys->sunset)->toTimeString(), 'inline' => true],
         ],
         'timestamp' => null,
     ]);
@@ -110,6 +120,12 @@ function ask_cleverbot($input) {
     return $deferred->promise();
 }
 
-
+function ping_me($msg) {
+    global $discord;
+    $discord
+        ->guilds->get('id','289410862907785216')
+        ->channels->get('id','289611811094003715')
+        ->sendMessage("<@193011352275648514>, $msg");
+}
 
 

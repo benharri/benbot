@@ -80,13 +80,10 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $starttime) {
         }
     });
 
-    $discord
-        ->guilds->get('id','289410862907785216')
-        ->channels->get('id','289611811094003715')
-        ->sendMessage("<@193011352275648514>, bot started successfully");
 
     $starttime = Carbon::now();
 
+    ping_me("bot started successfully");
 });
 
 
@@ -141,22 +138,29 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
         }
     } else {
         if (count($msg->mentions) > 0) {
-            // if users are mentioned
 
+            // if users are mentioned
             foreach ($msg->mentions as $mention) {
+
                 if ($cities->get($mention->id, true)) {
+
                     $msg->channel->broadcastTyping();
                     $ci = $cities->get($mention->id);
                     $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
 
-                    $discord->http->get($newurl)->then(function($json) use ($mention, $ci) {
+                    $discord->http->get($newurl)->then(function($json) use ($mention, $ci, $msg) {
+
                         $jtime = strtotime($json->time);
                         send($msg, "It's " . date('g:i A \o\n l F j, Y', $jtime) . " in {$ci["city"]} (<@{$mention->id}>).");
-                    }, function ($e) { echo $e->getMessage(), PHP_EOL; });
+
+                    })->otherwise(function ($e) { echo $e->getMessage(), PHP_EOL; });
+
                 } else {
                     send($msg, "No city found for <@{$mention->id}>.\nset a preferred city with `;time save city` or `;weather save city`");
                 }
+
             }
+
         } else {
             // look up the time for whatever they requested
             $msg->channel->broadcastTyping();
@@ -771,6 +775,7 @@ register_help('img');
 ///////////////////////////////////////////////////////////
 // look up defs or images!
 $discord->registerCommand('chat', function($msg, $args) {
+    $msg->channel->broadcastTyping();
     ask_cleverbot(implode(' ', $args))->then(function($result) use ($msg) {
         $msg->reply($result->output);
     });
