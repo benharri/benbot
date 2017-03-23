@@ -69,9 +69,8 @@ function ascii_from_img($filepath) {
 function fahr($celsius) {return $celsius * 9 / 5 + 32;}
 function cels($fahrenh) {return $fahrenh * 5 / 9 - 32;}
 
-function format_weather($json, $id = null) {
+function format_weather($json, $timezone = null) {
     global $discord;
-    global $cities;
 
     return $discord->factory(Embed::class, [
         'title' => "Weather in {$json->name}, {$json->sys->country}",
@@ -83,8 +82,8 @@ function format_weather($json, $id = null) {
             ['name' => 'Atmospheric Pressure', 'value' => "{$json->main->pressure} hPa", 'inline' => true],
             ['name' => 'Humidity', 'value' => "{$json->main->humidity} %", 'inline' => true],
             ['name' => 'Wind', 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°", 'inline' => true],
-            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestampUTC($json->sys->sunrise, $cities->get($id)["timezone"])->toTimeString(), 'inline' => true],
-            ['name' => 'Sunset', 'value' => Carbon::createFromTimestampUTC($json->sys->sunset, $cities->get($id)["timezone"])->toTimeString(), 'inline' => true],
+            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestamp($json->sys->sunrise, $timezone)->toTimeString(), 'inline' => true],
+            ['name' => 'Sunset', 'value' => Carbon::createFromTimestamp($json->sys->sunset, $timezone)->toTimeString(), 'inline' => true],
         ],
         'timestamp' => null,
     ]);

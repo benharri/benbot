@@ -237,9 +237,10 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
     if (count($args) == 0) {
         // look up for your saved city
         if ($cities->get($id, true)) {
-            $url .= "id=" . $cities->get($id)["id"];
-            $discord->http->get($url)->then(function($result) use ($msg) {
-                send($msg, "", format_weather($result, $id));
+            $ci = $cities->($id);
+            $url .= "id=" . $ci["id"];
+            $discord->http->get($url)->then(function($result) use ($msg, $ci) {
+                send($msg, "", format_weather($result, $ci["timezone"]));
             });
         } else {
             $msg->reply("you can set your preferred city with `;weather save <city>`");
@@ -250,9 +251,10 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
             // look up for another person
             foreach ($msg->mentions as $mention) {
                 if ($cities->get($mention->id, true)) {
-                    $url .= "id=" . $cities->get($mention->id)["id"];
-                    $discord->http->get($url)->then(function($result) use ($msg) {
-                        send($msg, "", format_weather($result, $mention->id));
+                    $ci = $cities->get($mention->id);
+                    $url .= "id=" . $ci["id"];
+                    $discord->http->get($url)->then(function($result) use ($msg, $ci) {
+                        send($msg, "", format_weather($result, $ci["timezone"]));
                     });
                 } else {
                     // mentioned user not found
