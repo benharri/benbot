@@ -38,6 +38,11 @@ function is_dm($msg) {
 }
 
 
+function timestampFromSnowflake ($id) {
+    return ($id / 4194304) + 1420070400000;
+}
+
+
 function ascii_from_img($filepath) {
     $ret = "";
     $img = imagecreatefromstring(file_get_contents($filepath));

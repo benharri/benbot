@@ -887,6 +887,8 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
         3 => "(╯°□°）╯︵ ┻━┻: must have verified email, be registered on discord for more than 5 minutes, and must wait 10 minutes before speaking in any channel",
     ];
     $guild = $msg->channel->guild;
+    $create_date = Carbon::createFromTimestamp(timestampFromSnowflake($guild->id));
+
     $embed = $discord->factory(Embed::class, [
         'title' => "{$guild->name} server info",
         'thumbnail' => [
@@ -904,6 +906,10 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             [
                 'name' => 'Region',
                 'value' => $guild->region,
+            ],
+            [
+                'name' => 'Created',
+                'value' => $create_date->format('g:i A \o\n l F j, Y') . " (" . $create_date->diffForHumans() . ")",
             ],
             [
                 'name' => 'Owner',
