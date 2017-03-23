@@ -895,13 +895,8 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
         ],
         'fields' => [
             [
-                'name' => 'Member Count',
-                'value' => $guild->member_count,
-                'inline' => true,
-            ],
-            [
-                'name' => 'Channel Count',
-                'value' => count($guild->channels),
+                'name' => 'Owner',
+                'value' => "@{$guild->owner->username}#{$guild->owner->discriminator}",
                 'inline' => true,
             ],
             [
@@ -910,8 +905,14 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
                 'inline' => true,
             ],
             [
-                'name' => 'Owner',
-                'value' => "@{$guild->owner->username}#{$guild->owner->discriminator}",
+                'name' => 'Member Count',
+                'value' => $guild->member_count,
+                'inline' => true,
+            ],
+            [
+                'name' => 'Channel Count',
+                'value' => count($guild->channels),
+                'inline' => true,
             ],
             [
                 'name' => 'Verification level',
