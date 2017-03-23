@@ -638,7 +638,7 @@ register_help('joke');
         $url = "http://api.icndb.com/jokes/random1";
         $result = $discord->http->get($url, null, [], false)->then(function($result) use ($msg) {
             send($msg, $result->value->joke);
-        }, function ($e) {
+        }, function ($e) use ($msg) {
             send($msg, $e->getMessage());
         });
     }, [
@@ -658,21 +658,12 @@ register_help('joke');
     ]);
 
     $joke->registerSubCommand('dad', function($msg, $args) use ($discord) {
-        // $client = new \Discord\Http\Http(new ArrayCachePool(), "", 6, null);
-
-        $discord->http->get('https://icanhazdadjoke.com', null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg) {
-            print_r($result);
+        $url = "https://icanhazdadjoke.com";
+        $discord->http->get($url, null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg) {
             send($msg, $result->joke);
-        }, function($e) {
-            echo $e->getMessage(), PHP_EOL;
+        }, function($e) use ($msg) {
+            send($msg, $e->getMessage());
         });
-
-        // send($msg, file_get_contents("https://icanhazdadjoke.com/", false, stream_context_create([
-        //     'http' => [
-        //         'method' => 'GET',
-        //         'header' => 'Accept: text/plain'
-        //     ]
-        // ])));
     }, [
         'description' => 'tells a dad joke',
     ]);
