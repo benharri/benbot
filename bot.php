@@ -660,10 +660,9 @@ register_help('joke');
     $joke->registerSubCommand('dad', function($msg, $args) use ($discord) {
         // $client = new \Discord\Http\Http(new ArrayCachePool(), "", 6, null);
 
-        $discord->http->get('https://icanhazdadjoke.com', null, ['Accept' => 'text/plain'], false)->then(function ($result) use ($msg) {
-            // echo $result;
+        $discord->http->get('https://icanhazdadjoke.com', null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg) {
             print_r($result);
-            // send($msg, $result)->then(function($result){print_r($result);}, function($e){echo $e->getMessage();});
+            send($msg, $result->joke);
         }, function($e) {
             echo $e->getMessage(), PHP_EOL;
         });

@@ -35,7 +35,6 @@ function sendfile($msg, $filepath, $filename, $txt) {
 
 function is_dm($msg) {
     return $msg->channel->is_private;
-    // return $msg->author instanceOf Discord\Parts\User\User;
 }
 
 
@@ -112,7 +111,6 @@ function ask_cleverbot($input) {
     $key = get_thing('cleverbot');
     $input = rawurlencode($input);
     $discord->http->get("$url?input=$input&key=$key", null, [], false)->then(function($apidata) use ($deferred) {
-        // print_r($apidata);
         $deferred->resolve($apidata);
     }, function ($e) {
         $deferred->reject($e);
