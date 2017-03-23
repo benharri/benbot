@@ -131,7 +131,7 @@ $savecity = function($msg, $args) use ($cities, $discord) {
         $lat = $json->coord->lat;
         $lng = $json->coord->lon;
         $geonamesurl = "http://api.geonames.org/timezoneJSON?username=benharri&lat=$lat&lng=$lng";
-        $discord->http->get($geonamesurl)->then(function($geojson) use ($cities, $msg) {
+        $discord->http->get($geonamesurl)->then(function($geojson) use ($cities, $msg, $json) {
 
 
             if (count($msg->mentions) > 0) {
