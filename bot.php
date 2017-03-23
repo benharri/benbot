@@ -237,7 +237,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
     if (count($args) == 0) {
         // look up for your saved city
         if ($cities->get($id, true)) {
-            $ci = $cities->($id);
+            $ci = $cities->get($id);
             $url .= "id=" . $ci["id"];
             $discord->http->get($url)->then(function($result) use ($msg, $ci) {
                 send($msg, "", format_weather($result, $ci["timezone"]));
