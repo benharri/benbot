@@ -174,11 +174,9 @@ $savecity = function($msg, $args) use ($cities, $discord) {
 ///////////////////////////////////////////////////////////
 $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $discord) {
     $id = is_dm($msg) ? $msg->author->id : $msg->author->user->id;
-    $url = "http://api.geonames.org/timezoneJSON?username=benharri";
+
     if (count($args) == 0) {
         // lookup the person's time or tell them to save their time
-        $msg->channel->broadcastTyping();
-
         if ($cities->get($id, true)) {
             $ci = $cities->get($id);
             send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
@@ -187,11 +185,9 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
         }
     } else {
         if (count($msg->mentions) > 0) {
-
             // if users are mentioned
             foreach ($msg->mentions as $mention) {
                 if ($cities->get($mention->id, true)) {
-                    $msg->channel->broadcastTyping();
                     $ci = $cities->get($mention->id);
                     send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
                 } else {
@@ -235,14 +231,15 @@ register_help('time');
 
 ///////////////////////////////////////////////////////////
 $weather = $discord->registerCommand('weather', function($msg, $args) use ($cities, $discord) {
+    $id = is_dm($msg) ? $msg->author->id : $msg->author->user->id;
     $api_key = get_thing('weather_api_key');
     $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric&";
     if (count($args) == 0) {
         // look up for your saved city
-        if ($cities->get($msg->author->id, true)) {
-            $url .= "id=" . $cities->get($msg->author->id)["id"];
+        if ($cities->get($id, true)) {
+            $url .= "id=" . $cities->get($id)["id"];
             $discord->http->get($url)->then(function($result) use ($msg) {
-                send($msg, "", format_weather($result));
+                send($msg, "", format_weather($result, $id));
             });
         } else {
             $msg->reply("you can set your preferred city with `;weather save <city>`");
@@ -255,7 +252,7 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
                 if ($cities->get($mention->id, true)) {
                     $url .= "id=" . $cities->get($mention->id)["id"];
                     $discord->http->get($url)->then(function($result) use ($msg) {
-                        send($msg, "", format_weather($result));
+                        send($msg, "", format_weather($result, $mention->id));
                     });
                 } else {
                     // mentioned user not found

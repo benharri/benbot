@@ -69,10 +69,10 @@ function ascii_from_img($filepath) {
 function fahr($celsius) {return $celsius * 9 / 5 + 32;}
 function cels($fahrenh) {return $fahrenh * 5 / 9 - 32;}
 
-function format_weather($json) {
+function format_weather($json, $id = null) {
     global $discord;
+    global $cities;
 
-    // $fahr = round($json->main->temp * 5 / 9 + 32);
     return $discord->factory(Embed::class, [
         'title' => "Weather in {$json->name}, {$json->sys->country}",
         'thumbnail' => ['url' => "http://openweathermap.org/img/w/{$json->weather[0]->icon}.png"],
@@ -83,16 +83,12 @@ function format_weather($json) {
             ['name' => 'Atmospheric Pressure', 'value' => "{$json->main->pressure} hPa", 'inline' => true],
             ['name' => 'Humidity', 'value' => "{$json->main->humidity} %", 'inline' => true],
             ['name' => 'Wind', 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°", 'inline' => true],
-            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestampUTC($json->sys->sunrise)->toTimeString(), 'inline' => true],
-            ['name' => 'Sunset', 'value' => Carbon::createFromTimestampUTC($json->sys->sunset)->toTimeString(), 'inline' => true],
+            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestampUTC($json->sys->sunrise, $cities->get($id)["timezone"])->toTimeString(), 'inline' => true],
+            ['name' => 'Sunset', 'value' => Carbon::createFromTimestampUTC($json->sys->sunset, $cities->get($id)["timezone"])->toTimeString(), 'inline' => true],
         ],
         'timestamp' => null,
     ]);
 
-//     $ret = <<<EOD
-// it's {$json->main->temp}°C ({$fahr}°F) with {$json->weather[0]->description} in {$json->name}, {$json->sys->country}
-// EOD;
-//     return $ret;
 }
 
 
