@@ -856,6 +856,7 @@ $discord->registerCommand('status', function($msg, $args) use ($discord, $startt
             ['name' => 'Uptime', 'value' => $starttime->diffForHumans(Carbon::now(), true) . " (since " . $starttime->format('g:i A \o\n l F j, Y') . ")"],
             ['name' => 'Server Count', 'value' => count($discord->guilds)],
         ],
+        'timestamp' => null,
     ]);
     print_r($discord->guilds);
     send($msg, "", $embed);
