@@ -37,7 +37,8 @@ $discord = new DiscordCommandClient([
     'defaultHelpCommand' => false,
     'name'               => 'benbot',
     'discordOptions'     => [
-        'pmChannels'  => true,
+        'pmChannels'     => true,
+        'loadAllMembers' => true,
     ],
 ]);
 
@@ -849,12 +850,17 @@ $discord->registerCommand('sys', function($msg, $args) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('status', function($msg, $args) use ($discord, $starttime) {
+    $usercount = 0;
+    foreach ($discord->guilds as $guild) {
+        $usercount += $guild->member_count;
+    }
     $embed = $discord->factory(Embed::class, [
         'title' => 'Benbot status',
         'thumbnail' => ['url' => $discord->avatar],
         'fields' => [
             ['name' => 'Uptime', 'value' => $starttime->diffForHumans(Carbon::now(), true) . " (since " . $starttime->format('g:i A \o\n l F j, Y') . ")"],
             ['name' => 'Server Count', 'value' => count($discord->guilds)],
+            ['name' => 'User Count', 'value' => $usercount],
         ],
         'timestamp' => null,
     ]);
@@ -890,6 +896,10 @@ $discord->registerCommand('server', function($msg, $args) use ($discord) {
             [
                 'name' => 'Member Count',
                 'value' => $guild->member_count,
+            ],
+            [
+                'name' => 'Channel Count',
+                'value' => count($guild->channels),
             ],
             [
                 'name' => 'Region',
