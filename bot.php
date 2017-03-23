@@ -858,7 +858,7 @@ $discord->registerCommand('status', function($msg, $args) use ($discord, $startt
         ],
         'timestamp' => null,
     ]);
-    print_r($discord->guilds);
+    print_r($discord->user);
     send($msg, "", $embed);
 }, [
     'description' => 'bot status',
