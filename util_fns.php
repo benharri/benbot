@@ -34,7 +34,8 @@ function sendfile($msg, $filepath, $filename, $txt) {
 
 
 function is_dm($msg) {
-    return $msg->author instanceOf Discord\Parts\User\User;
+    return $msg->channel->is_private;
+    // return $msg->author instanceOf Discord\Parts\User\User;
 }
 
 

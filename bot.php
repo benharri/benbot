@@ -21,6 +21,9 @@ include __DIR__.'/kaomoji.php';
 include __DIR__.'/definitions.php';
 include __DIR__.'/util_fns.php';
 
+$yomamajokes = file("yomamajokes.txt");
+$jokes = explode("-----------------------------------------------------------------------------", file_get_contents(__DIR__.'/miscjokes.txt'));
+
 $starttime = Carbon::now();
 $defs      = new Definitions(__DIR__.'/definitions.json');
 $imgs      = new Definitions(__DIR__.'/img_urls.json');
@@ -40,7 +43,7 @@ $discord = new DiscordCommandClient([
 
 
 $game = $discord->factory(Game::class, [
-    'name' => 'with myself... type ;help for more info',
+    'name' => ';help for more info',
 ]);
 
 
@@ -71,6 +74,7 @@ $discord->on('ready', function($discord) use ($game, $defs, $imgs, $starttime) {
 
             if (is_dm($msg)) {
                 if (!$msg->author->bot){
+                    $msg->channel->broadcastTyping();
                     ask_cleverbot(implode(" ", $args))->then(function($result) use ($msg) {
                         send($msg, $result->output);
                     });
@@ -618,9 +622,8 @@ register_help('kaomoji');
 
 
 ///////////////////////////////////////////////////////////
-$joke = $discord->registerCommand('joke', function($msg, $args) {
-    $joke_arr = explode("-----------------------------------------------------------------------------", file_get_contents(__DIR__.'/miscjokes.txt'));
-    send($msg, $joke_arr[array_rand($joke_arr)]);
+$joke = $discord->registerCommand('joke', function($msg, $args) use ($jokes) {
+    send($msg, $jokes[array_rand($jokes)]);
 }, [
     'description' => 'tells a random joke',
     'usage' => '<chucknorris|yomama|dad>',
@@ -645,9 +648,8 @@ register_help('joke');
         ],
     ]);
 
-    $joke->registerSubCommand('yomama', function($msg, $args) {
-        $jokes = file("yomamajokes.txt");
-        send($msg, $jokes[array_rand($jokes)]);
+    $joke->registerSubCommand('yomama', function($msg, $args) use ($yomamajokes) {
+        send($msg, $yomamajokes[array_rand($yomamajokes)]);
     }, [
         'description' => 'yo mama jokes',
         'aliases' => [
