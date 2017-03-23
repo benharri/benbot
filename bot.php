@@ -120,6 +120,57 @@ $discord->registerCommand('hi', [
 
 
 
+
+
+$savecity = function($msg, $args) use ($cities, $discord) {
+    $api_key = get_thing('weather_api_key');
+    $query = implode("%20", $args);
+    $url = "http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric";
+
+    $discord->http->get($url)->then(function($json) use ($cities, $msg, $discord) {
+        $lat = $json->coord->lat;
+        $lng = $json->coord->lon;
+        $geonamesurl = "http://api.geonames.org/timezoneJSON?username=benharri&lat=$lat&lng=$lng";
+        $discord->http->get($geonamesurl)->then(function($geojson) use ($cities, $msg) {
+
+
+            if (count($msg->mentions) > 0) {
+                $ret = "the preferred city for ";
+                foreach ($msg->mentions as $mention) {
+                    $cities->set($mention->id, [
+                        'id'   => $json->id,
+                        'lat'  => $json->coord->lat,
+                        'lon'  => $json->coord->lon,
+                        'city' => $json->name,
+                        'timezone' => $geojson->timezoneId,
+                    ]);
+                    $mentions[] = "<@{$mention->id}>";
+                }
+                $ret .= implode(", ", $mentions);
+                $ret .= " has been set to {$json->name}";
+                send($msg, $ret);
+            } else {
+                $cities->set($msg->author->id, [
+                    'id'   => $json->id,
+                    'lat'  => $json->coord->lat,
+                    'lon'  => $json->coord->lon,
+                    'city' => $json->name,
+                    'timezone' => $geojson->timezoneId,
+                ]);
+                $msg->reply("your preferred city has been set to {$json->name}");
+            }
+
+
+        });
+
+    });
+};
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////
 $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $discord) {
     $url = "http://api.geonames.org/timezoneJSON?username=benharri";
@@ -202,39 +253,7 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
 register_help('time');
 
 
-    $time->registerSubCommand('save', function($msg, $args) use ($cities, $discord) {
-        $api_key = get_thing('weather_api_key');
-        $query = implode("%20", $args);
-        $url = "http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric";
-
-        $discord->http->get($url)->then(function($json) use ($cities, $msg) {
-
-            if (count($msg->mentions) > 0) {
-                $ret = "the preferred city for ";
-                foreach ($msg->mentions as $mention) {
-                    $cities->set($mention->id, [
-                        'id'   => $json->id,
-                        'lat'  => $json->coord->lat,
-                        'lon'  => $json->coord->lon,
-                        'city' => $json->name,
-                    ]);
-                    $mentions[] = "<@{$mention->id}>";
-                }
-                $ret .= implode(", ", $mentions);
-                $ret .= " has been set to {$json->name}";
-                send($msg, $ret);
-            } else {
-                $cities->set($msg->author->id, [
-                    'id'   => $json->id,
-                    'lat'  => $json->coord->lat,
-                    'lon'  => $json->coord->lon,
-                    'city' => $json->name,
-                ]);
-                $msg->reply("your preferred city has been set to {$json->name}");
-            }
-
-        });
-    }, [
+    $time->registerSubCommand('save', $savecity, [
         'description' => 'saves a preferred city to use with ;weather and ;time',
         'usage' => '<city>',
     ]);
@@ -288,43 +307,12 @@ $weather = $discord->registerCommand('weather', function($msg, $args) use ($citi
 register_help('weather');
 
 
-    $weather->registerSubCommand('save', function($msg, $args) use ($cities, $discord) {
-        $api_key = get_thing('weather_api_key');
-        $query = implode("%20", $args);
-        $url = "http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric";
-
-        $discord->http->get($url)->then(function($json) use ($cities, $msg) {
-
-            if (count($msg->mentions) > 0) {
-                $ret = "the preferred city for ";
-                foreach ($msg->mentions as $mention) {
-                    $cities->set($mention->id, [
-                        'id'   => $json->id,
-                        'lat'  => $json->coord->lat,
-                        'lon'  => $json->coord->lon,
-                        'city' => $json->name,
-                    ]);
-                    $mentions[] = "<@{$mention->id}>";
-                }
-                $ret .= implode(", ", $mentions);
-                $ret .= " has been set to {$json->name}";
-                send($msg, $ret);
-            } else {
-                $cities->set($msg->author->id, [
-                    'id'   => $json->id,
-                    'lat'  => $json->coord->lat,
-                    'lon'  => $json->coord->lon,
-                    'city' => $json->name,
-                ]);
-                $msg->reply("your preferred city has been set to {$json->name}");
-            }
-
-        });
-
-    }, [
+    $weather->registerSubCommand('save', $savecity, [
         'description' => 'saves your favorite city',
         'usage' => '<location>',
     ]);
+
+
 
 
 ///////////////////////////////////////////////////////////
