@@ -173,13 +173,17 @@ $savecity = function($msg, $args) use ($cities, $discord) {
 
 ///////////////////////////////////////////////////////////
 $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $discord) {
+    $id = is_dm($msg) ? $msg->author->id : $msg->author->user->id;
     $url = "http://api.geonames.org/timezoneJSON?username=benharri";
     if (count($args) == 0) {
         // lookup the person's time or tell them to save their time
         $msg->channel->broadcastTyping();
 
-        if ($cities->get($msg->author->id, true)) {
-            $ci = $cities->get($msg->author->id);
+        if ($cities->get($id, true)) {
+            $ci = $cities->get($id);
+            send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . "in {$ci["city"]}.");
+            return;
+
             $newurl = "$url&lat={$ci["lat"]}&lng={$ci["lon"]}";
 
             $discord->http->get($newurl)->then(function($json) use ($ci, $msg) {
@@ -189,7 +193,7 @@ $time = $discord->registerCommand('time', function($msg, $args) use ($cities, $d
             });
 
         } else {
-            send($msg, "It's " . date('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nset a preferred city with `;time save city` or `;weather save.`");
+            send($msg, "It's " . Carbon::now()->format('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nset a preferred city with `;time save city` or `;weather save.`");
         }
     } else {
         if (count($msg->mentions) > 0) {
