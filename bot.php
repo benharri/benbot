@@ -133,15 +133,14 @@ $savecity = function($msg, $args) use ($cities, $discord) {
         $geonamesurl = "http://api.geonames.org/timezoneJSON?username=benharri&lat=$lat&lng=$lng";
         $discord->http->get($geonamesurl)->then(function($geojson) use ($cities, $msg, $json) {
 
-
             if (count($msg->mentions) > 0) {
                 $ret = "the preferred city for ";
                 foreach ($msg->mentions as $mention) {
                     $cities->set($mention->id, [
-                        'id'   => $json->id,
-                        'lat'  => $json->coord->lat,
-                        'lon'  => $json->coord->lon,
-                        'city' => $json->name,
+                        'id'       => $json->id,
+                        'lat'      => $json->coord->lat,
+                        'lon'      => $json->coord->lon,
+                        'city'     => $json->name,
                         'timezone' => $geojson->timezoneId,
                     ]);
                     $mentions[] = "<@{$mention->id}>";
@@ -151,15 +150,14 @@ $savecity = function($msg, $args) use ($cities, $discord) {
                 send($msg, $ret);
             } else {
                 $cities->set($msg->author->id, [
-                    'id'   => $json->id,
-                    'lat'  => $json->coord->lat,
-                    'lon'  => $json->coord->lon,
-                    'city' => $json->name,
+                    'id'       => $json->id,
+                    'lat'      => $json->coord->lat,
+                    'lon'      => $json->coord->lon,
+                    'city'     => $json->name,
                     'timezone' => $geojson->timezoneId,
                 ]);
                 $msg->reply("your preferred city has been set to {$json->name}");
             }
-
 
         });
 
@@ -830,7 +828,8 @@ $discord->registerCommand('dbg', function($msg, $args) use ($defs, $imgs, $disco
     if ($id == "193011352275648514") {
         print_r($msg);
         send($msg, "debugging. check logs.");
-        print_r($discord);
+        print_r($msg->channel->guild);
+        echo "args: ", implode(" ", $args), PHP_EOL;
     } else send($msg, "you're not allowed to use that command");
 }, [
     'aliases' => [
@@ -854,7 +853,7 @@ $discord->registerCommand('status', function($msg, $args) use ($discord, $startt
         'title' => 'Benbot status',
         'thumbnail' => ['url' => $discord->avatar],
         'fields' => [
-            ['name' => 'Uptime', 'value' => $starttime->diffForHumans(Carbon::now(), true) . " since " . $starttime->format('g:i A \o\n l F j, Y')],
+            ['name' => 'Uptime', 'value' => $starttime->diffForHumans(Carbon::now(), true) . " (since " . $starttime->format('g:i A \o\n l F j, Y') . ")"],
         ],
     ]);
     print_r($discord->guilds);
@@ -961,20 +960,6 @@ $discord->registerCommand('help', function($msg, $args) use ($discord, $help) {
         send($msg, "$ret```");
     } else {
 
-        // $fields = [];
-        // foreach ($help as $name => $value){
-        //     $fields[] = [
-        //         'name' => $name,
-        //         'value' => $value,
-        //     ];
-        // }
-        // print_r($fields);
-        // $embed = $discord->factory(Embed::class, [
-        //     'title' => 'benbot help',
-        //     'description' => 'a bot mady by benh. avatar by hirose.',
-        //     'timestamp' => null,
-        //     'fields' => $fields,
-        // ]);
         $ret .= "
  , __             , __
 /|/  \           /|/  \
