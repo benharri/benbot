@@ -7,13 +7,15 @@ use Carbon\Carbon;
 
 include_once __DIR__.'/env_stuff.php';
 
-function char_in($str) {
+function charIn($str)
+{
     for ($i = 0; $i <= strlen($str); $i++)
         yield substr($str, $i, 1);
 }
 
 
-function send($msg, $txt, $embed = null) {
+function send($msg, $txt, $embed = null)
+{
     return $msg->channel->sendMessage($txt, false, $embed)
         ->otherwise(function($e) use ($msg) {
             echo $e->getMessage(), PHP_EOL;
@@ -23,7 +25,8 @@ function send($msg, $txt, $embed = null) {
 }
 
 
-function sendfile($msg, $filepath, $filename, $txt) {
+function sendFile($msg, $filepath, $filename, $txt)
+{
     return $msg->channel->sendFile($filepath, $filename, $txt)
         ->otherwise(function($e) use ($msg) {
             echo $e->getMessage(), PHP_EOL;
@@ -33,17 +36,20 @@ function sendfile($msg, $filepath, $filename, $txt) {
 }
 
 
-function is_dm($msg) {
+function isDM($msg)
+{
     return $msg->channel->is_private;
 }
 
 
-function timestampFromSnowflake ($id) {
-    return ($id / 4194304) + 1420070400000;
+function timestampFromSnowflake($id)
+{
+    return (($id / 4194304) + 1420070400000) / 1000;
 }
 
 
-function ascii_from_img($filepath) {
+function asciiFromImg($filepath)
+{
     $ret = "";
     $img = imagecreatefromstring(file_get_contents($filepath));
     list($width, $height) = getimagesize($filepath);
@@ -71,24 +77,56 @@ function ascii_from_img($filepath) {
 
 
 
-function fahr($celsius) {return $celsius * 9 / 5 + 32;}
-function cels($fahrenh) {return $fahrenh * 5 / 9 - 32;}
+function fahr($celsius)
+{
+    return $celsius * 9 / 5 + 32;
+}
 
-function format_weather($json, $timezone = null) {
+function cels($fahrenh)
+{
+    return $fahrenh * 5 / 9 - 32;
+}
+
+function formatWeatherJson($json, $timezone = null)
+{
     global $discord;
 
     return $discord->factory(Embed::class, [
         'title' => "Weather in {$json->name}, {$json->sys->country}",
         'thumbnail' => ['url' => "http://openweathermap.org/img/w/{$json->weather[0]->icon}.png"],
         'fields' => [
-            ['name' => 'Current temperature', 'value' => "{$json->main->temp}°C (".fahr($json->main->temp)."°F)", 'inline' => true],
-            ['name' => 'Low/High Forecasted Temp', 'value' => "{$json->main->temp_min}/{$json->main->temp_max}°C  " . fahr($json->main->temp_min) . "/" . fahr($json->main->temp_max) . "°F", 'inline' => true],
-            ['name' => 'Current conditions', 'value' => $json->weather[0]->description, 'inline' => true],
-            ['name' => 'Atmospheric Pressure', 'value' => "{$json->main->pressure} hPa", 'inline' => true],
-            ['name' => 'Humidity', 'value' => "{$json->main->humidity} %", 'inline' => true],
-            ['name' => 'Wind', 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°", 'inline' => true],
-            ['name' => 'Sunrise', 'value' => Carbon::createFromTimestamp($json->sys->sunrise, $timezone)->toTimeString(), 'inline' => true],
-            ['name' => 'Sunset', 'value' => Carbon::createFromTimestamp($json->sys->sunset, $timezone)->toTimeString(), 'inline' => true],
+            ['name' => 'Current temperature'
+            , 'value' => "{$json->main->temp}°C (".fahr($json->main->temp)."°F)"
+            , 'inline' => true
+            ],
+            ['name' => 'Low/High Forecasted Temp'
+            , 'value' => "{$json->main->temp_min}/{$json->main->temp_max}°C  " . fahr($json->main->temp_min) . "/" . fahr($json->main->temp_max) . "°F"
+            , 'inline' => true
+            ],
+            ['name' => 'Current conditions'
+            , 'value' => $json->weather[0]->description
+            , 'inline' => true
+            ],
+            ['name' => 'Atmospheric Pressure'
+            , 'value' => "{$json->main->pressure} hPa"
+            , 'inline' => true
+            ],
+            ['name' => 'Humidity'
+            , 'value' => "{$json->main->humidity} %"
+            , 'inline' => true
+            ],
+            ['name' => 'Wind'
+            , 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°"
+            , 'inline' => true
+            ],
+            ['name' => 'Sunrise'
+            , 'value' => Carbon::createFromTimestamp($json->sys->sunrise, $timezone)->toTimeString()
+            , 'inline' => true
+            ],
+            ['name' => 'Sunset'
+            , 'value' => Carbon::createFromTimestamp($json->sys->sunset, $timezone)->toTimeString()
+            , 'inline' => true
+            ],
         ],
         'timestamp' => null,
     ]);
@@ -97,18 +135,20 @@ function format_weather($json, $timezone = null) {
 
 
 
-function register_help($cmd_name) {
+function registerHelp($cmd_name)
+{
     global $discord; global $help;
     $help[$cmd_name] = $discord->getCommand($cmd_name)->getHelp(';')["text"];
 }
 
 
-function ask_cleverbot($input) {
+function askCleverbot($input)
+{
     $deferred = new Deferred();
     global $discord;
 
     $url = "https://www.cleverbot.com/getreply";
-    $key = get_thing('cleverbot');
+    $key = getenv('CLEVERBOT_API_KEY');
     $input = rawurlencode($input);
     $discord->http->get("$url?input=$input&key=$key", null, [], false)->then(function($apidata) use ($deferred) {
         $deferred->resolve($apidata);
@@ -119,7 +159,8 @@ function ask_cleverbot($input) {
     return $deferred->promise();
 }
 
-function ping_me($msg) {
+function pingMe($msg)
+{
     global $discord;
     $discord
         ->guilds->get('id','289410862907785216')

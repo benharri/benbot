@@ -1,7 +1,7 @@
 uploaded_images/
 vendor/
 
-env_stuff.php
+.env
 
 bot.err
 bot.out

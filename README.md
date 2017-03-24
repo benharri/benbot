@@ -10,8 +10,8 @@ Feel free to clone this project and try your hand at making a bot.
 
 1. `git clone https://github.com/benharri/testcord && cd testcord`
 1. Install DiscordPHP and dependencies: `composer install`
-1. Get your Discord API Key and save it in `env_stuff.php`
-2. --optional save your API keys in `env_stuff.php` for openweathermap.org, cleverbot.com, and a phone number for the text command
+1. Get your Discord API Key and save it in `.env` (copy or rename `.env.example` and paste your keys in)
+2. --optional save your API keys in `.env` for openweathermap.org, cleverbot.com, and a phone number for the text command
 1. Run the bot `./bot start`
 
 >If you want to keep the bot running in the background, run it as `./bot nohup`
@@ -21,7 +21,16 @@ Feel free to clone this project and try your hand at making a bot.
 
 ## Commands
 
-- `benbot - a bot made by benh. avatar by hirose.`
+
+```
+            //////                        //////                //
+           //    //    ////    //////    //    //    ////    ////////
+          //////    ////////  //    //  //////    //    //    //
+         //    //  //        //    //  //    //  //    //    //
+        //////      //////  //    //  //////      ////        ////
+```
+
+- `- a bot made by benh. avatar by hirose.`
 
 
 - `;time <@user> - looks up current time for yourself or another user`
