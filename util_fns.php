@@ -61,8 +61,8 @@ function asciiFromImg($filepath)
     ];
     $chars = array_reverse($chars);
     $c_count = count($chars);
-    for($y = 0; $y <= $height - $scale - 1; $y += $scale) {
-        for($x = 0; $x <= $width - ($scale / 2) - 1; $x += ($scale / 2)) {
+    for ($y = 0; $y <= $height - $scale - 1; $y += $scale) {
+        for ($x = 0; $x <= $width - ($scale / 2) - 1; $x += ($scale / 2)) {
             $rgb = imagecolorat($img, $x, $y);
             $r = (($rgb >> 16) & 0xFF);
             $g = (($rgb >> 8) & 0xFF);
@@ -75,6 +75,18 @@ function asciiFromImg($filepath)
     return $ret;
 }
 
+function checkForSwears($text)
+{
+    $text = $text;
+    $bad_words = file_get_contents(__DIR__.'/swearWords.txt');
+    $b = '/\W' . $bad_words . '\W/i';
+
+    if(preg_match($b, $text)){
+        return true;
+    } else {
+        return false;
+    }
+}
 
 
 function fahr($celsius)

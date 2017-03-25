@@ -1,9 +1,9 @@
+# bot-specific data
 uploaded_images/
-vendor/
-
+bot_data/
 .env
-
+# composer packages
+vendor/
+# unneccessary
 bot.err
 bot.out
-*.json
-!composer.json

@@ -8,12 +8,6 @@ include __DIR__.'/vendor/autoload.php';
 use Discord\DiscordCommandClient;
 use Discord\Parts\User\Game;
 use Discord\Parts\Embed\Embed;
-use Discord\Parts\Embed\Author;
-use Discord\Parts\Embed\Image;
-use Discord\Parts\Embed\Footer;
-use Discord\Parts\Embed\Field;
-use Discord\Helpers\Collection;
-use Discord\Helpers\Process;
 use Carbon\Carbon;
 
 
@@ -28,9 +22,9 @@ $yomamajokes = file("yomamajokes.txt");
 $jokes = explode("---", file_get_contents(__DIR__.'/miscjokes.txt'));
 
 $starttime = Carbon::now();
-$defs      = new Definitions(__DIR__.'/definitions.json');
-$imgs      = new Definitions(__DIR__.'/img_urls.json');
-$cities    = new Definitions(__DIR__.'/cities.json');
+$defs      = new Definitions(__DIR__.'/bot_data/definitions.json');
+$imgs      = new Definitions(__DIR__.'/bot_data/img_urls.json');
+$cities    = new Definitions(__DIR__.'/bot_data/cities.json');
 $help      = [];
 
 
@@ -84,7 +78,22 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime) 
             }
         }
 
+        if ($msg->channel->guild->id === "233603102047993856") {
+            if (strpos(strtolower($text), 'dib') !== false) {
+                $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
+                    echo $e->getMessage(), PHP_EOL;
+                });
+            }
+        }
 
+//        if (!$msg->author->bot) {
+  //          if (checkForSwears(strtolower($text))) {
+    //            echo "someone swore", PHP_EOL;
+      //          $msg->react("‼")->otherwise(function ($e) {
+        //            echo $e->getMessage(), PHP_EOL;
+          //      });
+            //}
+//        }
 
     });
 
@@ -742,7 +751,7 @@ registerHelp('img');
 
 
     $img->registerSubCommand('list', function ($msg, $args) use ($imgs) {
-        send($msg, "list of uploaded images:\n\n" . implode(", ", $imgs->list_keys()));
+        send($msg, "list of uploaded images:\n\n" . implode(", ", $imgs->getKeys()));
     }, [
         'description' => 'saved image list',
     ]);

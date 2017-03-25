@@ -336,3 +336,7 @@ $bs = ":ok_hand:　:joy:
  :joy:　:ok_hand:
   :joy: :ok_hand:
 　  :ok_hand:";
+
+
+
+
