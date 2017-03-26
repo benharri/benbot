@@ -5,8 +5,6 @@ use React\Promise\Deferred;
 use Discord\Parts\Embed\Embed;
 use Carbon\Carbon;
 
-include_once __DIR__.'/env_stuff.php';
-
 function charIn($str)
 {
     for ($i = 0; $i <= strlen($str); $i++)

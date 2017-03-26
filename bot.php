@@ -25,6 +25,7 @@ $starttime = Carbon::now();
 $defs      = new Definitions(__DIR__.'/bot_data/definitions.json');
 $imgs      = new Definitions(__DIR__.'/bot_data/img_urls.json');
 $cities    = new Definitions(__DIR__.'/bot_data/cities.json');
+$swearjar  = new Definitions(__DIR__.'/bot_data/swearjar.json');
 $help      = [];
 
 
@@ -45,10 +46,10 @@ $game = $discord->factory(Game::class, [
 ]);
 
 
-$discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime) {
+$discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, $swearjar) {
     $discord->updatePresence($game);
 
-    $discord->on('message', function ($msg, $args) use ($defs, $imgs) {
+    $discord->on('message', function ($msg, $args) use ($defs, $imgs, $swearjar) {
         // for stuff that isn't a command
         $text = $msg->content;
         $gen = charIn($text);
@@ -84,16 +85,23 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime) 
                     echo $e->getMessage(), PHP_EOL;
                 });
             }
-        }
+        } elseif (!$msg->author->bot) {
+            if (checkForSwears(strtolower($text))) {
+                $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
 
-//        if (!$msg->author->bot) {
-  //          if (checkForSwears(strtolower($text))) {
-    //            echo "someone swore", PHP_EOL;
-      //          $msg->react("‼")->otherwise(function ($e) {
-        //            echo $e->getMessage(), PHP_EOL;
-          //      });
-            //}
-//        }
+                $swearcount = $swearjar->get($id, true) ? $swearjar->get($id)["swear_count"] + 1 : 1;
+
+                $swearjar->set($msg->author->id, [
+                    'swear_count' => $swearcount,
+                    'latest_swear' => $msg->content,
+                    'timestamp' => Carbon::now(),
+                ]);
+
+                $msg->react("‼")->otherwise(function ($e) {
+                    echo $e->getMessage(), PHP_EOL;
+                });
+            }
+        }
 
     });
 
@@ -756,19 +764,26 @@ registerHelp('img');
         'description' => 'saved image list',
     ]);
 
-    // $img->registerSubCommand('asciiart', function ($msg, $args) {
-    //     if (count($msg->attachments) > 0) {
-    //         print_r($msg->attachments);
-    //         $imgpath = $msg->attachments[0]->url;
-    //     } else {
-    //         $imgpath = $msg->author->user->avatar;
-    //     }
-    //     echo $imgpath, PHP_EOL;
-    //     send($msg, "```" . asciiFromImg($imgpath) . "```");
-    // }, [
-    //     'description' => 'converts image to ascii art',
-    //     'usage' => '<image>',
-    // ]);
+    $img->registerSubCommand('rm', function ($msg, $args) use ($imgs) {
+        $qu = strtolower($args[0]);
+        if ($imgs->get($qu, true)) {
+            $img = $imgs->get($qu);
+            $imgs->unset($qu);
+            unlink(__DIR__."/uploaded_images/$img");
+            send($msg, "$img deleted");
+        } else {
+            send($msg, "$img doesn't exist. can't delete");
+        }
+    }, [
+        'description' => 'deletes a saved image',
+        'usage' => '<image name>',
+        'aliases' => [
+            'del',
+            'delete',
+            'remove',
+        ],
+    ]);
+
 
 
 ///////////////////////////////////////////////////////////
@@ -829,7 +844,23 @@ $discord->registerCommand('bamboozle', function ($msg, $args) {
     ],
 ]);
 
-
+///////////////////////////////////////////////////////////
+$discord->registerCommand('swearjar', function($msg, $args) use ($swearjar) {
+    $ret = "";
+    foreach ($swearjar->iter() as $user => $swear_info) {
+        $ret .= "<@$user> said '{$swear_info["latest_swear"]}' " . $swear_info["timestamp"]->diffForHumans() . "\n";
+    }
+    send($msg, $ret);
+}, [
+    'description' => 'tattles on naughty people',
+    'aliases' => [
+        'Swearjar',
+        'swears',
+        'Swears',
+        'dirtymouths',
+        'Dirtymouths',
+    ],
+]);
 
 
 
