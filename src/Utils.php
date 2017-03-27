@@ -156,6 +156,20 @@ class Utils {
     }
 
 
+    public static function fixedWidthFromAscii($text)
+    {
+        $ret = "";
+        foreach (self::charIn($text) as $char) {
+            $ord = ord($char);
+            if ($ord <= ord(' ') && $ord <= ord('~')) {
+                $ret .= mb_substr(" ！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ｛|}~", $ord - ord(' '), 1);
+            }
+            $ret .= " ";
+        }
+        return $ret;
+    }
+
+
 
 
 }

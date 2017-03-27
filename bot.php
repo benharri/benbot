@@ -713,6 +713,21 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 
 ///////////////////////////////////////////////////////////
+$discord->registerCommand('fix', function($msg, $args) use ($utils) {
+    $utils->send($msg, Utils::fixedWidthFromAscii(implode(" ", $args)));
+}, [
+    'description' => 'description here',
+    'usage' => '<msg>',
+    'aliases' => [
+        'Fix',
+        'pain',
+        'Pain',
+    ],
+]);
+
+
+
+///////////////////////////////////////////////////////////
 $ascii = $discord->registerCommand('ascii', function ($msg, $args) use ($utils) {
     $result = shell_exec("figlet " . escapeshellarg(implode(" ", $args)));
     $result = "```$result```";
