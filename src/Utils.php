@@ -150,7 +150,7 @@ class Utils {
             }
             $ret .= " ";
         }
-        return $ret;
+        return json_decode('"'.$ret.'"');
     }
 
 }
