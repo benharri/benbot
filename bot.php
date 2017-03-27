@@ -71,7 +71,6 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
 
         if (!$msg->author->bot) {
 
-
             if ($first_char == ';') {
 
                 for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next()) {
