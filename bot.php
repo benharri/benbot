@@ -64,12 +64,8 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
         $gen = Utils::charIn($text);
         $first_char = $gen->current();
 
-        print_r($msg);
-        if ($msg->author instanceOf User) {
-            echo "is user", PHP_EOL;
-        }
 
-        if (!$msg->author->bot) {
+        if (isset($msg->author) && !$msg->author->bot) {
 
             if ($first_char == ';') {
 
