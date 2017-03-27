@@ -68,34 +68,36 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
 
             if ($first_char == ';') {
 
-                for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next())
+                for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next()) {
                     $qu .= $gen->current();
+                }
                 $qu = strtolower($qu);
 
-                if (isset($defs[$qu]))
+                if (isset($defs[$qu])) {
                     $utils->send($msg, "**$qu**: " . $defs[$qu]);
+                }
                 if (isset($imgs[$qu])) {
-                    $imgfile = $imgs[$qu];
-                    $utils->sendFile($msg, __DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+                    $utils->sendFile($msg, __DIR__."/uploaded_images/{$imgs[$qu]}", $imgs[$qu], $qu);
                 }
 
-            }
-
-            if (Utils::isDM($msg)){
+            } elseif (Utils::isDM($msg)){
                 $msg->channel->broadcastTyping();
                 $utils->askCleverbot($text)->then(function ($result) use ($msg, $utils) {
                     $utils->send($msg, $result->output);
                 });
-            } else {
-                if ($msg->channel->guild->id === "233603102047993856") {
-                    // arf specific
-                    if (strpos(strtolower($text), 'dib') !== false) {
-                        $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
-                            echo $e->getMessage(), PHP_EOL;
-                        });
-                    }
+            }
+
+
+            if ($msg->channel->guild->id === "233603102047993856") {
+                // arf specific
+                // dib
+                if (strpos(strtolower($text), 'dib') !== false) {
+                    $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
+                        echo $e->getMessage(), PHP_EOL;
+                    });
                 }
             }
+
 
         }
     });
@@ -656,7 +658,7 @@ $help->registerHelp('joke');
         $url = "https://icanhazdadjoke.com";
         $discord->http->get($url, null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg, $utils) {
             $utils->send($msg, $result->joke);
-        }, function ($e) use ($msg) {
+        }, function ($e) use ($msg, $utils) {
             $utils->send($msg, $e->getMessage());
         });
     }, [
@@ -668,7 +670,7 @@ $help->registerHelp('joke');
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('block', function ($msg, $args) use ($utils) {
     $ret = "";
-    foreach (charIn(strtolower(implode(" ", $args))) as $char) {
+    foreach (Utils::charIn(strtolower(implode(" ", $args))) as $char) {
         if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
         else if (ctype_digit($char)) {
             switch ($char) {
