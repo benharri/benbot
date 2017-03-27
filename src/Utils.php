@@ -140,16 +140,17 @@ class Utils {
         foreach (charin($string) as $char) {
             $ord = ord($char);
             if ($ord >= ord('0') && $ord <= ord('9')) {
-                $d = dechex(0x1d7ce + dechex($ord - ord('0')));
+                $code_point = dechex(0x1d7ce + dechex($ord - ord('0')));
             } elseif ($ord >= ord('a') && $ord <= ord('z')) {
-                $d = dechex(0x1d4ea + dechex($ord - ord('a')));
+                $code_point = dechex(0x1d4ea + dechex($ord - ord('a')));
             } elseif ($ord >= ord('A') && $ord <= ord('Z')) {
-                $d = dechex(0x1d4d0 + dechex($ord - ord('A')));
+                $code_point = dechex(0x1d4d0 + dechex($ord - ord('A')));
             } else {
                 continue;
             }
-            $ret .= self::utf8_chr($d) . " ";
+            $ret .= self::utf8_chr($code_point) . " ";
         }
+        echo $ret, PHP_EOL;
         return $ret;
     }
 
