@@ -138,12 +138,13 @@ class Utils {
     {
         $ret = "";
         foreach (charin($string) as $char) {
-            if (ord($char) >= ord('0') && ord($char) <= ord('9')) {
-                $d = dechex(0x1d7ce + dechex(ord($char) - ord('0')));
-            } elseif (ord($char) >= ord('a') && ord($char) <= ord('z')) {
-                $d = dechex(0x1d4ea + dechex(ord($char) - ord('a')));
-            } elseif (ord($char) >= ord('A') && ord($char) <= ord('Z')) {
-                $d = dechex(0x1d4d0 + dechex(ord($char) - ord('A')));
+            $ord = ord($char);
+            if ($ord >= ord('0') && $ord <= ord('9')) {
+                $d = dechex(0x1d7ce + dechex($ord - ord('0')));
+            } elseif ($ord >= ord('a') && $ord <= ord('z')) {
+                $d = dechex(0x1d4ea + dechex($ord - ord('a')));
+            } elseif ($ord >= ord('A') && $ord <= ord('Z')) {
+                $d = dechex(0x1d4d0 + dechex($ord - ord('A')));
             } else {
                 continue;
             }
