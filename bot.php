@@ -92,7 +92,6 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
                 });
             }
 
-
             if ($msg->channel->guild->id === "233603102047993856") {
                 // arf specific
                 // dib
