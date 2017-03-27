@@ -7,6 +7,7 @@
 include __DIR__.'/vendor/autoload.php';
 use Discord\DiscordCommandClient;
 use Discord\Parts\User\Game;
+use Discord\Parts\User;
 use Discord\Parts\Embed\Embed;
 use BenBot\SerializedArray;
 use BenBot\Utils;
@@ -62,6 +63,11 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
         $text = $msg->content;
         $gen = Utils::charIn($text);
         $first_char = $gen->current();
+
+        print_r($msg->author);
+        if ($msg->author instanceOf User) {
+            echo "is user", PHP_EOL;
+        }
 
         if (!$msg->author->bot) {
 
