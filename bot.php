@@ -703,28 +703,28 @@ $help->registerHelp('block');
 $discord->registerCommand('script', function($msg, $args) use ($utils) {
     $utils->send($msg, Utils::scriptFromAscii(implode(" ", $args)));
 }, [
-    'description' => 'description here',
-    'usage' => '<usage>',
+    'description' => 'script font',
+    'usage' => '<msg>',
     'aliases' => [
         'Script',
     ],
 ]);
 
 
-
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('fix', function($msg, $args) use ($utils) {
-    $utils->send($msg, Utils::fixedWidthFromAscii(implode(" ", $args)));
+$discord->registerCommand('frak', function($msg, $args) use ($utils) {
+    $utils->send($msg, Utils::frakturFromAscii(implode(" ", $args)));
 }, [
-    'description' => 'description here',
+    'description' => 'gothic font',
     'usage' => '<msg>',
     'aliases' => [
-        'Fix',
-        'pain',
-        'Pain',
+        'Frak',
+        'fraktur',
+        'Fraktur',
+        'gothic',
+        'Gothic',
     ],
 ]);
-
 
 
 ///////////////////////////////////////////////////////////

@@ -156,18 +156,28 @@ class Utils {
     }
 
 
-    public static function fixedWidthFromAscii($text)
+    public static function frakturFromAscii($string)
     {
         $ret = "";
-        foreach (self::charIn($text) as $char) {
+        foreach (self::charIn($string) as $char) {
             $ord = ord($char);
-            if ($ord <= ord(' ') && $ord <= ord('~')) {
-                $ret .= mb_substr(" ！゛＃＄％＆'（）＊＋、ー。／０１２３４５６７８９：；〈＝〉？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［\］＾＿‘ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ｛|}~", $ord - ord(' '), 1);
+            if ($ord >= ord('0') && $ord <= ord('9')) {
+                $ret .= mb_substr("𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡", $ord - ord('0'), 1);
+            } elseif ($ord >= ord('a') && $ord <= ord('z')) {
+                $ret .= mb_substr("𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟", $ord - ord('a'), 1);
+            } elseif ($ord >= ord('A') && $ord <= ord('Z')) {
+                $ret .= mb_substr("𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅", $ord - ord('A'), 1);
+            } elseif ($char == " ") {
+                $ret .= " ";
+            } else {
+                continue;
             }
             $ret .= " ";
         }
         return $ret;
     }
+
+
 
 
 
