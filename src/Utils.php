@@ -140,17 +140,20 @@ class Utils {
         foreach (self::charIn($string) as $char) {
             $ord = ord($char);
             if ($ord >= ord('0') && $ord <= ord('9')) {
-                $code_point = dechex(0x1d7ce + dechex($ord - ord('0')));
+                $offset = $ord - ord('0');
+                $code_point = dechex(hexdec(0x1d7ce) + $offset);
             } elseif ($ord >= ord('a') && $ord <= ord('z')) {
-                $code_point = dechex(0x1d4ea + dechex($ord - ord('a')));
+                $offset = $ord - ord('a');
+                $code_point = dechex(hexdec(0x1d4ea) + $offset);
             } elseif ($ord >= ord('A') && $ord <= ord('Z')) {
-                $code_point = dechex(0x1d4d0 + dechex($ord - ord('A')));
+                $offset = $ord - ord('A');
+                $code_point = dechex(hexdec(0x1d4d0) + $offset);
             } else {
                 continue;
             }
-            $ret .= self::utf8_chr($code_point) . " ";
+            // $ret .= self::utf8_chr($code_point) . " ";
+            $ret .= mb_convert_encoding("&#$code_point;", 'UTF-8', 'HTML-ENTITIES');
         }
-        echo $ret, PHP_EOL;
         return $ret;
     }
 
