@@ -137,7 +137,7 @@ class Utils {
     public static function scriptFromAscii($string)
     {
         $ret = "";
-        foreach (charin($string) as $char) {
+        foreach (self::charIn($string) as $char) {
             $ord = ord($char);
             if ($ord >= ord('0') && $ord <= ord('9')) {
                 $code_point = dechex(0x1d7ce + dechex($ord - ord('0')));
@@ -155,60 +155,44 @@ class Utils {
     }
 
 
-    public static function utf8_chr( $code_point )
+    public static function utf8_chr($code_point)
     {
-        if( ( $i = ( int ) $code_point ) !== $code_point )
-        {
+        if (($i = (int) $code_point) !== $code_point) {
             //$code_point is a string, lets extract int code point from it
-
-            if( !( $i = ( int ) self::utf8_hex_to_int( $code_point ) ) )
-            {
+            if (!($i = (int) self::utf8_hex_to_int($code_point))) {
                 return '';
             }
         }
 
-        if( mbstring_loaded( ) /*extension_loaded( 'mbstring' )*/ )
-        {
-            return mb_convert_encoding( "&#$i;" , 'UTF-8' , 'HTML-ENTITIES' );
-        }
-        else if( version_compare( phpversion( ) , '5.0.0' ) === 1 )
-        {
+        if (extension_loaded('mbstring')) {
+            return mb_convert_encoding("&#$i;", 'UTF-8', 'HTML-ENTITIES');
+        } elseif (version_compare(phpversion( ), '5.0.0') === 1) {
             //html_entity_decode did not support Multi-Byte before PHP 5.0.0
-            return html_entity_decode( "&#{$i};" , ENT_QUOTES, 'UTF-8' );
+            return html_entity_decode("&#{$i};", ENT_QUOTES, 'UTF-8');
         }
 
 
         //Fallback
 
-        $bits   = ( int ) ( log( $i , 2 ) + 1 );
+        $bits = (int) (log($i, 2) + 1);
 
-        if( $bits <= 7 )                //Single Byte
-        {
-            return chr( $i );
-        }
-        else if( $bits <= 11 )          //Two Bytes
-        {
-            return chr( ( ( $i >> 6 ) & 0x1F ) | 0xC0 ) . chr( ( $i & 0x3F ) | 0x80 );
-        }
-        else if( $bits <= 16 )          //Three Bytes
-        {
-            return chr( ( ( $i >> 12 ) & 0x0F ) | 0xE0 ) . chr( ( ( $i >> 6 ) & 0x3F ) | 0x80 ) . chr( ( $i & 0x3F ) | 0x80 );
-        }
-        else if( $bits <=21 )           //Four Bytes
-        {
-            return chr( ( ( $i >> 18 ) & 0x07 ) | 0xF0 ) . chr( ( ( $i >> 12 ) & 0x3F ) | 0x80 ) . chr( ( ( $i >> 6 ) & 0x3F ) | 0x80 ) . chr( ( $i & 0x3F ) | 0x80 );
-        }
-        else
-        {
+        if ($bits <= 7) {               //Single Byte
+            return chr($i);
+        } elseif ($bits <= 11) {         //Two Bytes
+            return chr((( $i >> 6 ) & 0x1F) | 0xC0) . chr(($i & 0x3F) | 0x80);
+        } elseif ($bits <= 16) {         //Three Bytes
+            return chr((($i >> 12) & 0x0F) | 0xE0) . chr((($i >> 6) & 0x3F) | 0x80) . chr(($i & 0x3F) | 0x80);
+        } elseif ( $bits <=21 ) {          //Four Bytes
+            return chr((($i >> 18) & 0x07) | 0xF0) . chr((($i >> 12) & 0x3F) | 0x80) . chr((($i >> 6) & 0x3F) | 0x80) . chr(($i & 0x3F) | 0x80);
+        } else {
             return '';  //Cannot be encoded as Valid UTF-8
         }
     }
 
-    public static function utf8_hex_to_int( $str )
+    public static function utf8_hex_to_int($str)
     {
-        if( preg_match( '/^(?:\\\u|U\+|)([a-z0-9]{4,6})$/i' , $str , $match ) )
-        {
-            return ( int ) hexdec( $match[1] );
+        if (preg_match( '/^(?:\\\u|U\+|)([a-z0-9]{4,6})$/i' , $str , $match)) {
+            return (int) hexdec($match[1]);
         }
 
         return 0;
