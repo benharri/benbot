@@ -790,7 +790,12 @@ $help->registerHelp('img');
 
 
     $img->registerSubCommand('list', function ($msg, $args) use ($imgs, $utils) {
-        $utils->send($msg, "list of uploaded images:\n\n" . implode(", ", $imgs->array_keys()));
+        $ret = "";
+        foreach ($imgs as $name => $img) {
+            $ret .= "$name, ";
+        }
+        $ret = rtrim($ret, ",");
+        $utils->send($msg, "list of uploaded images:\n\n$ret");
     }, [
         'description' => 'saved image list',
     ]);
