@@ -3,13 +3,16 @@ namespace BenBot;
 
 
 class Help {
+
     protected $help;
     protected $discord;
+    protected $utils;
 
-    public function __construct($discord)
+    public function __construct($discord, $utils)
     {
-        $help = [];
+        $help          = [];
         $this->discord = $discord;
+        $this->utils   = $utils;
     }
 
     public function registerHelp($cmd_name)
@@ -43,7 +46,7 @@ class Help {
                 $ret = "```$banner\n- a bot made by benh. avatar by hirose.\n\n";
                 $ret .= implode("", $this->help);
                 $ret .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
-                send($msg, $ret);
+                $this->utils->send($msg, $ret);
             }
         };
         return $helpfn;

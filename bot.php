@@ -47,7 +47,7 @@ $discord = new DiscordCommandClient([
 ]);
 
 $utils = new Utils($discord);
-$help  = new Help($discord);
+$help  = new Help($discord, $utils);
 
 $game = $discord->factory(Game::class, [
     'name' => ';help for more info',
@@ -57,7 +57,7 @@ $game = $discord->factory(Game::class, [
 $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, $utils) {
     $discord->updatePresence($game);
 
-    $discord->on('message', function ($msg, $args) use ($defs, $imgs, $utils) {
+    $discord->on('message', function ($msg) use ($defs, $imgs, $utils) {
         // for stuff that isn't a command
         $text = $msg->content;
         $gen = Utils::charIn($text);
