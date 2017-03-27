@@ -8,6 +8,9 @@ include __DIR__.'/vendor/autoload.php';
 use Discord\DiscordCommandClient;
 use Discord\Parts\User\Game;
 use Discord\Parts\Embed\Embed;
+use BenBot\SerializedArray;
+use BenBot\Utils;
+use BenBot\Help;
 use Carbon\Carbon;
 
 
@@ -15,18 +18,21 @@ $dotenv = new Dotenv\Dotenv(__DIR__);
 $dotenv->load();
 
 include __DIR__.'/kaomoji.php';
-include __DIR__.'/serializedarray.php';
-include __DIR__.'/util_fns.php';
 
 $yomamajokes = file("yomamajokes.txt");
 $jokes = explode("---", file_get_contents(__DIR__.'/miscjokes.txt'));
 
 $starttime = Carbon::now();
-$defs      = new SerializedArray(__DIR__.'/bot_data/defs.mp');
-$imgs      = new SerializedArray(__DIR__.'/bot_data/img_urls.mp');
-$cities    = new SerializedArray(__DIR__.'/bot_data/cities.mp');
-$swearjar  = new SerializedArray(__DIR__.'/bot_data/swearjar.mp');
-$help      = [];
+
+try {
+    $defs   = new SerializedArray(__DIR__.'/bot_data/defs.mp');
+    $imgs   = new SerializedArray(__DIR__.'/bot_data/img_urls.mp');
+    $cities = new SerializedArray(__DIR__.'/bot_data/cities.mp');
+    $emails = new SerializedArray(__DIR__.'/bot_data/emails.mp');
+} catch (Exception $e) {
+    echo 'Caught exception: ', $e->getMessage(), PHP_EOL;
+}
+
 
 
 $discord = new DiscordCommandClient([
@@ -40,19 +46,21 @@ $discord = new DiscordCommandClient([
     ],
 ]);
 
+$utils = new Utils($discord);
+$help  = new Help($discord);
 
 $game = $discord->factory(Game::class, [
     'name' => ';help for more info',
 ]);
 
 
-$discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, $swearjar) {
+$discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, $utils) {
     $discord->updatePresence($game);
 
-    $discord->on('message', function ($msg, $args) use ($defs, $imgs, $swearjar) {
+    $discord->on('message', function ($msg, $args) use ($defs, $imgs, $utils) {
         // for stuff that isn't a command
         $text = $msg->content;
-        $gen = charIn($text);
+        $gen = Utils::charIn($text);
         $first_char = $gen->current();
 
         if (!$msg->author->bot) {
@@ -63,45 +71,29 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
                 for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next())
                     $qu .= $gen->current();
                 $qu = strtolower($qu);
-                if ($defs->get($qu, true))
-                    send($msg, "**$qu**: " . $defs->get($qu));
-                if ($imgs->get($qu, true)) {
-                    $imgfile = $imgs->get($qu);
-                    sendFile($msg, __DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+
+                if (isset($defs[$qu]))
+                    $utils->send($msg, "**$qu**: " . $defs[$qu]);
+                if (isset($imgs[$qu])) {
+                    $imgfile = $imgs[$qu];
+                    $utils->sendFile($msg, __DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
                 }
 
             }
 
-            if (isDM($msg)){
+            if (Utils::isDM($msg)){
                 $msg->channel->broadcastTyping();
-                askCleverbot(implode(" ", $args))->then(function ($result) use ($msg) {
-                    send($msg, $result->output);
+                $utils->askCleverbot($text)->then(function ($result) use ($msg, $utils) {
+                    $utils->send($msg, $result->output);
                 });
-            }
-
-
-            if ($msg->channel->guild->id === "233603102047993856") {
-                // arf specific
-                if (strpos(strtolower($text), 'dib') !== false) {
-                    $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
-                        echo $e->getMessage(), PHP_EOL;
-                    });
-                }
             } else {
-                if (checkForSwears(strtolower($text))) {
-                    $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
-
-                    $swearcount = $swearjar->get($id, true) ? $swearjar->get($id)["swear_count"] + 1 : 1;
-
-                    $swearjar->set($msg->author->id, [
-                        'swear_count' => $swearcount,
-                        'latest_swear' => $msg->content,
-                        'timestamp' => Carbon::now(),
-                    ]);
-
-                    $msg->react("‼")->otherwise(function ($e) {
-                        echo $e->getMessage(), PHP_EOL;
-                    });
+                if ($msg->channel->guild->id === "233603102047993856") {
+                    // arf specific
+                    if (strpos(strtolower($text), 'dib') !== false) {
+                        $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
+                            echo $e->getMessage(), PHP_EOL;
+                        });
+                    }
                 }
             }
 
@@ -111,7 +103,7 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
 
     $starttime = Carbon::now();
 
-    pingMe("bot started successfully");
+    $utils->pingMe("bot started successfully");
 });
 
 
@@ -123,9 +115,9 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('deltest', function ($msg, $args) use ($discord) {
-    send($msg, "test")->then(function($result) use ($discord, $msg) {
-        print_r($result);
+$discord->registerCommand('deltest', function ($msg, $args) use ($discord, $utils) {
+    $utils->send($msg, "test")->then(function($result) use ($discord, $msg) {
+        // print_r($result);
         $msgs = $discord->getRepository('MessageRepository', $msg->id, '');
         print_r($msgs);
         // $msgs->delete($msg);
@@ -154,40 +146,40 @@ $discord->registerCommand('hi', [
 
 
 
-$savecity = function ($msg, $args) use ($cities, $discord) {
+$savecity = function ($msg, $args) use ($cities, $discord, $utils) {
     $api_key = getenv('OWM_API_KEY');
     $query = implode("%20", $args);
     $url = "http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric";
 
-    $discord->http->get($url)->then(function ($json) use ($cities, $msg, $discord) {
+    $discord->http->get($url)->then(function ($json) use ($cities, $msg, $discord, $utils) {
         $lat = $json->coord->lat;
         $lng = $json->coord->lon;
         $geonamesurl = "http://api.geonames.org/timezoneJSON?username=benharri&lat=$lat&lng=$lng";
-        $discord->http->get($geonamesurl)->then(function ($geojson) use ($cities, $msg, $json) {
+        $discord->http->get($geonamesurl)->then(function ($geojson) use ($cities, $msg, $json, $utils) {
 
             if (count($msg->mentions) > 0) {
                 $ret = "the preferred city for ";
                 foreach ($msg->mentions as $mention) {
-                    $cities->set($mention->id, [
+                    $cities[$mention->id] =  [
                         'id'       => $json->id,
                         'lat'      => $json->coord->lat,
                         'lon'      => $json->coord->lon,
                         'city'     => $json->name,
                         'timezone' => $geojson->timezoneId,
-                    ]);
+                    ];
                     $mentions[] = "<@{$mention->id}>";
                 }
                 $ret .= implode(", ", $mentions);
                 $ret .= " has been set to {$json->name}";
-                send($msg, $ret);
+                $utils->send($msg, $ret);
             } else {
-                $cities->set($msg->author->id, [
+                $cities[$msg->author->id] = [
                     'id'       => $json->id,
                     'lat'      => $json->coord->lat,
                     'lon'      => $json->coord->lon,
                     'city'     => $json->name,
                     'timezone' => $geojson->timezoneId,
-                ]);
+                ];
                 $msg->reply("your preferred city has been set to {$json->name}");
             }
 
@@ -202,26 +194,26 @@ $savecity = function ($msg, $args) use ($cities, $discord) {
 
 
 ///////////////////////////////////////////////////////////
-$time = $discord->registerCommand('time', function ($msg, $args) use ($cities, $discord) {
-    $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
+$time = $discord->registerCommand('time', function ($msg, $args) use ($cities, $discord, $utils) {
+    $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
 
     if (count($args) == 0) {
         // lookup the person's time or tell them to save their time
-        if ($cities->get($id, true)) {
-            $ci = $cities->get($id);
-            send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
+        if (isset($cities[$id])) {
+            $ci = $cities[$id];
+            $utils->send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
         } else {
-            send($msg, "It's " . Carbon::now()->format('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nyou can set a preferred city with `;time save city` or `;weather save.`");
+            $utils->send($msg, "It's " . Carbon::now()->format('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nyou can set a preferred city with `;time save city` or `;weather save.`");
         }
     } else {
         if (count($msg->mentions) > 0) {
             // if users are mentioned
             foreach ($msg->mentions as $mention) {
-                if ($cities->get($mention->id, true)) {
-                    $ci = $cities->get($mention->id);
-                    send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
+                if (isset($cities[$mention->id])) {
+                    $ci = $cities[$mention->id];
+                    $utils->send($msg, "It's " . Carbon::now($ci["timezone"])->format('g:i A \o\n l F j, Y') . " in {$ci["city"]}.");
                 } else {
-                    send($msg, "No city found for <@{$mention->id}>.\nset a preferred city with `;time save city` or `;weather save city`");
+                    $utils->send($msg, "No city found for <@{$mention->id}>.\nset a preferred city with `;time save city` or `;weather save city`");
                 }
             }
 
@@ -233,12 +225,12 @@ $time = $discord->registerCommand('time', function ($msg, $args) use ($cities, $
             $query = implode("%20", $args);
             $url = "http://api.openweathermap.org/data/2.5/weather?q={$query}&APPID=$api_key&units=metric";
 
-            $discord->http->get($url)->then(function ($jsoncoords) use ($discord, $msg) {
+            $discord->http->get($url)->then(function ($jsoncoords) use ($discord, $msg, $utils) {
                 $coord = $jsoncoords->coord;
                 $url = "http://api.geonames.org/timezoneJSON?username=benharri";
                 $newurl = "$url&lat={$coord->lat}&lng={$coord->lon}";
-                $discord->http->get($newurl)->then(function ($json) use ($msg, $jsoncoords) {
-                    send($msg, "It's " . Carbon::now($json->timezoneId)->format('g:i A \o\n l F j, Y') . " in {$jsoncoords->name}.");
+                $discord->http->get($newurl)->then(function ($json) use ($msg, $jsoncoords, $utils) {
+                    $utils->send($msg, "It's " . Carbon::now($json->timezoneId)->format('g:i A \o\n l F j, Y') . " in {$jsoncoords->name}.");
                 });
             });
         }
@@ -250,7 +242,7 @@ $time = $discord->registerCommand('time', function ($msg, $args) use ($cities, $
         'Time',
     ],
 ]);
-registerHelp('time');
+$help->registerHelp('time');
 
 
     $time->registerSubCommand('save', $savecity, [
@@ -260,17 +252,17 @@ registerHelp('time');
 
 
 ///////////////////////////////////////////////////////////
-$weather = $discord->registerCommand('weather', function ($msg, $args) use ($cities, $discord) {
-    $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
+$weather = $discord->registerCommand('weather', function ($msg, $args) use ($cities, $discord, $utils) {
+    $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
     $api_key = getenv('OWM_API_KEY');
     $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric&";
     if (count($args) == 0) {
         // look up for your saved city
-        if ($cities->get($id, true)) {
-            $ci = $cities->get($id);
+        if (isset($cities[$id])) {
+            $ci = $cities[$id];
             $url .= "id=" . $ci["id"];
-            $discord->http->get($url)->then(function ($result) use ($msg, $ci) {
-                send($msg, "", formatWeatherJson($result, $ci["timezone"]));
+            $discord->http->get($url)->then(function ($result) use ($msg, $ci, $utils) {
+                $utils->send($msg, "", $utils->formatWeatherJson($result, $ci["timezone"]));
             });
         } else {
             $msg->reply("you can set your preferred city with `;weather save <city>`");
@@ -280,23 +272,23 @@ $weather = $discord->registerCommand('weather', function ($msg, $args) use ($cit
         if (count($msg->mentions) > 0) {
             // look up for another person
             foreach ($msg->mentions as $mention) {
-                if ($cities->get($mention->id, true)) {
-                    $ci = $cities->get($mention->id);
+                if (isset($cities[$mention->id])) {
+                    $ci = $cities[$mention->id];
                     $url .= "id=" . $ci["id"];
-                    $discord->http->get($url)->then(function ($result) use ($msg, $ci) {
-                        send($msg, "", formatWeatherJson($result, $ci["timezone"]));
+                    $discord->http->get($url)->then(function ($result) use ($msg, $ci, $utils) {
+                        $utils->send($msg, "", $utils->formatWeatherJson($result, $ci["timezone"]));
                     });
                 } else {
                     // mentioned user not found
-                    send($msg, "no preferred city found for <@{$mention->id}>.\nset a preferred city with `;weather save city <@{$mention->id}>`.");
+                    $utils->send($msg, "no preferred city found for <@{$mention->id}>.\nset a preferred city with `;weather save city <@{$mention->id}>`.");
                 }
             }
         } else {
             // look up any city
             $query = implode("%20", $args);
             $url .= "q=$query";
-            $discord->http->get($url)->then(function ($result) use($msg) {
-                send($msg, "", formatWeatherJson($result));
+            $discord->http->get($url)->then(function ($result) use($msg, $utils) {
+                $utils->send($msg, "", $utils->formatWeatherJson($result));
             });
         }
     }
@@ -307,7 +299,7 @@ $weather = $discord->registerCommand('weather', function ($msg, $args) use ($cit
         'Weather',
     ],
 ]);
-registerHelp('weather');
+$help->registerHelp('weather');
 
 
     $weather->registerSubCommand('save', $savecity, [
@@ -328,23 +320,23 @@ $discord->registerCommand('roll', function ($msg, $args) {
         'Roll',
     ],
 ]);
-registerHelp('roll');
+$help->registerHelp('roll');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('text_benh', function ($msg, $args) {
+$discord->registerCommand('text_benh', function ($msg, $args, $utils) {
     if (count($args) === 0) {
-        send($msg, 'can\'t send a blank message');
+        $utils->send($msg, 'can\'t send a blank message');
         return;
     }
 
     $srvr = $msg->channel->guild->name;
-    $user = isDM($msg) ? $msg->author->username : $msg->author->user->username;
+    $user = Utils::isDM($msg) ? $msg->author->username : $msg->author->user->username;
     $from = "From: {$srvr} Discord <{$srvr}@bot.benharris.ch>";
     $msg_body = $user . ":\n\n" . implode(" ", $args);
 
     if (mail(getenv('PHONE_NUMBER') . "@vtext.com", "", $msg_body, $from)) {
-        return "message sent to benh";
+        $utils->send($msg, "message sent to benh");
     }
 }, [
     'description' => 'text a message to benh',
@@ -355,19 +347,22 @@ $discord->registerCommand('text_benh', function ($msg, $args) {
         'Textben',
     ],
 ]);
-registerHelp('text_benh');
+$help->registerHelp('text_benh');
 
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('avatar', function ($msg, $args) {
+$discord->registerCommand('avatar', function ($msg, $args, $utils) {
     if (count($msg->mentions) === 0) {
-        if (isDM($msg)) send($msg, $msg->author->avatar);
-        else send($msg, $msg->author->user->avatar);
+        if (Utils::isDM($msg)) {
+            $utils->send($msg, $msg->author->avatar);
+        } else {
+            $utils->send($msg, $msg->author->user->avatar);
+        }
         return;
     }
     foreach ($msg->mentions as $av)
-        send($msg, $av->avatar);
+        $utils->send($msg, $av->avatar);
 }, [
     'description' => 'gets the avatar for a user',
     'usage' => '<@user>',
@@ -375,13 +370,13 @@ $discord->registerCommand('avatar', function ($msg, $args) {
         'Avatar',
     ],
 ]);
-registerHelp('avatar');
+$help->registerHelp('avatar');
 
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function ($msg, $args) use ($starttime) {
-    send($msg, "benbot has been up for {$starttime->diffForHumans(Carbon::now(), true)}.");
+$discord->registerCommand('up', function ($msg, $args) use ($starttime, $utils) {
+    $utils->send($msg, "benbot has been up for {$starttime->diffForHumans(Carbon::now(), true)}.");
 }, [
     'description' => 'bot uptime',
     'aliases' => [
@@ -392,13 +387,13 @@ $discord->registerCommand('up', function ($msg, $args) use ($starttime) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('say', function ($msg, $args) {
+$discord->registerCommand('say', function ($msg, $args, $utils) {
     $a = implode(" ", $args);
     if ((strpos($a, '@everyone') !== false) || (strpos($a, '@here') !== false)) {
         $msg->reply("sry, can't do that! :P");
         return;
     }
-    send($msg, "$a\n\n**love**, {$msg->author}");
+    $utils->send($msg, "$a\n\n**love**, {$msg->author}");
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
@@ -412,13 +407,13 @@ $discord->registerCommand('say', function ($msg, $args) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('sing', function ($msg, $args) {
+$discord->registerCommand('sing', function ($msg, $args, $utils) {
     $a = implode(" ", $args);
     if ((strpos($a, '@everyone') !== false) || (strpos($a, '@here') !== false)) {
         $msg->reply("sry, can't do that! :P");
         return;
     }
-    send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}");
+    $utils->send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}");
 }, [
     'description' => 'sing sing sing',
     'usage' => '<sing>',
@@ -432,14 +427,14 @@ $discord->registerCommand('sing', function ($msg, $args) {
 ///////////////////////////////////////////////////////////
 // DEFINITIONS STUFF
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('set', function ($msg, $args) use ($defs) {
+$discord->registerCommand('set', function ($msg, $args) use ($defs, $utils) {
     $def = strtolower(array_shift($args));
     if ($def == "san" && $msg->author->id != 190933157430689792) {
         $msg->reply("you're not san");
         return;
     }
-    $defs->set($def, implode(" ", $args));
-    send($msg, $def . " set to: " . implode(" ", $args));
+    $defs[$def] = implode(" ", $args);
+    $utils->send($msg, $def . " set to: " . implode(" ", $args));
 }, [
     'description' => 'sets this to that',
     'usage' => '<this> <that>',
@@ -447,11 +442,19 @@ $discord->registerCommand('set', function ($msg, $args) use ($defs) {
         'Set',
     ],
 ]);
-registerHelp('set');
+$help->registerHelp('set');
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('get', function ($msg, $args) use ($defs) {
-    if (isset($args[0])) send($msg, "**" . $args[0] . "**: " . $defs->get(strtolower($args[0])));
-    else send($msg, "can't search for nothing");
+$discord->registerCommand('get', function ($msg, $args) use ($defs, $utils) {
+    if (isset($args[0])) {
+        $qu = strtolower($args[0]);
+        if (isset($defs[$qu])) {
+            $utils->send($msg, "**" . $args[0] . "**: " . $defs[$qu]);
+        } else {
+            $utils->send($msg, "not found! you can set this definition with `;set $qu <thing here>`");
+        }
+    } else {
+        $utils->send($msg, "can't search for nothing");
+    }
 }, [
     'description' => 'gets a value from the definitions. you can also omit get (;<thing to get>)',
     'usage' => '<thing to get>',
@@ -459,11 +462,12 @@ $discord->registerCommand('get', function ($msg, $args) use ($defs) {
         'Get',
     ],
 ]);
-registerHelp('get');
+$help->registerHelp('get');
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('unset', function ($msg, $args) use ($defs) {
-    $defs->unset(strtolower($args[0]));
-    send($msg, $args[0] . " unset");
+$discord->registerCommand('unset', function ($msg, $args) use ($defs, $utils) {
+    $qu = strtolower($args[0]);
+    unset($defs[$qu]);
+    $utils->send($msg, "$qu unset");
 }, [
     'description' => 'removes a definition',
     'usage' => '<def to remove>',
@@ -471,17 +475,17 @@ $discord->registerCommand('unset', function ($msg, $args) use ($defs) {
         'Unset',
     ],
 ]);
-registerHelp('unset');
+$help->registerHelp('unset');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('listdefs', function ($msg, $args) use ($defs) {
+$discord->registerCommand('listdefs', function ($msg, $args) use ($defs, $utils) {
     $ret = "benbot definitions:\n\n";
-    foreach ($defs->iter() as $key => $val) {
+    foreach ($defs as $key => $val) {
         $ret .= "**$key**: $val\n";
     }
 
-    if (isDM($msg)) send($msg, $ret);
+    if (Utils::isDM($msg)) $utils->send($msg, $ret);
     else {
         if (strlen($ret) > 2000) {
             foreach (str_split($ret, 2000) as $split) {
@@ -504,11 +508,11 @@ $discord->registerCommand('listdefs', function ($msg, $args) use ($defs) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('8ball', function ($msg, $args) use ($fortunes) {
+$discord->registerCommand('8ball', function ($msg, $args) use ($fortunes, $utils) {
     $ret = "Your Question: *";
     $ret .= count($args) == 0 ? "Why didn't {$msg->author} ask a question?" : implode(" ", $args);
     $ret .= "*\n\n**" . $fortunes[array_rand($fortunes)] . "**";
-    send($msg, $ret);
+    $utils->send($msg, $ret);
 }, [
     'description' => 'tells your fortune',
     'usage' => '<question to ask the mighty 8ball>',
@@ -517,13 +521,13 @@ $discord->registerCommand('8ball', function ($msg, $args) use ($fortunes) {
         'Ask',
     ],
 ]);
-registerHelp('8ball');
+$help->registerHelp('8ball');
 
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('lenny', function ($msg, $args) {
-    send($msg, "( ͡° ͜ʖ ͡°)")->then(function ($result) use ($msg) {
+$discord->registerCommand('lenny', function ($msg, $args, $utils) {
+    $utils->send($msg, "( ͡° ͜ʖ ͡°)")->then(function ($result) use ($msg) {
         $msg->delete();
     });
 }, [
@@ -533,8 +537,8 @@ $discord->registerCommand('lenny', function ($msg, $args) {
     ],
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('lennies', function ($msg, $args) use ($lennyception) {
-    send($msg, $lennyception);
+$discord->registerCommand('lennies', function ($msg, $args) use ($lennyception, $utils) {
+    $utils->send($msg, $lennyception);
 }, [
     'description' => '( ͡° ͜ʖ ͡°)',
     'aliases' => [
@@ -544,8 +548,8 @@ $discord->registerCommand('lennies', function ($msg, $args) use ($lennyception) 
     ],
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('shrug', function ($msg, $args) {
-    send($msg, "¯\\\_(ツ)\_/¯");
+$discord->registerCommand('shrug', function ($msg, $args, $utils) {
+    $utils->send($msg, "¯\\\_(ツ)\_/¯");
 }, [
     'description' => 'meh',
     'aliases' => [
@@ -555,8 +559,8 @@ $discord->registerCommand('shrug', function ($msg, $args) {
     ],
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('noice', function ($msg, $args) use ($bs) {
-    send($msg, $bs);
+$discord->registerCommand('noice', function ($msg, $args) use ($bs, $utils) {
+    $utils->send($msg, $bs);
 }, [
     'description' => 'ayyy',
     'aliases' => [
@@ -566,9 +570,9 @@ $discord->registerCommand('noice', function ($msg, $args) use ($bs) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('copypasta', function ($msg, $args) {
+$discord->registerCommand('copypasta', function ($msg, $args) use ($utils) {
     $copypastas = explode("---", file_get_contents(__DIR__.'/copypasta.txt'));
-    send($msg, $copypastas[array_rand($copypastas)]);
+    $utils->send($msg, $copypastas[array_rand($copypastas)]);
 }, [
     'description' => 'gets random copypasta',
     'aliases' => [
@@ -578,8 +582,8 @@ $discord->registerCommand('copypasta', function ($msg, $args) {
 
 
 ///////////////////////////////////////////////////////////
-$kaomoji = $discord->registerCommand('kaomoji', function ($msg, $args) use ($kaomojis) {
-    send($msg, $kaomojis[array_rand($kaomojis)]);
+$kaomoji = $discord->registerCommand('kaomoji', function ($msg, $args) use ($kaomojis, $utils) {
+    $utils->send($msg, $kaomojis[array_rand($kaomojis)]);
 }, [
     'description' => 'sends random kaomoji',
     'usage' => '<sad|happy|angry|confused|surprised>',
@@ -587,34 +591,34 @@ $kaomoji = $discord->registerCommand('kaomoji', function ($msg, $args) use ($kao
         'Kaomoji',
     ],
 ]);
-registerHelp('kaomoji');
+$help->registerHelp('kaomoji');
 
 
-    $kaomoji->registerSubCommand('sad', function ($msg, $args) use($sad_kaomojis) {
-        send($msg, $sad_kaomojis[array_rand($sad_kaomojis)]);
+    $kaomoji->registerSubCommand('sad', function ($msg, $args) use($sad_kaomojis, $utils) {
+        $utils->send($msg, $sad_kaomojis[array_rand($sad_kaomojis)]);
     }, ['description' => 'sad kaomoji']);
-    $kaomoji->registerSubCommand('happy', function ($msg, $args) use($happy_kaomojis) {
-        send($msg, $happy_kaomojis[array_rand($happy_kaomojis)]);
+    $kaomoji->registerSubCommand('happy', function ($msg, $args) use($happy_kaomojis, $utils) {
+        $utils->send($msg, $happy_kaomojis[array_rand($happy_kaomojis)]);
     }, ['description' => 'happy kaomoji']);
-    $kaomoji->registerSubCommand('angry', function ($msg, $args) use($angry_kaomojis) {
-        send($msg, $angry_kaomojis[array_rand($angry_kaomojis)]);
+    $kaomoji->registerSubCommand('angry', function ($msg, $args) use($angry_kaomojis, $utils) {
+        $utils->send($msg, $angry_kaomojis[array_rand($angry_kaomojis)]);
     }, ['description' => 'angry kaomoji']);
-    $kaomoji->registerSubCommand('confused', function ($msg, $args) use($confused_kaomojis) {
-        send($msg, $confused_kaomojis[array_rand($confused_kaomojis)]);
+    $kaomoji->registerSubCommand('confused', function ($msg, $args) use($confused_kaomojis, $utils) {
+        $utils->send($msg, $confused_kaomojis[array_rand($confused_kaomojis)]);
     }, ['description' => 'confused kaomoji']);
-    $kaomoji->registerSubCommand('surprised', function ($msg, $args) use($surprised_kaomojis) {
-        send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)]);
+    $kaomoji->registerSubCommand('surprised', function ($msg, $args) use($surprised_kaomojis, $utils) {
+        $utils->send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)]);
     }, ['description' => 'surprised kaomoji']);
-    $kaomoji->registerSubCommand('embarrassed', function ($msg, $args) use($embarrassed_kaomojis) {
-        send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
+    $kaomoji->registerSubCommand('embarrassed', function ($msg, $args) use($embarrassed_kaomojis, $utils) {
+        $utils->send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
     }, ['description' => 'embarrassed kaomoji']);
 
 
 
 
 ///////////////////////////////////////////////////////////
-$joke = $discord->registerCommand('joke', function ($msg, $args) use ($jokes) {
-    send($msg, $jokes[array_rand($jokes)]);
+$joke = $discord->registerCommand('joke', function ($msg, $args) use ($jokes, $utils) {
+    $utils->send($msg, $jokes[array_rand($jokes)]);
 }, [
     'description' => 'tells a random joke',
     'usage' => '<chucknorris|yomama|dad>',
@@ -622,15 +626,15 @@ $joke = $discord->registerCommand('joke', function ($msg, $args) use ($jokes) {
         'Joke',
     ],
 ]);
-registerHelp('joke');
+$help->registerHelp('joke');
 
 
-    $joke->registerSubCommand('chucknorris', function ($msg, $args) use ($discord) {
+    $joke->registerSubCommand('chucknorris', function ($msg, $args) use ($discord, $utils) {
         $url = "http://api.icndb.com/jokes/random1";
-        $result = $discord->http->get($url, null, [], false)->then(function ($result) use ($msg) {
-            send($msg, $result->value->joke);
-        }, function ($e) use ($msg) {
-            send($msg, $e->getMessage());
+        $result = $discord->http->get($url, null, [], false)->then(function ($result) use ($msg, $utils) {
+            $utils->send($msg, $result->value->joke);
+        }, function ($e) use ($msg, $utils) {
+            $utils->send($msg, $e->getMessage());
         });
     }, [
         'description' => 'get a random fact about chuck norris',
@@ -639,8 +643,8 @@ registerHelp('joke');
         ],
     ]);
 
-    $joke->registerSubCommand('yomama', function ($msg, $args) use ($yomamajokes) {
-        send($msg, $yomamajokes[array_rand($yomamajokes)]);
+    $joke->registerSubCommand('yomama', function ($msg, $args) use ($yomamajokes, $utils) {
+        $utils->send($msg, $yomamajokes[array_rand($yomamajokes)]);
     }, [
         'description' => 'yo mama jokes',
         'aliases' => [
@@ -648,12 +652,12 @@ registerHelp('joke');
         ],
     ]);
 
-    $joke->registerSubCommand('dad', function ($msg, $args) use ($discord) {
+    $joke->registerSubCommand('dad', function ($msg, $args) use ($discord, $utils) {
         $url = "https://icanhazdadjoke.com";
-        $discord->http->get($url, null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg) {
-            send($msg, $result->joke);
+        $discord->http->get($url, null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg, $utils) {
+            $utils->send($msg, $result->joke);
         }, function ($e) use ($msg) {
-            send($msg, $e->getMessage());
+            $utils->send($msg, $e->getMessage());
         });
     }, [
         'description' => 'tells a dad joke',
@@ -662,7 +666,7 @@ registerHelp('joke');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('block', function ($msg, $args) {
+$discord->registerCommand('block', function ($msg, $args) use ($utils) {
     $ret = "";
     foreach (charIn(strtolower(implode(" ", $args))) as $char) {
         if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
@@ -682,7 +686,7 @@ $discord->registerCommand('block', function ($msg, $args) {
         }
         else if ($char == " ") $ret .= "   ";
     }
-    send($msg, $ret);
+    $utils->send($msg, $ret);
 }, [
     'description' => 'turn a message into block text',
     'usage' => '<msg>',
@@ -690,16 +694,19 @@ $discord->registerCommand('block', function ($msg, $args) {
         'Block',
     ],
 ]);
-registerHelp('block');
+$help->registerHelp('block');
 
 
 
 ///////////////////////////////////////////////////////////
-$ascii = $discord->registerCommand('ascii', function ($msg, $args) {
+$ascii = $discord->registerCommand('ascii', function ($msg, $args) use ($utils) {
     $result = shell_exec("figlet " . escapeshellarg(implode(" ", $args)));
     $result = "```$result```";
-    if (strlen($result) > 2000) send($msg, "oops message too large for discord");
-    else send($msg, $result);
+    if (strlen($result) > 2000) {
+        $utils->send($msg, "oops message too large for discord");
+    } else {
+        $utils->send($msg, $result);
+    }
 }, [
     'description' => 'ascii-ifies your message',
     'usage' => '<msg>',
@@ -709,33 +716,44 @@ $ascii = $discord->registerCommand('ascii', function ($msg, $args) {
     ],
 ]);
 
-    $ascii->registerSubCommand('slant', function ($msg, $args) {
+    $ascii->registerSubCommand('slant', function ($msg, $args) use ($utils) {
         $result = shell_exec("figlet -f smslant " . escapeshellarg(implode(" ", $args)));
         $result = "```$result```";
-        if (strlen($result) > 2000) send($msg, "oops message too large for discord");
-        else send($msg, $result);
+        if (strlen($result) > 2000) {
+            $utils->send($msg, "oops message too large for discord");
+        } else {
+            $utils->send($msg, $result);
+        }
     }, [
         'description' => 'slant ascii',
         'usage' => '<msg>',
     ]);
 
-    $ascii->registerSubCommand('lean', function ($msg, $args) {
+    $ascii->registerSubCommand('lean', function ($msg, $args) use ($utils) {
         $result = shell_exec("figlet -f lean " . escapeshellarg(implode(" ", $args)) . " | tr ' _/' ' //'");
         $result = "```$result```";
-        if (strlen($result) > 2000) send($msg, "oops message too large for discord");
-        else send($msg, $result);
+        if (strlen($result) > 2000) {
+            $utils->send($msg, "oops message too large for discord");
+        } else {
+            $utils->send($msg, $result);
+        }
     });
 
 
 
 
 ///////////////////////////////////////////////////////////
-$img = $discord->registerCommand('img', function ($msg, $args) use ($imgs, $discord) {
+$img = $discord->registerCommand('img', function ($msg, $args) use ($imgs, $discord, $utils) {
+    if (count($args) < 1) {
+        $utils->send($msg, "type the name of an image you'd like to see. `;img list` shows all saved images.");
+        return;
+    }
     $qu = strtolower($args[0]);
     // look for image in uploaded_images
-    if ($imgs->get($qu, true)) {
-        $imgfile = $imgs->get($qu);
-        sendFile($msg, __DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+    if (isset($imgs[$qu])) {
+        $utils->sendFile($msg, __DIR__."/uploaded_images/{$imgs[$qu]}", $imgs[$qu], $qu);
+    } else {
+        $utils->send($msg, "$qu is not a saved image. you can save it by attaching the image with `;img save $qu`");
     }
 }, [
     'description' => 'image tools (;help img for more info)',
@@ -744,46 +762,48 @@ $img = $discord->registerCommand('img', function ($msg, $args) use ($imgs, $disc
         'Img',
     ],
 ]);
-registerHelp('img');
+$help->registerHelp('img');
 
 
 
-    $img->registerSubCommand('save', function ($msg, $args) use ($imgs) {
+    $img->registerSubCommand('save', function ($msg, $args) use ($imgs, $utils) {
         $qu = strtolower($args[0]);
-        if ($imgs->get($qu, true)) {
-            send($msg, "img with this name already exists");
+        if (isset($imgs[$qu])) {
+            $utils->send($msg, "img with this name already exists");
             return;
         }
         if (count($msg->attachments) > 0) {
             foreach ($msg->attachments as $attachment) {
                 $ext = pathinfo($attachment->url, PATHINFO_EXTENSION);
-                $imgs->set($qu, "$qu.$ext");
+                $imgs[$qu] = "$qu.$ext";
                 file_put_contents(__DIR__."/uploaded_images/$qu.$ext", file_get_contents($attachment->url));
             }
 
-            send($msg, "image saved as $qu");
-        } else send($msg, "no image to save");
+            $utils->send($msg, "image saved as $qu");
+        } else {
+            $utils->send($msg, "no image to save");
+        }
     }, [
         'description' => 'saves attached image as name',
         'usage' => '<name>',
     ]);
 
 
-    $img->registerSubCommand('list', function ($msg, $args) use ($imgs) {
-        send($msg, "list of uploaded images:\n\n" . implode(", ", $imgs->getKeys()));
+    $img->registerSubCommand('list', function ($msg, $args) use ($imgs, $utils) {
+        $utils->send($msg, "list of uploaded images:\n\n" . implode(", ", $imgs->array_keys()));
     }, [
         'description' => 'saved image list',
     ]);
 
-    $img->registerSubCommand('rm', function ($msg, $args) use ($imgs) {
+    $img->registerSubCommand('rm', function ($msg, $args) use ($imgs, $utils) {
         $qu = strtolower($args[0]);
-        if ($imgs->get($qu, true)) {
-            $img = $imgs->get($qu);
-            $imgs->unset($qu);
+        if (isset($imgs[$qu])) {
+            $img = $imgs[$qu];
+            unset($imgs[$qu]);
             unlink(__DIR__."/uploaded_images/$img");
-            send($msg, "$img deleted");
+            $utils->send($msg, "$qu deleted");
         } else {
-            send($msg, "$img doesn't exist. can't delete");
+            $utils->send($msg, "$qu doesn't exist. can't delete");
         }
     }, [
         'description' => 'deletes a saved image',
@@ -799,9 +819,9 @@ registerHelp('img');
 
 ///////////////////////////////////////////////////////////
 // look up defs or images!
-$discord->registerCommand('chat', function ($msg, $args) {
+$discord->registerCommand('chat', function ($msg, $args) use ($utils) {
     $msg->channel->broadcastTyping();
-    askCleverbot(implode(' ', $args))->then(function ($result) use ($msg) {
+    $utils->askCleverbot(implode(' ', $args))->then(function ($result) use ($msg) {
         $msg->reply($result->output);
     });
 }, [
@@ -814,12 +834,14 @@ $discord->registerCommand('chat', function ($msg, $args) {
         'cleverbot',
     ],
 ]);
-registerHelp('chat');
+$help->registerHelp('chat');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('dm', function ($msg, $args) {
-    if (isDM($msg)) send($msg, "you're already in a dm, silly");
+$discord->registerCommand('dm', function ($msg, $args) use ($utils) {
+    if (Utils::isDM($msg)) {
+        $utils->send($msg, "you're already in a dm, silly");
+    }
     if (count($msg->mentions) == 0) {
         $msg->author->user->sendMessage("hi\ntry typing `;help` or just have a conversation with me");
     } else {
@@ -834,18 +856,18 @@ $discord->registerCommand('dm', function ($msg, $args) {
         'Dm',
     ],
 ]);
-registerHelp('dm');
+$help->registerHelp('dm');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('bamboozle', function ($msg, $args) {
+$discord->registerCommand('bamboozle', function ($msg, $args) use ($utils) {
     $ret = "";
     if (count($msg->mentions) > 0)
         foreach ($msg->mentions as $key => $val)
             $ret .= "<@$key>";
     else $ret = $msg->author;
     $ret .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!";
-    sendFile($msg, 'img/bamboozled.jpg', 'bamboozle.jpg', $ret);
+    $utils->sendFile($msg, 'img/bamboozled.jpg', 'bamboozle.jpg', $ret);
 
 }, [
     'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
@@ -855,25 +877,6 @@ $discord->registerCommand('bamboozle', function ($msg, $args) {
     ],
 ]);
 
-///////////////////////////////////////////////////////////
-$discord->registerCommand('swearjar', function($msg, $args) use ($swearjar) {
-    $ret = "";
-    foreach ($swearjar->iter() as $user => $swear_info) {
-        print_r($swear_info);
-        $date = new Carbon($swear_info["timestamp"]["date"], $swear_info["timestamp"]["timezone"]);
-        $ret .= "<@$user> said \"{$swear_info["latest_swear"]}\" " . $date->diffForHumans() . "\n";
-    }
-    send($msg, $ret);
-}, [
-    'description' => 'tattles on naughty people',
-    'aliases' => [
-        'Swearjar',
-        'swears',
-        'Swears',
-        'dirtymouths',
-        'Dirtymouths',
-    ],
-]);
 
 
 
@@ -888,33 +891,37 @@ $discord->registerCommand('swearjar', function($msg, $args) use ($swearjar) {
 ///////////////////////////////////////////////////////////
 // debugging commands
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('dbg', function ($msg, $args) use ($defs, $imgs, $discord) {
-    $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
+$discord->registerCommand('dbg', function ($msg, $args) use ($defs, $imgs, $discord, $utils) {
+    $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
 
     if ($id == "193011352275648514") {
         print_r($msg);
-        send($msg, "debugging. check logs.");
+        $utils->send($msg, "debugging. check logs.");
         print_r($msg->channel->guild);
         echo "args: ", implode(" ", $args), PHP_EOL;
-    } else send($msg, "you're not allowed to use that command");
+    } else {
+        $utils->send($msg, "you're not allowed to use that command");
+    }
 }, [
     'aliases' => [
         'Dbg',
     ],
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('sys', function ($msg, $args) {
-    $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
+$discord->registerCommand('sys', function ($msg, $args) use ($utils) {
+    $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
     if ($id == "193011352275648514") {
-        send($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
-    } else send($msg, "you're not allowed to use that command");
+        $utils->send($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
+    } else {
+        $utils->send($msg, "you're not allowed to use that command");
+    }
 }, [
     'aliases' => [
         'Sys',
     ],
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('status', function ($msg, $args) use ($discord, $starttime) {
+$discord->registerCommand('status', function ($msg, $args) use ($discord, $starttime, $utils) {
     $usercount = 0;
     foreach ($discord->guilds as $guild) {
         $usercount += $guild->member_count;
@@ -929,8 +936,7 @@ $discord->registerCommand('status', function ($msg, $args) use ($discord, $start
         ],
         'timestamp' => null,
     ]);
-    print_r($discord->user);
-    send($msg, "", $embed);
+    $utils->send($msg, "", $embed);
 }, [
     'description' => 'bot status',
     'usage' => '',
@@ -939,9 +945,9 @@ $discord->registerCommand('status', function ($msg, $args) use ($discord, $start
     ],
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('server', function ($msg, $args) use ($discord) {
-    if (isDM($msg)) {
-        send($msg, "you're not in a server right now");
+$discord->registerCommand('server', function ($msg, $args) use ($discord, $utils) {
+    if (Utils::isDM($msg)) {
+        $utils->send($msg, "you're not in a server right now");
         return;
     }
 
@@ -952,7 +958,7 @@ $discord->registerCommand('server', function ($msg, $args) use ($discord) {
         3 => "(╯°□°）╯︵ ┻━┻: must have verified email, be registered on discord for more than 5 minutes, and must wait 10 minutes before speaking in any channel",
     ];
     $guild = $msg->channel->guild;
-    $created_at = Carbon::createFromTimestamp(timestampFromSnowflake($guild->id));
+    $created_at = Carbon::createFromTimestamp($utils->timestampFromSnowflake($guild->id));
 
     $embed = $discord->factory(Embed::class, [
         'title' => "{$guild->name} server info",
@@ -991,7 +997,7 @@ $discord->registerCommand('server', function ($msg, $args) use ($discord) {
         ],
         'timestamp' => null,
     ]);
-    send($msg, "", $embed);
+    $utils->send($msg, "", $embed);
 }, [
     'description' => 'server info',
     'aliases' => [
@@ -1000,15 +1006,15 @@ $discord->registerCommand('server', function ($msg, $args) use ($discord) {
         'Guild',
     ],
 ]);
-registerHelp('server');
+$help->registerHelp('server');
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('roles', function ($msg, $args) {
+$discord->registerCommand('roles', function ($msg, $args, $utils) {
     $ret = "```\nroles for {$msg->channel->guild->name}\n\n";
     foreach ($msg->channel->guild->roles as $role) {
         $ret .= "{$role->name} ({$role->id})\n";
     }
     $ret .= "```";
-    send($msg, $ret);
+    $utils->send($msg, $ret);
 }, [
     'description' => 'lists all roles for the server',
     'aliases' => [
@@ -1017,7 +1023,7 @@ $discord->registerCommand('roles', function ($msg, $args) {
         'Role',
     ],
 ]);
-registerHelp('roles');
+$help->registerHelp('roles');
 
 
 
@@ -1027,26 +1033,11 @@ registerHelp('roles');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('help', function ($msg, $args) use ($discord, $help) {
-    $ret = "```";
-    if (count($args) == 1) {
-        $qu = strtolower($args[0]);
-        if ($cmd = $discord->getCommand($qu, true)) {
-            $ret .= $cmd->getHelp(';')["text"];
-        } else {
-            $ret .= "$qu not found";
-        }
-        send($msg, "$ret```");
-    } else {
-
-        $ret .= file_get_contents(__DIR__.'/banner.txt') . "\n - a bot made by benh. avatar by hirose.\n\n";
-        $ret .= implode("", $help);
-        $ret .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
-        send($msg, $ret);
-    }
-}, [
+$discord->registerCommand('help', $help->helpFn(), [
     'aliases' => [
         'Help',
+        'halp',
+        'Halp',
     ],
 ]);
 

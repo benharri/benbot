@@ -17,7 +17,7 @@ function send($msg, $txt, $embed = null)
     return $msg->channel->sendMessage($txt, false, $embed)
         ->otherwise(function($e) use ($msg) {
             echo $e->getMessage(), PHP_EOL;
-            ping_me($e->getMessage());
+            pingMe($e->getMessage());
             $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
         });
 }
@@ -28,7 +28,7 @@ function sendFile($msg, $filepath, $filename, $txt)
     return $msg->channel->sendFile($filepath, $filename, $txt)
         ->otherwise(function($e) use ($msg) {
             echo $e->getMessage(), PHP_EOL;
-            ping_me($e->getMessage());
+            pingMe($e->getMessage());
             $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
         });
 }
