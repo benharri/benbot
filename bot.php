@@ -7,7 +7,6 @@
 include __DIR__.'/vendor/autoload.php';
 use Discord\DiscordCommandClient;
 use Discord\Parts\User\Game;
-use Discord\Parts\User;
 use Discord\Parts\Embed\Embed;
 use BenBot\SerializedArray;
 use BenBot\Utils;
