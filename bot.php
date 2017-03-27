@@ -699,6 +699,19 @@ $help->registerHelp('block');
 
 
 ///////////////////////////////////////////////////////////
+$discord->registerCommand('script', function($msg, $args) use ($utils) {
+    $utils->send($msg, Utils::scriptFromAscii(implode(" ", $args)));
+}, [
+    'description' => 'description here',
+    'usage' => '<usage>',
+    'aliases' => [
+        'Script',
+    ],
+]);
+
+
+
+///////////////////////////////////////////////////////////
 $ascii = $discord->registerCommand('ascii', function ($msg, $args) use ($utils) {
     $result = shell_exec("figlet " . escapeshellarg(implode(" ", $args)));
     $result = "```$result```";
@@ -794,7 +807,7 @@ $help->registerHelp('img');
         foreach ($imgs as $name => $img) {
             $ret .= "$name, ";
         }
-        $ret = rtrim($ret, ",");
+        $ret = rtrim($ret, ", ");
         $utils->send($msg, "list of uploaded images:\n\n$ret");
     }, [
         'description' => 'saved image list',

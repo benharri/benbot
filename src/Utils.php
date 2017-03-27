@@ -132,4 +132,25 @@ class Utils {
             ->sendMessage("<@193011352275648514>, $msg");
     }
 
+
+
+    public static function scriptFromAscii($string)
+    {
+        $ret = "";
+        foreach (self::charIn($string) as $char) {
+            if (ord($char) >= ord('0') && ord($char) <= ord('9')) {
+                $d = dechex(0x1d7ce + dechex(ord($char) - ord('0')));
+                $ret .= "\u{$d}";
+            } elseif (ord($char) >= ord('a') && ord($char) <= ord('z')) {
+                $d = dechex(0x1d4ea + dechex(ord($char) - ord('a')));
+                $ret .= "\u{$d}";
+            } elseif (ord($char) >= ord('A') && ord($char) <= ord('Z')) {
+                $d = dechex(0x1d4d0 + dechex(ord($char) - ord('A')));
+                $ret .= "\u{$d}";
+            }
+            $ret .= " ";
+        }
+        return $ret;
+    }
+
 }
