@@ -2,7 +2,7 @@
 
 \usepackage{fullpage}
 
-\title{Senior Project Proposal}
+\title{Senior Project Proposal: Discord Chat Bot}
 \date{March 22, 2017}
 \author{Ben Harris}
 
@@ -14,11 +14,25 @@
 
     \section{Objective}
 
-        On a whim, I decided to try my hand at making a bot for the voice and text chat service Discord. I quickly became very absorbed with it and
+        On a whim, I decided to try my hand at making a bot for the voice and text chat service Discord. I became absorbed with it and started spending a lot of my free time on it. My goal is to create a dynamic, interactive chat experience through my bot. I would like it to be able to find images from search engines, look up weather, local time in any time zone, save arbitrary text and images, transform text to ASCII art or block emojis, play games, create and vote on polls, and more.
+
+
+    \section{What I want to learn}
+
+        I hope to become more familiar with PHP (especially PHP 7, which is new to me, having used 5.4 extensively). I would also like to improve the style of my code to meet the PHP Style Recommendations (PSRs). Namespacing and dependency management is also an important part of modern PHP development, so I would like to learn how to leverage Composer to manage dependencies, namespaces, and class autoloading.
+
+        It's very important that a piece of software like a chat bot not be blocked by longer-running tasks. To solve this problem, I will use the Promises paradigm to write asynchronous code.
+
+        I will need to set up and maintain a server for my bot, so I hope to learn how to create a stable, reliable, self-healing management system for the main bot process. I want to learn more about security in terms of both keeping my API tokens secure and sending HTTP requests and data over WebSockets with SSL.
+
+        I'd like to improve my skills at source control (Git). I'm comfortable with most aspects of working with Git apart from a usable branching model and dealing with merge conflicts.
+
+
 
     \section{Technologies}
 
         \begin{itemize}
+
             \item Discord Bot API (RESTful)
             \item DiscordPHP (client for interacting with the API)
             \item Ubuntu Server
@@ -37,39 +51,53 @@
 
 
 
-    \section{What I hope to learn}
-
-        I hope to become more familiar with PHP (especially PHP 7, which is new to me, having used 5.4 extensively). I would also like to improve the style of my code to meet the PHP Style Recommendations (PSRs). Namespacing and dependency management is also an important part of modern PHP development, so I would like to learn how to leverage Composer to manage dependencies, namespaces, and class autoloading.
-
-        I will need to set up and maintain a server for my bot, so I hope to learn how to create a stable, reliable, self-healing management system for the main bot process.
-
-
-
-
     \section{Proposed Features and Points}
 
-        \begin{itemize}
+		\begin{itemize}
 
+			\item Get User Info [1 pts]
+			\item Get Profile Photo for arbitrary User [1 pts]
+			\item Get Server Info [2 pts]
+			\item Display Bot Status/Uptime [1 pts]
+			\item Send direct message to any user [1 pts]
+            \item Permissions for commands based on user's permissions [2 pts]
+			\item Talk to Cleverbot [3 pts]
+			\item Save images and retrieve them later [5 pts]
+			\item Save text and retrieve it later [2 pts]
+			\item Send me a text message [2 pts]
+            \item Send emails to a saved address for a user [2 pts]
+			\item Internet lookups
+				\begin{itemize}
+					\item Weather for any city [3 pts]
+					\item Time for any city (by looking up timezone) and formatting correctly [3 pts]
+                    \item Save a preferred city for each user for time and weather [2 pts]
+					\item Look up a random joke [2 pts]
+					\item Send an image from Google Image Search Results [5 pts]
+					\item Stream music from YouTube to a voice channel [10 pts]
+				\end{itemize}
+			\item Create and vote on polls [5 pts]
+			\item Chat games (TicTacToe, Hangman, or both) [10 pts]
+			\item Text transform (block emojis, unicode fonts, and ASCII art) [3 pts]
+			\item Roll an n-sided die [1 pts]
+			\item 8-Ball style fortunes [2 pts]
 
-
-        \end{itemize}
-
+		\end{itemize}
 
 
 
     \section{Grading Scale}
 
-        50 points total.
+        70 points total.
 
-        45+ =$>$ A
+        63+ =$>$ A
 
-        40+ =$>$ B
+        56+ =$>$ B
 
-        35+ =$>$ C
+        49+ =$>$ C
 
-        30+ =$>$ D
+        42+ =$>$ D
 
-        25+ =$>$ F
+        35+ =$>$ F
 
         The items that have a higher point value are the features that I am least familiar with and will require the most effort/learning on my part.
 

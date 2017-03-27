@@ -7,3 +7,4 @@ vendor/
 # unneccessary
 bot.err
 bot.out
+php_errors.log

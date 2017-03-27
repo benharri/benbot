@@ -15,17 +15,17 @@ $dotenv = new Dotenv\Dotenv(__DIR__);
 $dotenv->load();
 
 include __DIR__.'/kaomoji.php';
-include __DIR__.'/definitions.php';
+include __DIR__.'/serializedarray.php';
 include __DIR__.'/util_fns.php';
 
 $yomamajokes = file("yomamajokes.txt");
 $jokes = explode("---", file_get_contents(__DIR__.'/miscjokes.txt'));
 
 $starttime = Carbon::now();
-$defs      = new Definitions(__DIR__.'/bot_data/definitions.json');
-$imgs      = new Definitions(__DIR__.'/bot_data/img_urls.json');
-$cities    = new Definitions(__DIR__.'/bot_data/cities.json');
-$swearjar  = new Definitions(__DIR__.'/bot_data/swearjar.json');
+$defs      = new SerializedArray(__DIR__.'/bot_data/defs.mp');
+$imgs      = new SerializedArray(__DIR__.'/bot_data/img_urls.mp');
+$cities    = new SerializedArray(__DIR__.'/bot_data/cities.mp');
+$swearjar  = new SerializedArray(__DIR__.'/bot_data/swearjar.mp');
 $help      = [];
 
 
@@ -55,54 +55,57 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
         $gen = charIn($text);
         $first_char = $gen->current();
 
-        if ($first_char == ';') {
+        if (!$msg->author->bot) {
 
-            for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next())
-                $qu .= $gen->current();
-            $qu = strtolower($qu);
-            if ($defs->get($qu, true))
-                send($msg, "**$qu**: " . $defs->get($qu));
-            if ($imgs->get($qu, true)) {
-                $imgfile = $imgs->get($qu);
-                sendFile($msg, __DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+
+            if ($first_char == ';') {
+
+                for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next())
+                    $qu .= $gen->current();
+                $qu = strtolower($qu);
+                if ($defs->get($qu, true))
+                    send($msg, "**$qu**: " . $defs->get($qu));
+                if ($imgs->get($qu, true)) {
+                    $imgfile = $imgs->get($qu);
+                    sendFile($msg, __DIR__."/uploaded_images/$imgfile", $imgfile, $qu);
+                }
+
             }
 
-        } else {
+            if (isDM($msg)){
+                $msg->channel->broadcastTyping();
+                askCleverbot(implode(" ", $args))->then(function ($result) use ($msg) {
+                    send($msg, $result->output);
+                });
+            }
 
-            if (isDM($msg)) {
-                if (!$msg->author->bot){
-                    $msg->channel->broadcastTyping();
-                    askCleverbot(implode(" ", $args))->then(function ($result) use ($msg) {
-                        send($msg, $result->output);
+
+            if ($msg->channel->guild->id === "233603102047993856") {
+                // arf specific
+                if (strpos(strtolower($text), 'dib') !== false) {
+                    $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
+                        echo $e->getMessage(), PHP_EOL;
+                    });
+                }
+            } else {
+                if (checkForSwears(strtolower($text))) {
+                    $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
+
+                    $swearcount = $swearjar->get($id, true) ? $swearjar->get($id)["swear_count"] + 1 : 1;
+
+                    $swearjar->set($msg->author->id, [
+                        'swear_count' => $swearcount,
+                        'latest_swear' => $msg->content,
+                        'timestamp' => Carbon::now(),
+                    ]);
+
+                    $msg->react("‼")->otherwise(function ($e) {
+                        echo $e->getMessage(), PHP_EOL;
                     });
                 }
             }
+
         }
-
-        if ($msg->channel->guild->id === "233603102047993856") {
-            if (strpos(strtolower($text), 'dib') !== false) {
-                $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
-                    echo $e->getMessage(), PHP_EOL;
-                });
-            }
-        } elseif (!$msg->author->bot) {
-            if (checkForSwears(strtolower($text))) {
-                $id = isDM($msg) ? $msg->author->id : $msg->author->user->id;
-
-                $swearcount = $swearjar->get($id, true) ? $swearjar->get($id)["swear_count"] + 1 : 1;
-
-                $swearjar->set($msg->author->id, [
-                    'swear_count' => $swearcount,
-                    'latest_swear' => $msg->content,
-                    'timestamp' => Carbon::now(),
-                ]);
-
-                $msg->react("‼")->otherwise(function ($e) {
-                    echo $e->getMessage(), PHP_EOL;
-                });
-            }
-        }
-
     });
 
 
@@ -119,7 +122,15 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
 ///////////////////////////////////////////////////////////
 
 
-
+///////////////////////////////////////////////////////////
+$discord->registerCommand('deltest', function ($msg, $args) use ($discord) {
+    send($msg, "test")->then(function($result) use ($discord, $msg) {
+        print_r($result);
+        $msgs = $discord->getRepository('MessageRepository', $msg->id, '');
+        print_r($msgs);
+        // $msgs->delete($msg);
+    });
+});
 
 
 ///////////////////////////////////////////////////////////
@@ -848,7 +859,9 @@ $discord->registerCommand('bamboozle', function ($msg, $args) {
 $discord->registerCommand('swearjar', function($msg, $args) use ($swearjar) {
     $ret = "";
     foreach ($swearjar->iter() as $user => $swear_info) {
-        $ret .= "<@$user> said '{$swear_info["latest_swear"]}' " . $swear_info["timestamp"]->diffForHumans() . "\n";
+        print_r($swear_info);
+        $date = new Carbon($swear_info["timestamp"]["date"], $swear_info["timestamp"]["timezone"]);
+        $ret .= "<@$user> said \"{$swear_info["latest_swear"]}\" " . $date->diffForHumans() . "\n";
     }
     send($msg, $ret);
 }, [
