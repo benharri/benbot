@@ -10,6 +10,7 @@ use Discord\Parts\User\Game;
 use Discord\Parts\Embed\Embed;
 use BenBot\SerializedArray;
 use BenBot\Utils;
+use BenBot\UnicodeFontConverter;
 use BenBot\Help;
 use Carbon\Carbon;
 
@@ -701,7 +702,7 @@ $help->registerHelp('block');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('script', function($msg, $args) use ($utils) {
-    $utils->send($msg, Utils::scriptFromAscii(implode(" ", $args)));
+    $utils->send($msg, UnicodeFontConverter::script($args));
 }, [
     'description' => 'script font',
     'usage' => '<msg>',
@@ -713,7 +714,7 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('frak', function($msg, $args) use ($utils) {
-    $utils->send($msg, Utils::frakturFromAscii(implode(" ", $args)));
+    $utils->send($msg, UnicodeFontConverter::fraktur($args));
 }, [
     'description' => 'gothic font',
     'usage' => '<msg>',
@@ -723,6 +724,20 @@ $discord->registerCommand('frak', function($msg, $args) use ($utils) {
         'Fraktur',
         'gothic',
         'Gothic',
+    ],
+]);
+
+///////////////////////////////////////////////////////////
+$discord->registerCommand('text', function($msg, $args) use ($utils) {
+    $font = array_shift($args);
+    $utils->send($msg, UnicodeFontConverter::$font($args));
+}, [
+    'description' => 'different fonts',
+    'usage' => '<font> <message>',
+    'aliases' => [
+        'Text',
+        'font',
+        'Font',
     ],
 ]);
 
