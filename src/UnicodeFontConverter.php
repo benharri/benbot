@@ -1,6 +1,8 @@
 <?php
 namespace BenBot;
 
+use BenBot\Utils;
+
 mb_internal_encoding("UTF-8");
 
 class UnicodeFontConverter {
@@ -57,7 +59,7 @@ class UnicodeFontConverter {
 
         $string = implode(" ", $args);
         $ret = "";
-        foreach (self::charIn($string) as $char) {
+        foreach (Utils::charIn($string) as $char) {
             $ord = ord($char);
             if ($ord >= ord('0') && $ord <= ord('9')) {
                 $ret .= mb_substr($fonts[$name]["nums"], $ord - ord('0'), 1);
