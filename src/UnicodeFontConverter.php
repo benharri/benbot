@@ -57,7 +57,8 @@ class UnicodeFontConverter {
             return $ret;
         }
 
-        $string = implode(" ", $args);
+        print_r($args);
+        $string = $args[0];
         $ret = "";
         foreach (Utils::charIn($string) as $char) {
             $ord = ord($char);

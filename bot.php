@@ -702,7 +702,7 @@ $help->registerHelp('block');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('script', function($msg, $args) use ($utils) {
-    $utils->send($msg, UnicodeFontConverter::script($args));
+    $utils->send($msg, UnicodeFontConverter::script(implode(" ", $args)));
 }, [
     'description' => 'script font',
     'usage' => '<msg>',
@@ -714,7 +714,7 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('frak', function($msg, $args) use ($utils) {
-    $utils->send($msg, UnicodeFontConverter::fraktur($args));
+    $utils->send($msg, UnicodeFontConverter::fraktur(implode(" ", $args)));
 }, [
     'description' => 'gothic font',
     'usage' => '<msg>',
@@ -730,7 +730,7 @@ $discord->registerCommand('frak', function($msg, $args) use ($utils) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('text', function($msg, $args) use ($utils) {
     $font = array_shift($args);
-    $utils->send($msg, UnicodeFontConverter::$font($args));
+    $utils->send($msg, UnicodeFontConverter::$font(implode(" ", $args)));
 }, [
     'description' => 'different fonts',
     'usage' => '<font> <message>',
