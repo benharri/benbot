@@ -64,8 +64,8 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
         $gen = Utils::charIn($text);
         $first_char = $gen->current();
 
-
-        if (isset($msg->author) && !$msg->author->bot) {
+        $author = $msg->author ?? false;
+        if ($author && !$msg->author->bot) {
 
             if ($first_char == ';') {
 
