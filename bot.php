@@ -714,7 +714,7 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('frak', function($msg, $args) use ($utils) {
-    $utils->send($msg, UnicodeFontConverter::fraktur(implode(" ", $args)));
+    $utils->send($msg, UnicodeFontConverter::gothic(implode(" ", $args)));
 }, [
     'description' => 'gothic font',
     'usage' => '<msg>',

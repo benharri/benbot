@@ -50,6 +50,11 @@ class UnicodeFontConverter {
                 'uppers' => '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅',
                 'nums' => '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡',
             ],
+            'vaporwave' => [
+                'lowers' => 'ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ',
+                'uppers' => 'ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ',
+                'nums' => '０１２３４５６７８９',
+            ],
         ];
         if (!isset($fonts[$name])) {
             $ret = "sorry that font doesn't exist. try these fonts:\n";
@@ -57,10 +62,8 @@ class UnicodeFontConverter {
             return $ret;
         }
 
-        print_r($args);
-        $string = $args[0];
         $ret = "";
-        foreach (Utils::charIn($string) as $char) {
+        foreach (Utils::charIn($args[0]) as $char) {
             $ord = ord($char);
             if ($ord >= ord('0') && $ord <= ord('9')) {
                 $ret .= mb_substr($fonts[$name]["nums"], $ord - ord('0'), 1);
