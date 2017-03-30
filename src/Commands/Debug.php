@@ -1,10 +1,11 @@
 <?php
 namespace BenBot\Commands;
 
+use BenBot\BenBot;
 use BenBot\Utils;
 use Discord\Parts\Embed\Embed;
 
-class Debug {
+class Debug extends Benbot {
     protected $bot;
 
     public function __construct(&$that)
@@ -14,19 +15,19 @@ class Debug {
 
     public function register()
     {
-        $this->bot->registerCommand('up', $this->up($msg, $args), [
+        $this->bot->registerCommand('up', [$this, 'up'], [
             'description' => 'shows uptime for the bot',
         ]);
         $this->bot->help->registerHelp('up');
 
-        $this->bot->registerCommand('dbg', $this->dbg($msg, $args));
+        $this->bot->registerCommand('dbg', [$this, 'dbg']);
 
-        $this->bot->registerCommand('sys', $this->sys($msg, $args));
+        $this->bot->registerCommand('sys', [$this, 'sys']);
 
-        $this->bot->registerCommand('status', $this->status($msg, $args));
+        $this->bot->registerCommand('status', [$this, 'status']);
         $this->bot->help->registerHelp('status');
 
-        $this->bot->registerCommand('roles', $this->roles($msg, $args));
+        $this->bot->registerCommand('roles', [$this, 'roles']);
         $this->bot->help->registerHelp('roles');
     }
 
