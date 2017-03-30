@@ -5,14 +5,16 @@
 ///////////////////////////////////////////////////////////
 
 include __DIR__.'/vendor/autoload.php';
+
 use Discord\DiscordCommandClient;
 use Discord\Parts\User\Game;
 use Discord\Parts\Embed\Embed;
 use BenBot\SerializedArray;
 use BenBot\Utils;
-use BenBot\UnicodeFontConverter;
+use BenBot\FontConverter;
 use BenBot\Help;
 use Carbon\Carbon;
+use function Stringy\create as s;
 
 
 $dotenv = new Dotenv\Dotenv(__DIR__);
@@ -60,19 +62,14 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
 
     $discord->on('message', function ($msg) use ($defs, $imgs, $utils) {
         // for stuff that isn't a command
-        $text = $msg->content;
-        $gen = Utils::charIn($text);
-        $first_char = $gen->current();
+        $str = s($msg->content);
 
         $author = $msg->author ?? false;
         if ($author && !$msg->author->bot) {
 
-            if ($first_char == ';') {
-
-                for ($qu = "", $gen->next(); $gen->current() != " " && $gen->valid(); $gen->next()) {
-                    $qu .= $gen->current();
-                }
-                $qu = strtolower($qu);
+            if ($str->startsWith(';')) {
+                // get first word to see if we have something saved
+                $qu = (string) $str->removeLeft(';')->split(' ', 1)[0]->toLowerCase();
 
                 if (isset($defs[$qu])) {
                     $utils->send($msg, "**$qu**: " . $defs[$qu]);
@@ -81,9 +78,9 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
                     $utils->sendFile($msg, __DIR__."/uploaded_images/{$imgs[$qu]}", $imgs[$qu], $qu);
                 }
 
-            } elseif (Utils::isDM($msg)){
+            } elseif (Utils::isDM($msg)) {
                 $msg->channel->broadcastTyping();
-                $utils->askCleverbot($text)->then(function ($result) use ($msg, $utils) {
+                $utils->askCleverbot($str)->then(function ($result) use ($msg, $utils) {
                     $utils->send($msg, $result->output);
                 });
             }
@@ -91,7 +88,7 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
             if ($msg->channel->guild->id === "233603102047993856") {
                 // arf specific
                 // dib
-                if (strpos(strtolower($text), 'dib') !== false) {
+                if ($str->contains('dib', false)) {
                     $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
                         echo $e->getMessage(), PHP_EOL;
                     });
@@ -117,22 +114,12 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('deltest', function ($msg, $args) use ($discord, $utils) {
-    $utils->send($msg, "test")->then(function($result) use ($discord, $msg) {
-        // print_r($result);
-        $msgs = $discord->getRepository('MessageRepository', $msg->id, '');
-        print_r($msgs);
-        // $msgs->delete($msg);
-    });
-});
-
-
-///////////////////////////////////////////////////////////
 $discord->registerCommand('hi', [
     'hey',
     'hello',
     'wussup',
     'soup',
+    'how are you today?',
 ], [
     'description' => 'greeting',
     'aliases' => [
@@ -326,7 +313,7 @@ $help->registerHelp('roll');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('text_benh', function ($msg, $args, $utils) {
+$discord->registerCommand('text_benh', function ($msg, $args) use ($utils) {
     if (count($args) === 0) {
         $utils->send($msg, 'can\'t send a blank message');
         return;
@@ -354,7 +341,7 @@ $help->registerHelp('text_benh');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('avatar', function ($msg, $args, $utils) {
+$discord->registerCommand('avatar', function ($msg, $args) use ($utils) {
     if (count($msg->mentions) === 0) {
         if (Utils::isDM($msg)) {
             $utils->send($msg, $msg->author->avatar);
@@ -376,22 +363,12 @@ $help->registerHelp('avatar');
 
 
 
-///////////////////////////////////////////////////////////
-$discord->registerCommand('up', function ($msg, $args) use ($starttime, $utils) {
-    $utils->send($msg, "benbot has been up for {$starttime->diffForHumans(Carbon::now(), true)}.");
-}, [
-    'description' => 'bot uptime',
-    'aliases' => [
-        'Up',
-    ],
-]);
-
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('say', function ($msg, $args, $utils) {
-    $a = implode(" ", $args);
-    if ((strpos($a, '@everyone') !== false) || (strpos($a, '@here') !== false)) {
+$discord->registerCommand('say', function ($msg, $args) use ($utils) {
+    $a = s(implode(" ", $args));
+    if ($a->contains('@everyone') || $a->contains('@here')) {
         $msg->reply("sry, can't do that! :P");
         return;
     }
@@ -409,7 +386,7 @@ $discord->registerCommand('say', function ($msg, $args, $utils) {
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('sing', function ($msg, $args, $utils) {
+$discord->registerCommand('sing', function ($msg, $args) use ($utils) {
     $a = implode(" ", $args);
     if ((strpos($a, '@everyone') !== false) || (strpos($a, '@here') !== false)) {
         $msg->reply("sry, can't do that! :P");
@@ -528,10 +505,8 @@ $help->registerHelp('8ball');
 
 
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('lenny', function ($msg, $args, $utils) {
-    $utils->send($msg, "( ͡° ͜ʖ ͡°)")->then(function ($result) use ($msg) {
-        $msg->delete();
-    });
+$discord->registerCommand('lenny', function ($msg, $args) use ($utils) {
+    $utils->send($msg, "( ͡° ͜ʖ ͡°)");
 }, [
     'description' => 'you should know what this does',
     'aliases' => [
@@ -667,28 +642,11 @@ $help->registerHelp('joke');
 
 
 
+// FONTS
+
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('block', function ($msg, $args) use ($utils) {
-    $ret = "";
-    foreach (Utils::charIn(strtolower(implode(" ", $args))) as $char) {
-        if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
-        else if (ctype_digit($char)) {
-            switch ($char) {
-                case 0: $ret .= ":zero: "; break;
-                case 1: $ret .= ":one: "; break;
-                case 2: $ret .= ":two: "; break;
-                case 3: $ret .= ":three: "; break;
-                case 4: $ret .= ":four: "; break;
-                case 5: $ret .= ":five: "; break;
-                case 6: $ret .= ":six: "; break;
-                case 7: $ret .= ":seven: "; break;
-                case 8: $ret .= ":eight: "; break;
-                case 9: $ret .= ":nine: "; break;
-            }
-        }
-        else if ($char == " ") $ret .= "   ";
-    }
-    $utils->send($msg, $ret);
+    $utils->send($msg, FontConverter::blockText(implode(" ", $args)));
 }, [
     'description' => 'turn a message into block text',
     'usage' => '<msg>',
@@ -702,7 +660,7 @@ $help->registerHelp('block');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('script', function($msg, $args) use ($utils) {
-    $utils->send($msg, UnicodeFontConverter::script(implode(" ", $args)));
+    $utils->send($msg, FontConverter::script(implode(" ", $args)));
 }, [
     'description' => 'script font',
     'usage' => '<msg>',
@@ -714,7 +672,7 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('frak', function($msg, $args) use ($utils) {
-    $utils->send($msg, UnicodeFontConverter::gothic(implode(" ", $args)));
+    $utils->send($msg, FontConverter::gothic(implode(" ", $args)));
 }, [
     'description' => 'gothic font',
     'usage' => '<msg>',
@@ -730,7 +688,7 @@ $discord->registerCommand('frak', function($msg, $args) use ($utils) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('text', function($msg, $args) use ($utils) {
     $font = array_shift($args);
-    $utils->send($msg, UnicodeFontConverter::$font(implode(" ", $args)));
+    $utils->send($msg, FontConverter::$font(implode(" ", $args)));
 }, [
     'description' => 'different fonts',
     'usage' => '<font> <message>',
@@ -930,13 +888,6 @@ $discord->registerCommand('bamboozle', function ($msg, $args) use ($utils) {
 
 
 
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////
 // debugging commands
 ///////////////////////////////////////////////////////////
@@ -991,6 +942,15 @@ $discord->registerCommand('status', function ($msg, $args) use ($discord, $start
     'usage' => '',
     'aliases' => [
         'Status',
+    ],
+]);
+///////////////////////////////////////////////////////////
+$discord->registerCommand('up', function ($msg, $args) use ($starttime, $utils) {
+    $utils->send($msg, "benbot has been up for {$starttime->diffForHumans(Carbon::now(), true)}.");
+}, [
+    'description' => 'bot uptime',
+    'aliases' => [
+        'Up',
     ],
 ]);
 ///////////////////////////////////////////////////////////
@@ -1057,7 +1017,7 @@ $discord->registerCommand('server', function ($msg, $args) use ($discord, $utils
 ]);
 $help->registerHelp('server');
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('roles', function ($msg, $args, $utils) {
+$discord->registerCommand('roles', function ($msg, $args) use ($utils) {
     $ret = "```\nroles for {$msg->channel->guild->name}\n\n";
     foreach ($msg->channel->guild->roles as $role) {
         $ret .= "{$role->name} ({$role->id})\n";

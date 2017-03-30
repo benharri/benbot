@@ -14,13 +14,6 @@ class Utils {
         $this->discord = $discord;
     }
 
-    public static function charIn($str)
-    {
-        for ($i = 0; $i <= strlen($str); $i++) {
-            yield substr($str, $i, 1);
-        }
-    }
-
     public function send($msg, $txt, $embed = null)
     {
         return $msg->channel->sendMessage($txt, false, $embed)
