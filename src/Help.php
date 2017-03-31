@@ -1,23 +1,25 @@
 <?php
 namespace BenBot;
 
+use BenBot\BenBot;
 
-class Help {
+
+class Help extends BenBot {
 
     protected $help;
     protected $discord;
     protected $utils;
 
-    public function __construct($discord, $utils)
+    public function __construct()
     {
         $help          = [];
-        $this->discord = $discord;
-        $this->utils   = $utils;
+        // $this->discord = $discord;
+        // $this->utils   = $utils;
     }
 
     public function registerHelp($cmd_name)
     {
-        $this->help[$cmd_name] = $this->discord->getCommand($cmd_name)->getHelp(';')["text"];
+        $this->help[$cmd_name] = $this->getCommand($cmd_name)->getHelp(';')["text"];
     }
 
     public function __toString()

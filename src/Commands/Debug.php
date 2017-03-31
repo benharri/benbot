@@ -5,35 +5,31 @@ use BenBot\BenBot;
 use BenBot\Utils;
 use Discord\Parts\Embed\Embed;
 
-class Debug extends Benbot {
-    protected $bot;
+class Debug extends BenBot {
 
-    public function __construct(&$that)
-    {
-        $this->bot = $that;
-    }
+    public function __construct() {}
 
     public function register()
     {
-        $this->bot->registerCommand('up', [$this, 'up'], [
+        $this->registerCommand('up', [$this, 'up'], [
             'description' => 'shows uptime for the bot',
         ]);
-        $this->bot->help->registerHelp('up');
+        $this->help->registerHelp('up');
 
-        $this->bot->registerCommand('dbg', [$this, 'dbg']);
+        $this->registerCommand('dbg', [$this, 'dbg']);
 
-        $this->bot->registerCommand('sys', [$this, 'sys']);
+        $this->registerCommand('sys', [$this, 'sys']);
 
-        $this->bot->registerCommand('status', [$this, 'status']);
-        $this->bot->help->registerHelp('status');
+        $this->registerCommand('status', [$this, 'status']);
+        $this->help->registerHelp('status');
 
-        $this->bot->registerCommand('roles', [$this, 'roles']);
-        $this->bot->help->registerHelp('roles');
+        $this->registerCommand('roles', [$this, 'roles']);
+        $this->help->registerHelp('roles');
     }
 
     public function up($msg, $args)
     {
-        $this->bot->utils->send($msg, "benbot has been up for {$bot->start_time->diffForHumans(Carbon::now(), true)}.");
+        Utils::ssend($msg, "benbot has been up for {$this->start_time->diffForHumans(Carbon::now(), true)}.");
     }
 
     public function dbg($msg, $args)
@@ -42,11 +38,11 @@ class Debug extends Benbot {
 
         if ($id == "193011352275648514") {
             print_r($msg);
-            $this->bot->utils->send($msg, "debugging. check logs.");
+            Utils::ssend($msg, "debugging. check logs.");
             print_r($msg->channel->guild);
             echo "args: ", implode(" ", $args), PHP_EOL;
         } else {
-            $this->bot->utils->send($msg, "you're not allowed to use that command");
+            Utils::ssend($msg, "you're not allowed to use that command");
         }
     }
 
@@ -55,7 +51,7 @@ class Debug extends Benbot {
     {
         $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
         if ($id == "193011352275648514") {
-            $this->bot->utils->send($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
+            Utils::ssend($msg, "```\n" . shell_exec(implode(" ", $args)) . "\n```");
         } else {
             $msg->reply("you're not allowed to use that command");
         }
@@ -77,7 +73,7 @@ class Debug extends Benbot {
             ],
             'timestamp' => null,
         ]);
-        $this->bot->utils->send($msg, "", $embed);
+        Utils::ssend($msg, "", $embed);
     }
 
     public function roles($msg, $args)
@@ -87,7 +83,7 @@ class Debug extends Benbot {
             $ret .= "{$role->name} ({$role->id})\n";
         }
         $ret .= "```";
-        $this->bot->utils->send($msg, $ret);
+        Utils::ssend($msg, $ret);
     }
 
 }

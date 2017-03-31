@@ -50,7 +50,8 @@ class BenBot extends DiscordCommandClient {
 
         $this->dir = $dir;
         $this->utils = new Utils($this);
-        $this->help = new Help($this, $this->utils);
+        $this->help = new Help();
+        // $this->help = new Help($this, $this->utils);
         $this->jokes = explode("---", file_get_contents("$dir/miscjokes.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
         $this->game = $this->factory(Game::class, [
@@ -114,13 +115,13 @@ class BenBot extends DiscordCommandClient {
                 'Halp',
             ],
         ]);
-        $this->cmds["Debug"]           = new Commands\Debug($this);
-        $this->cmds["Definitions"]     = new Commands\Definitions($this);
-        $this->cmds["Fonts"]           = new Commands\Fonts($this);
-        $this->cmds["Images"]          = new Commands\Images($this);
-        $this->cmds["Information"]     = new Commands\Information($this);
-        $this->cmds["Jokes"]           = new Commands\Jokes($this);
-        $this->cmds["PresetResponses"] = new Commands\PresetResponses($this);
+        $this->cmds["Debug"]           = new Commands\Debug();
+        // $this->cmds["Definitions"]     = new Commands\Definitions($this);
+        // $this->cmds["Fonts"]           = new Commands\Fonts($this);
+        // $this->cmds["Images"]          = new Commands\Images($this);
+        // $this->cmds["Information"]     = new Commands\Information($this);
+        // $this->cmds["Jokes"]           = new Commands\Jokes($this);
+        // $this->cmds["PresetResponses"] = new Commands\PresetResponses($this);
 
         foreach ($this->cmds as $cmd) {
             $cmd->register();

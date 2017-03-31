@@ -5,21 +5,30 @@ use Carbon\Carbon;
 use Discord\Parts\Embed\Embed;
 use React\Promise\Deferred;
 
-class Utils {
+class Utils extends BenBot {
 
     protected $discord;
 
     public function __construct($discord)
     {
-        $this->discord = $discord;
+        // $this->discord = $discord;
     }
 
-    public function send($msg, $txt, $embed = null)
+    public function mysend($msg, $txt, $embed = null)
     {
         return $msg->channel->sendMessage($txt, false, $embed)
             ->otherwise(function($e) use ($msg) {
                 echo $e->getMessage(), PHP_EOL;
                 $this->pingMe($e->getMessage());
+                $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
+            });
+    }
+
+    public static function ssend($msg, $txt, $embed = null)
+    {
+        return $msg->channel->sendMessage($txt, false, $embed)
+            ->otherwise(function($e) use ($msg) {
+                echo $e->getMessage(), PHP_EOL;
                 $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
             });
     }
