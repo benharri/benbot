@@ -7,30 +7,33 @@ use Discord\Parts\Embed\Embed;
 
 class Debug extends BenBot {
 
-    public function __construct() {}
+    public function __construct() {
+        $this->registerCommand('up', $up);
+    }
 
     public function register()
     {
-        $this->registerCommand('up', [$this, 'up'], [
-            'description' => 'shows uptime for the bot',
-        ]);
-        $this->help->registerHelp('up');
+        print_r(get_class_methods('Debug'));
+        // $this->registerCommand('up', [$this, 'up'], [
+        //     'description' => 'shows uptime for the bot',
+        // ]);
+        // $this->help->registerHelp('up');
 
-        $this->registerCommand('dbg', [$this, 'dbg']);
+        // $this->registerCommand('dbg', [$this, 'dbg']);
 
-        $this->registerCommand('sys', [$this, 'sys']);
+        // $this->registerCommand('sys', [$this, 'sys']);
 
-        $this->registerCommand('status', [$this, 'status']);
-        $this->help->registerHelp('status');
+        // $this->registerCommand('status', [$this, 'status']);
+        // $this->help->registerHelp('status');
 
-        $this->registerCommand('roles', [$this, 'roles']);
-        $this->help->registerHelp('roles');
+        // $this->registerCommand('roles', [$this, 'roles']);
+        // $this->help->registerHelp('roles');
     }
 
-    public function up($msg, $args)
-    {
-        Utils::ssend($msg, "benbot has been up for {$this->start_time->diffForHumans(Carbon::now(), true)}.");
-    }
+    $up = function ($msg, $args) {
+        print_r($msg);
+        Utils::ssend($msg, "benbot has been up for " . $this->start_time->diffForHumans(Carbon::now(), true));
+    };
 
     public function dbg($msg, $args)
     {

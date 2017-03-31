@@ -49,9 +49,8 @@ class BenBot extends DiscordCommandClient {
         ]);
 
         $this->dir = $dir;
-        $this->utils = new Utils($this);
+        $this->utils = new Utils();
         $this->help = new Help();
-        // $this->help = new Help($this, $this->utils);
         $this->jokes = explode("---", file_get_contents("$dir/miscjokes.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
         $this->game = $this->factory(Game::class, [
@@ -100,7 +99,7 @@ class BenBot extends DiscordCommandClient {
             });
 
             $this->start_time = Carbon::now();
-            $this->utils->pingMe("bot started successfully");
+            // $this->utils->pingMe("bot started successfully");
         });
 
         $this->registerAllCommands();
@@ -123,9 +122,9 @@ class BenBot extends DiscordCommandClient {
         // $this->cmds["Jokes"]           = new Commands\Jokes($this);
         // $this->cmds["PresetResponses"] = new Commands\PresetResponses($this);
 
-        foreach ($this->cmds as $cmd) {
-            $cmd->register();
-        }
+        // foreach ($this->cmds as $cmd) {
+        //     $cmd->register();
+        // }
     }
 
 

@@ -9,7 +9,7 @@ class Utils extends BenBot {
 
     protected $discord;
 
-    public function __construct($discord)
+    public function __construct()
     {
         // $this->discord = $discord;
     }
@@ -128,7 +128,7 @@ class Utils extends BenBot {
 
     public function pingMe($msg)
     {
-        return $this->discord
+        return $this
             ->guilds->get('id', '289410862907785216')
             ->channels->get('id','289611811094003715')
             ->sendMessage("<@193011352275648514>, $msg");
