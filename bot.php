@@ -14,11 +14,15 @@ use BenBot\Utils;
 use BenBot\FontConverter;
 use BenBot\Help;
 use Carbon\Carbon;
+use Linfo\Linfo;
 use function Stringy\create as s;
 
 
 $dotenv = new Dotenv\Dotenv(__DIR__);
 $dotenv->load();
+
+$linfo = new Linfo();
+$parser = $linfo->getParser();
 
 include __DIR__.'/kaomoji.php';
 
@@ -970,11 +974,18 @@ $discord->registerCommand('sys', function ($msg, $args) use ($utils) {
     ],
 ]);
 ///////////////////////////////////////////////////////////
-$discord->registerCommand('status', function ($msg, $args) use ($discord, $starttime, $utils) {
+$discord->registerCommand('status', function ($msg, $args) use ($discord, $starttime, $utils, $parser) {
     $usercount = 0;
     foreach ($discord->guilds as $guild) {
         $usercount += $guild->member_count;
     }
+
+    $discord->http->get('http://test.benharris.ch/phpsysinfo/xml.php?plugin=complete&json')->then(function ($result) {
+        print_r($result);
+    });
+
+    $utils->send($msg, "```{$parser->getCPU()}```");
+
     $embed = $discord->factory(Embed::class, [
         'title' => 'Benbot status',
         'thumbnail' => ['url' => $discord->avatar],
