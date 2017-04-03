@@ -340,6 +340,55 @@ $help->registerHelp('text_benh');
 
 
 
+$email = $discord->registerCommand('email', function ($msg, $args) use ($utils, $emails) {
+    $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
+    $to = "";
+    $from = "From: {$msg->channel->guild->name} {$msg->author->username} benbot <{$msg->author->username}@{$msg->channel->guild->name}.benbot>";
+    $body = implode(" ", $args);
+
+    if (count($msg->mentions) == 0) {
+        if (isset($emails[$id])) {
+            $to = $emails[$id];
+        } else {
+            $utils->send($msg, "you can save an email with `;email save <email>`");
+        }
+    } else {
+        foreach ($msg->mentions as $mention) {
+            if (isset($emails[$mention->id])) {
+                $to .= $emails[$mention->id] . ";";
+            } else {
+                $utils->send($msg, "you can save an email with `;email save <email> <@user>` or have them do it");
+            }
+        }
+    }
+    if (mail($to, 'BenBot Message', $body, $from)) {
+        $utils->send($msg, "message sent successfully");
+    }
+}, [
+    'description' => 'sends an email',
+    'usage' => '<recipient> <msg>',
+    'aliases' => [
+        'Email',
+        'tell',
+        'Tell',
+    ],
+]);
+
+    $email->registerSubCommand('save', function ($msg, $args) use ($utils, $emails) {
+        $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
+        if (count($msg->mentions) == 0) {
+            $emails[$id] = $args[0];
+        } elseif (count($msg->mentions) == 1) {
+            $emails[$msg->mentions[0]->id] = $args[0];
+        }
+        $utils->send($msg, $args[0] . " saved.");
+    }, [
+        'description' => 'saves your email',
+        'usage' => '<email>',
+    ]);
+
+
+
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('avatar', function ($msg, $args) use ($utils) {
     if (count($msg->mentions) === 0) {
