@@ -13,7 +13,8 @@
         "team-reflex/discord-php": "dev-develop",
         "guzzlehttp/guzzle": "~6.0",
         "vlucas/phpdotenv": "^2.4",
-        "rybakit/msgpack": "^0.2.2"
+        "rybakit/msgpack": "^0.2.2",
+        "linfo/linfo": "^3.0"
     },
     "autoload": {
         "psr-4": {
