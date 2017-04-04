@@ -27,7 +27,7 @@ class Help {
 
     public function getHelpText($cmd_name)
     {
-        if ($cmd = $this->discord->getCommand($cmd_name, true)) {
+        if ($cmd = $this->discord->getCommand(strtolower($cmd_name), true)) {
             return $cmd->getHelp(';')["text"];
         } else {
             return "$cmd_name not found";
@@ -38,9 +38,7 @@ class Help {
     {
         $helpfn = function ($msg, $args) {
             if (count($args) == 1) {
-                $qu = strtolower($args[0]);
-                $ret = $this->getHelpText($qu);
-                send($msg, "```$ret```");
+                $this->utils->send($msg, "```" . $this->getHelpText($args[0]) . "```");
             } else {
                 $banner = file_get_contents(__DIR__.'/../banner.txt');
                 $ret = "```$banner\n- a bot made by benh. avatar by hirose.\n\n";

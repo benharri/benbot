@@ -68,8 +68,7 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
         // for stuff that isn't a command
         $str = s($msg->content);
 
-        $author = $msg->author ?? false;
-        if ($author && !$msg->author->bot) {
+        if (!$msg->author->bot) {
 
             if ($str->startsWith(';')) {
                 // get first word to see if we have something saved
@@ -78,7 +77,9 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
                 if (isset($defs[$qu])) {
                     $utils->send($msg, "**$qu**: " . $defs[$qu]);
                 }
+
                 if (isset($imgs[$qu])) {
+                    $msg->channel->broadcastTyping();
                     $utils->sendFile($msg, __DIR__."/uploaded_images/{$imgs[$qu]}", $imgs[$qu], $qu);
                 }
 
