@@ -132,4 +132,36 @@ class Utils {
             ->sendMessage("<@193011352275648514>, $msg");
     }
 
+    public static function secondsConvert($uptime)
+    {
+        // Method here heavily based on freebsd's uptime source
+        $uptime += $uptime > 60 ? 30 : 0;
+        $years = floor($uptime / 31556926);
+        $uptime %= 31556926;
+        $days = floor($uptime / 86400);
+        $uptime %= 86400;
+        $hours = floor($uptime / 3600);
+        $uptime %= 3600;
+        $minutes = floor($uptime / 60);
+        $seconds = floor($uptime % 60);
+        // Send out formatted string
+        $return = array();
+        if ($years > 0) {
+            $return[] = $years.' '.($years > 1 ? self::$lang['years'] : substr(self::$lang['years'], 0, strlen(self::$lang['years']) - 1));
+        }
+        if ($days > 0) {
+            $return[] = $days.' '.self::$lang['days'];
+        }
+        if ($hours > 0) {
+            $return[] = $hours.' '.self::$lang['hours'];
+        }
+        if ($minutes > 0) {
+            $return[] = $minutes.' '.self::$lang['minutes'];
+        }
+        if ($seconds > 0) {
+            $return[] = $seconds.(date('m/d') == '06/03' ? ' sex' : ' '.self::$lang['seconds']);
+        }
+        return implode(', ', $return);
+    }
+
 }
