@@ -164,4 +164,38 @@ class Utils {
         return implode(', ', $return);
     }
 
+    public static function deleteMessage($msg)
+    {
+        $deferred = new Deferred();
+
+        $msg->channel->messages->delete($msg)->then(
+            function () use ($deferred) {
+                $deferred->resolve($this);
+            },
+            function ($e) use ($deferred) {
+                $deferred->reject($e);
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    public function editMessage($msg, $text)
+    {
+        $deferred = new Deferred();
+        $this->discord->http->patch(
+            "channels/{$msg->channel->id}/messages/{$msg->id}",
+            [
+                'content' => $text
+            ]
+        )->then(
+            function ($response) use ($deferred) {
+                $msg->fill($response);
+                $deferred->resolve($msg);
+            },
+            \React\Partial\bind_right($msg->reject, $deferred)
+        );
+        return $deferred->promise();
+    }
+
 }

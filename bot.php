@@ -557,7 +557,9 @@ $help->registerHelp('8ball');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lenny', function ($msg, $args) use ($utils) {
-    $utils->send($msg, "( ͡° ͜ʖ ͡°)");
+    $utils->send($msg, "( ͡° ͜ʖ ͡°)")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'you should know what this does',
     'aliases' => [
