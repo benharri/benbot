@@ -568,7 +568,9 @@ $discord->registerCommand('lenny', function ($msg, $args) use ($utils) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lennies', function ($msg, $args) use ($lennyception, $utils) {
-    $utils->send($msg, $lennyception);
+    $utils->send($msg, $lennyception)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => '( ͡° ͜ʖ ͡°)',
     'aliases' => [
@@ -579,7 +581,9 @@ $discord->registerCommand('lennies', function ($msg, $args) use ($lennyception, 
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('shrug', function ($msg, $args, $utils) {
-    $utils->send($msg, "¯\\\_(ツ)\_/¯");
+    $utils->send($msg, "¯\\\_(ツ)\_/¯")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'meh',
     'aliases' => [
@@ -590,7 +594,9 @@ $discord->registerCommand('shrug', function ($msg, $args, $utils) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('noice', function ($msg, $args) use ($bs, $utils) {
-    $utils->send($msg, $bs);
+    $utils->send($msg, $bs)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'ayyy',
     'aliases' => [
@@ -613,7 +619,9 @@ $discord->registerCommand('copypasta', function ($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $kaomoji = $discord->registerCommand('kaomoji', function ($msg, $args) use ($kaomojis, $utils) {
-    $utils->send($msg, $kaomojis[array_rand($kaomojis)]);
+    $utils->send($msg, $kaomojis[array_rand($kaomojis)])->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'sends random kaomoji',
     'usage' => '<sad|happy|angry|confused|surprised>',
@@ -625,22 +633,34 @@ $help->registerHelp('kaomoji');
 
 
     $kaomoji->registerSubCommand('sad', function ($msg, $args) use($sad_kaomojis, $utils) {
-        $utils->send($msg, $sad_kaomojis[array_rand($sad_kaomojis)]);
+        $utils->send($msg, $sad_kaomojis[array_rand($sad_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'sad kaomoji']);
     $kaomoji->registerSubCommand('happy', function ($msg, $args) use($happy_kaomojis, $utils) {
-        $utils->send($msg, $happy_kaomojis[array_rand($happy_kaomojis)]);
+        $utils->send($msg, $happy_kaomojis[array_rand($happy_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'happy kaomoji']);
     $kaomoji->registerSubCommand('angry', function ($msg, $args) use($angry_kaomojis, $utils) {
-        $utils->send($msg, $angry_kaomojis[array_rand($angry_kaomojis)]);
+        $utils->send($msg, $angry_kaomojis[array_rand($angry_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'angry kaomoji']);
     $kaomoji->registerSubCommand('confused', function ($msg, $args) use($confused_kaomojis, $utils) {
-        $utils->send($msg, $confused_kaomojis[array_rand($confused_kaomojis)]);
+        $utils->send($msg, $confused_kaomojis[array_rand($confused_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'confused kaomoji']);
     $kaomoji->registerSubCommand('surprised', function ($msg, $args) use($surprised_kaomojis, $utils) {
-        $utils->send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)]);
+        $utils->send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'surprised kaomoji']);
     $kaomoji->registerSubCommand('embarrassed', function ($msg, $args) use($embarrassed_kaomojis, $utils) {
-        $utils->send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
+        $utils->send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'embarrassed kaomoji']);
 
 
@@ -699,7 +719,12 @@ $help->registerHelp('joke');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('block', function ($msg, $args) use ($utils) {
-    $utils->send($msg, FontConverter::blockText(implode(" ", $args)));
+    $utils->send($msg, FontConverter::blockText(implode(" ", $args)) . "\n--{$msg->author}")
+    ->then(
+        function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        }
+    );
 }, [
     'description' => 'turn a message into block text',
     'usage' => '<msg>',
@@ -713,7 +738,9 @@ $help->registerHelp('block');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('script', function($msg, $args) use ($utils) {
-    $utils->send($msg, FontConverter::script(implode(" ", $args)));
+    $utils->send($msg, FontConverter::script(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'script font',
     'usage' => '<msg>',
@@ -725,7 +752,9 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('frak', function($msg, $args) use ($utils) {
-    $utils->send($msg, FontConverter::gothic(implode(" ", $args)));
+    $utils->send($msg, FontConverter::gothic(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'gothic font',
     'usage' => '<msg>',
@@ -741,7 +770,9 @@ $discord->registerCommand('frak', function($msg, $args) use ($utils) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('text', function($msg, $args) use ($utils) {
     $font = array_shift($args);
-    $utils->send($msg, FontConverter::$font(implode(" ", $args)));
+    $utils->send($msg, FontConverter::$font(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'different fonts',
     'usage' => '<font> <message>',
