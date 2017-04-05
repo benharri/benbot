@@ -72,12 +72,16 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
                 $qu = (string) $str->removeLeft(';')->split(' ', 1)[0]->toLowerCase();
 
                 if (isset($defs[$qu])) {
-                    $utils->send($msg, "**$qu**: " . $defs[$qu]);
+                    $utils->send($msg, "**$qu**: " . $defs[$qu])->then(function($result) use ($msg) {
+                        Utils::deleteMessage($msg);
+                    });
                 }
 
                 if (isset($imgs[$qu])) {
                     $msg->channel->broadcastTyping();
-                    $utils->sendFile($msg, __DIR__."/uploaded_images/{$imgs[$qu]}", $imgs[$qu], $qu);
+                    $utils->sendFile($msg, __DIR__."/uploaded_images/{$imgs[$qu]}", $imgs[$qu], $qu)->then(function ($result) use ($msg) {
+                        Utils::deleteMessage($msg);
+                    });
                 }
 
             } elseif (Utils::isDM($msg)) {
