@@ -226,6 +226,8 @@ $time = $discord->registerCommand('time', function ($msg, $args) use ($cities, $
             });
         }
     }
+    Utils::deleteMessage($msg);
+
 }, [
     'description' => 'looks up current time for yourself or another user',
     'usage' => '<@user>',
@@ -283,6 +285,8 @@ $weather = $discord->registerCommand('weather', function ($msg, $args) use ($cit
             });
         }
     }
+    Utils::deleteMessage($msg);
+
 }, [
     'description' => 'looks up weather for a city, other user, or yourself',
     'usage' => '<city|@user>',
@@ -303,7 +307,9 @@ $help->registerHelp('weather');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('roll', function ($msg, $args) {
-    $msg->reply('you rolled a ' . rand(1, $args[0] ?? 6));
+    $msg->reply('you rolled a ' . rand(1, $args[0] ?? 6))->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'rolls an n-sided die. defaults to 6.',
     'usage' => '<number of sides>',
@@ -423,7 +429,9 @@ $discord->registerCommand('say', function ($msg, $args) use ($utils) {
         $msg->reply("sry, can't do that! :P");
         return;
     }
-    $utils->send($msg, "$a\n\n**love**, {$msg->author}");
+    $utils->send($msg, "$a\n\n**love**, {$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
@@ -443,7 +451,9 @@ $discord->registerCommand('sing', function ($msg, $args) use ($utils) {
         $msg->reply("sry, can't do that! :P");
         return;
     }
-    $utils->send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}");
+    $utils->send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'sing sing sing',
     'usage' => '<sing>',
@@ -464,7 +474,9 @@ $discord->registerCommand('set', function ($msg, $args) use ($defs, $utils) {
         return;
     }
     $defs[$def] = implode(" ", $args);
-    $utils->send($msg, $def . " set to: " . implode(" ", $args));
+    $utils->send($msg, $def . " set to: " . implode(" ", $args))->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'sets this to that',
     'usage' => '<this> <that>',
@@ -478,7 +490,9 @@ $discord->registerCommand('get', function ($msg, $args) use ($defs, $utils) {
     if (isset($args[0])) {
         $qu = strtolower($args[0]);
         if (isset($defs[$qu])) {
-            $utils->send($msg, "**" . $args[0] . "**: " . $defs[$qu]);
+            $utils->send($msg, "**" . $args[0] . "**: " . $defs[$qu])->then(function ($result) use ($msg) {
+                Utils::deleteMessage($msg);
+            });
         } else {
             $utils->send($msg, "not found! you can set this definition with `;set $qu <thing here>`");
         }
@@ -542,7 +556,9 @@ $discord->registerCommand('8ball', function ($msg, $args) use ($fortunes, $utils
     $ret = "Your Question: *";
     $ret .= count($args) == 0 ? "Why didn't {$msg->author} ask a question?" : implode(" ", $args);
     $ret .= "*\n\n**" . $fortunes[array_rand($fortunes)] . "**";
-    $utils->send($msg, $ret);
+    $utils->send($msg, $ret)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'tells your fortune',
     'usage' => '<question to ask the mighty 8ball>',
@@ -958,7 +974,9 @@ $discord->registerCommand('bamboozle', function ($msg, $args) use ($utils) {
             $ret .= "<@$key>";
     else $ret = $msg->author;
     $ret .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!";
-    $utils->sendFile($msg, 'img/bamboozled.jpg', 'bamboozle.jpg', $ret);
+    $utils->sendFile($msg, 'img/bamboozled.jpg', 'bamboozle.jpg', $ret)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 
 }, [
     'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
