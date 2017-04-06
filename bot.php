@@ -3,6 +3,7 @@
 ///////////////////////////////////////////////////////////
 // config
 ///////////////////////////////////////////////////////////
+error_reporting(E_ALL);
 
 include __DIR__.'/vendor/autoload.php';
 
@@ -63,18 +64,30 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
     $discord->on('message', function ($msg) use ($defs, $imgs, $utils) {
         // for stuff that isn't a command
         $str = s($msg->content);
+<<<<<<< HEAD
 
         $author = $msg->author ?? false;
         if ($author && !$msg->author->bot) {
 
+=======
+
+        if (!$msg->author->bot) {
+
+>>>>>>> master
             if ($str->startsWith(';')) {
                 // get first word to see if we have something saved
                 $qu = (string) $str->removeLeft(';')->split(' ', 1)[0]->toLowerCase();
 
                 if (isset($defs[$qu])) {
+                    Utils::deleteMessage($msg);
                     $utils->send($msg, "**$qu**: " . $defs[$qu]);
                 }
+
                 if (isset($imgs[$qu])) {
+                    $msg->channel->broadcastTyping();
+                    Utils::deleteMessage($msg)->then(function ($result) use ($msg) {
+                        Utils::editMessage($result, $result->content . "\nby {$msg->author}");
+                    });
                     $utils->sendFile($msg, __DIR__."/uploaded_images/{$imgs[$qu]}", $imgs[$qu], $qu);
                 }
 
@@ -224,6 +237,8 @@ $time = $discord->registerCommand('time', function ($msg, $args) use ($cities, $
             });
         }
     }
+    Utils::deleteMessage($msg);
+
 }, [
     'description' => 'looks up current time for yourself or another user',
     'usage' => '<@user>',
@@ -281,6 +296,8 @@ $weather = $discord->registerCommand('weather', function ($msg, $args) use ($cit
             });
         }
     }
+    Utils::deleteMessage($msg);
+
 }, [
     'description' => 'looks up weather for a city, other user, or yourself',
     'usage' => '<city|@user>',
@@ -301,7 +318,9 @@ $help->registerHelp('weather');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('roll', function ($msg, $args) {
-    $msg->reply('you rolled a ' . rand(1, $args[0] ?? 6));
+    $msg->reply('you rolled a ' . rand(1, $args[0] ?? 6))->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'rolls an n-sided die. defaults to 6.',
     'usage' => '<number of sides>',
@@ -340,6 +359,55 @@ $help->registerHelp('text_benh');
 
 
 
+$email = $discord->registerCommand('email', function ($msg, $args) use ($utils, $emails) {
+    $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
+    $to = "";
+    $from = "From: {$msg->channel->guild->name} {$msg->author->username} benbot <{$msg->author->username}@{$msg->channel->guild->name}.benbot>";
+    $body = implode(" ", $args);
+
+    if (count($msg->mentions) == 0) {
+        if (isset($emails[$id])) {
+            $to = $emails[$id];
+        } else {
+            $utils->send($msg, "you can save an email with `;email save <email>`");
+        }
+    } else {
+        foreach ($msg->mentions as $mention) {
+            if (isset($emails[$mention->id])) {
+                $to .= $emails[$mention->id] . ";";
+            } else {
+                $utils->send($msg, "you can save an email with `;email save <email> <@user>` or have them do it");
+            }
+        }
+    }
+    if (mail($to, 'BenBot Message', $body, $from)) {
+        $utils->send($msg, "message sent successfully");
+    }
+}, [
+    'description' => 'sends an email',
+    'usage' => '<recipient> <msg>',
+    'aliases' => [
+        'Email',
+        'tell',
+        'Tell',
+    ],
+]);
+
+    $email->registerSubCommand('save', function ($msg, $args) use ($utils, $emails) {
+        $id = Utils::isDM($msg) ? $msg->author->id : $msg->author->user->id;
+        if (count($msg->mentions) == 0) {
+            $emails[$id] = $args[0];
+        } elseif (count($msg->mentions) == 1) {
+            $emails[$msg->mentions[0]->id] = $args[0];
+        }
+        $utils->send($msg, $args[0] . " saved.");
+    }, [
+        'description' => 'saves your email',
+        'usage' => '<email>',
+    ]);
+
+
+
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('avatar', function ($msg, $args) use ($utils) {
     if (count($msg->mentions) === 0) {
@@ -372,7 +440,9 @@ $discord->registerCommand('say', function ($msg, $args) use ($utils) {
         $msg->reply("sry, can't do that! :P");
         return;
     }
-    $utils->send($msg, "$a\n\n**love**, {$msg->author}");
+    $utils->send($msg, "$a\n\n**love**, {$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'repeats stuff back to you',
     'usage' => '<stuff to say>',
@@ -392,7 +462,9 @@ $discord->registerCommand('sing', function ($msg, $args) use ($utils) {
         $msg->reply("sry, can't do that! :P");
         return;
     }
-    $utils->send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}");
+    $utils->send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'sing sing sing',
     'usage' => '<sing>',
@@ -413,7 +485,9 @@ $discord->registerCommand('set', function ($msg, $args) use ($defs, $utils) {
         return;
     }
     $defs[$def] = implode(" ", $args);
-    $utils->send($msg, $def . " set to: " . implode(" ", $args));
+    $utils->send($msg, $def . " set to: " . implode(" ", $args))->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'sets this to that',
     'usage' => '<this> <that>',
@@ -427,7 +501,9 @@ $discord->registerCommand('get', function ($msg, $args) use ($defs, $utils) {
     if (isset($args[0])) {
         $qu = strtolower($args[0]);
         if (isset($defs[$qu])) {
-            $utils->send($msg, "**" . $args[0] . "**: " . $defs[$qu]);
+            $utils->send($msg, "**" . $args[0] . "**: " . $defs[$qu])->then(function ($result) use ($msg) {
+                Utils::deleteMessage($msg);
+            });
         } else {
             $utils->send($msg, "not found! you can set this definition with `;set $qu <thing here>`");
         }
@@ -491,7 +567,9 @@ $discord->registerCommand('8ball', function ($msg, $args) use ($fortunes, $utils
     $ret = "Your Question: *";
     $ret .= count($args) == 0 ? "Why didn't {$msg->author} ask a question?" : implode(" ", $args);
     $ret .= "*\n\n**" . $fortunes[array_rand($fortunes)] . "**";
-    $utils->send($msg, $ret);
+    $utils->send($msg, $ret)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'tells your fortune',
     'usage' => '<question to ask the mighty 8ball>',
@@ -506,7 +584,13 @@ $help->registerHelp('8ball');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lenny', function ($msg, $args) use ($utils) {
+<<<<<<< HEAD
     $utils->send($msg, "( ͡° ͜ʖ ͡°)");
+=======
+    $utils->send($msg, "( ͡° ͜ʖ ͡°)")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
+>>>>>>> master
 }, [
     'description' => 'you should know what this does',
     'aliases' => [
@@ -515,7 +599,9 @@ $discord->registerCommand('lenny', function ($msg, $args) use ($utils) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lennies', function ($msg, $args) use ($lennyception, $utils) {
-    $utils->send($msg, $lennyception);
+    $utils->send($msg, $lennyception)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => '( ͡° ͜ʖ ͡°)',
     'aliases' => [
@@ -526,7 +612,9 @@ $discord->registerCommand('lennies', function ($msg, $args) use ($lennyception, 
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('shrug', function ($msg, $args, $utils) {
-    $utils->send($msg, "¯\\\_(ツ)\_/¯");
+    $utils->send($msg, "¯\\\_(ツ)\_/¯")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'meh',
     'aliases' => [
@@ -537,7 +625,9 @@ $discord->registerCommand('shrug', function ($msg, $args, $utils) {
 ]);
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('noice', function ($msg, $args) use ($bs, $utils) {
-    $utils->send($msg, $bs);
+    $utils->send($msg, $bs)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'ayyy',
     'aliases' => [
@@ -560,7 +650,9 @@ $discord->registerCommand('copypasta', function ($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $kaomoji = $discord->registerCommand('kaomoji', function ($msg, $args) use ($kaomojis, $utils) {
-    $utils->send($msg, $kaomojis[array_rand($kaomojis)]);
+    $utils->send($msg, $kaomojis[array_rand($kaomojis)])->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 }, [
     'description' => 'sends random kaomoji',
     'usage' => '<sad|happy|angry|confused|surprised>',
@@ -572,22 +664,34 @@ $help->registerHelp('kaomoji');
 
 
     $kaomoji->registerSubCommand('sad', function ($msg, $args) use($sad_kaomojis, $utils) {
-        $utils->send($msg, $sad_kaomojis[array_rand($sad_kaomojis)]);
+        $utils->send($msg, $sad_kaomojis[array_rand($sad_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'sad kaomoji']);
     $kaomoji->registerSubCommand('happy', function ($msg, $args) use($happy_kaomojis, $utils) {
-        $utils->send($msg, $happy_kaomojis[array_rand($happy_kaomojis)]);
+        $utils->send($msg, $happy_kaomojis[array_rand($happy_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'happy kaomoji']);
     $kaomoji->registerSubCommand('angry', function ($msg, $args) use($angry_kaomojis, $utils) {
-        $utils->send($msg, $angry_kaomojis[array_rand($angry_kaomojis)]);
+        $utils->send($msg, $angry_kaomojis[array_rand($angry_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'angry kaomoji']);
     $kaomoji->registerSubCommand('confused', function ($msg, $args) use($confused_kaomojis, $utils) {
-        $utils->send($msg, $confused_kaomojis[array_rand($confused_kaomojis)]);
+        $utils->send($msg, $confused_kaomojis[array_rand($confused_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'confused kaomoji']);
     $kaomoji->registerSubCommand('surprised', function ($msg, $args) use($surprised_kaomojis, $utils) {
-        $utils->send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)]);
+        $utils->send($msg, $surprised_kaomojis[array_rand($surprised_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'surprised kaomoji']);
     $kaomoji->registerSubCommand('embarrassed', function ($msg, $args) use($embarrassed_kaomojis, $utils) {
-        $utils->send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)]);
+        $utils->send($msg, $embarrassed_kaomojis[array_rand($embarrassed_kaomojis)])->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
     }, ['description' => 'embarrassed kaomoji']);
 
 
@@ -646,7 +750,16 @@ $help->registerHelp('joke');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('block', function ($msg, $args) use ($utils) {
+<<<<<<< HEAD
     $utils->send($msg, FontConverter::blockText(implode(" ", $args)));
+=======
+    $utils->send($msg, FontConverter::blockText(implode(" ", $args)) . "\n--{$msg->author}")
+    ->then(
+        function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        }
+    );
+>>>>>>> master
 }, [
     'description' => 'turn a message into block text',
     'usage' => '<msg>',
@@ -660,7 +773,13 @@ $help->registerHelp('block');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('script', function($msg, $args) use ($utils) {
+<<<<<<< HEAD
     $utils->send($msg, FontConverter::script(implode(" ", $args)));
+=======
+    $utils->send($msg, FontConverter::script(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
+>>>>>>> master
 }, [
     'description' => 'script font',
     'usage' => '<msg>',
@@ -672,7 +791,13 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('frak', function($msg, $args) use ($utils) {
+<<<<<<< HEAD
     $utils->send($msg, FontConverter::gothic(implode(" ", $args)));
+=======
+    $utils->send($msg, FontConverter::gothic(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
+>>>>>>> master
 }, [
     'description' => 'gothic font',
     'usage' => '<msg>',
@@ -688,7 +813,13 @@ $discord->registerCommand('frak', function($msg, $args) use ($utils) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('text', function($msg, $args) use ($utils) {
     $font = array_shift($args);
+<<<<<<< HEAD
     $utils->send($msg, FontConverter::$font(implode(" ", $args)));
+=======
+    $utils->send($msg, FontConverter::$font(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
+>>>>>>> master
 }, [
     'description' => 'different fonts',
     'usage' => '<font> <message>',
@@ -874,7 +1005,9 @@ $discord->registerCommand('bamboozle', function ($msg, $args) use ($utils) {
             $ret .= "<@$key>";
     else $ret = $msg->author;
     $ret .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!";
-    $utils->sendFile($msg, 'img/bamboozled.jpg', 'bamboozle.jpg', $ret);
+    $utils->sendFile($msg, 'img/bamboozled.jpg', 'bamboozle.jpg', $ret)->then(function ($result) use ($msg) {
+        Utils::deleteMessage($msg);
+    });
 
 }, [
     'description' => "bamboozles mentioned user (or you if you don't mention anyone!!)",
@@ -926,6 +1059,43 @@ $discord->registerCommand('status', function ($msg, $args) use ($discord, $start
     foreach ($discord->guilds as $guild) {
         $usercount += $guild->member_count;
     }
+
+    $discord->http->get('http://test.benharris.ch/phpsysinfo/xml.php?plugin=complete&json')->then(function ($result) use ($discord, $starttime, $utils) {
+
+        // print_r($result);
+        $vitals = $result->Vitals->{"@attributes"};
+        print_r($vitals);
+
+        echo s($vitals->LoadAvg)->beforeFirst(' '), PHP_EOL;
+
+        $embed = $discord->factory(Embed::class, [
+            'title' => 'Benbot status',
+            'thumbnail' => ['url' => $discord->avatar],
+            'fields' => [
+                ['name' => 'Server Uptime'
+                ,'value' => Utils::secondsConvert($vitals->Uptime)
+                ],
+                ['name' => '1 Minute Load Avg'
+                ,'value' => s($vitals->LoadAvg)->beforeFirst(' ')
+                ,'inline' => true
+                ],
+                ['name' => '5 Minute Load Avg'
+                ,'value' => s($vitals->LoadAvg)->afterFirst(' ')
+                ,'inline' => true
+                ],
+                ['name' => '10 Minute Load Avg'
+                ,'value' => s($vitals->LoadAvg)->afterLast(' ')
+                ,'inline' => true
+                ],
+                ['name' => 'Bot Uptime'
+                ,'value' => $starttime->diffForHumans(Carbon::now(), true) . " (since " . $starttime->format('g:i A \o\n l F j, Y') . ")"
+                ],
+            ],
+            'timestamp' => null,
+        ]);
+        $utils->send($msg, "", $embed);
+    });
+
     $embed = $discord->factory(Embed::class, [
         'title' => 'Benbot status',
         'thumbnail' => ['url' => $discord->avatar],
@@ -1057,4 +1227,3 @@ $discord->registerCommand('help', $help->helpFn(), [
 
 
 $discord->run();
-
