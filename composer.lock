@@ -717,48 +717,6 @@
             "time": "2014-11-20 16:49:30"
         },
         {
-            "name": "ircmaxell/password-compat",
-            "version": "v1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ircmaxell/password_compat.git",
-                "reference": "5c5cde8822a69545767f7c7f3058cb15ff84614c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/5c5cde8822a69545767f7c7f3058cb15ff84614c",
-                "reference": "5c5cde8822a69545767f7c7f3058cb15ff84614c",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.*"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "lib/password.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Anthony Ferrara",
-                    "email": "ircmaxell@php.net",
-                    "homepage": "http://blog.ircmaxell.com"
-                }
-            ],
-            "description": "A compatibility library for the proposed simplified password hashing algorithm: https://wiki.php.net/rfc/password_hash",
-            "homepage": "https://github.com/ircmaxell/password_compat",
-            "keywords": [
-                "hashing",
-                "password"
-            ],
-            "time": "2014-11-20 16:49:30"
-        },
-        {
             "name": "monolog/monolog",
             "version": "1.22.1",
             "source": {
@@ -1700,7 +1658,7 @@
         },
         {
             "name": "symfony/intl",
-            "version": "v3.2.6",
+            "version": "v3.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/intl.git",
@@ -1775,16 +1733,16 @@
         },
         {
             "name": "symfony/options-resolver",
-            "version": "v3.2.6",
+            "version": "v3.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/options-resolver.git",
-                "reference": "56e3d0a41313f8a54326851f10690d591e62a24c"
+                "reference": "6a19be85237fe8bbd4975f86942b4763bb0da6ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/56e3d0a41313f8a54326851f10690d591e62a24c",
-                "reference": "56e3d0a41313f8a54326851f10690d591e62a24c",
+                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/6a19be85237fe8bbd4975f86942b4763bb0da6ca",
+                "reference": "6a19be85237fe8bbd4975f86942b4763bb0da6ca",
                 "shasum": ""
             },
             "require": {
@@ -1825,7 +1783,7 @@
                 "configuration",
                 "options"
             ],
-            "time": "2017-02-21 09:12:04"
+            "time": "2017-03-21 21:44:32"
         },
         {
             "name": "symfony/polyfill",
@@ -1918,16 +1876,16 @@
         },
         {
             "name": "symfony/translation",
-            "version": "v3.2.6",
+            "version": "v3.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "0e1b15ce8fbf3890f4ccdac430ed5e07fdfe0690"
+                "reference": "c740eee70783d2af4d3d6b70d5146f209e6b4d13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/0e1b15ce8fbf3890f4ccdac430ed5e07fdfe0690",
-                "reference": "0e1b15ce8fbf3890f4ccdac430ed5e07fdfe0690",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/c740eee70783d2af4d3d6b70d5146f209e6b4d13",
+                "reference": "c740eee70783d2af4d3d6b70d5146f209e6b4d13",
                 "shasum": ""
             },
             "require": {
@@ -1978,7 +1936,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-04 12:23:14"
+            "time": "2017-03-21 21:44:32"
         },
         {
             "name": "team-reflex/discord-php",
@@ -2145,18 +2103,6 @@
         },
         {
             "name": "voku/anti-xss",
-<<<<<<< HEAD
-            "version": "2.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/voku/anti-xss.git",
-                "reference": "697142eb3cd99e06bc0b0779eaa746a63ed718de"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/voku/anti-xss/zipball/697142eb3cd99e06bc0b0779eaa746a63ed718de",
-                "reference": "697142eb3cd99e06bc0b0779eaa746a63ed718de",
-=======
             "version": "2.1.3",
             "source": {
                 "type": "git",
@@ -2167,7 +2113,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/voku/anti-xss/zipball/c5ef94790d9ed8654f1bccfeb6b397cf1fb87d88",
                 "reference": "c5ef94790d9ed8654f1bccfeb6b397cf1fb87d88",
->>>>>>> master
                 "shasum": ""
             },
             "require": {
@@ -2175,11 +2120,7 @@
                 "voku/portable-utf8": "~3.0"
             },
             "require-dev": {
-<<<<<<< HEAD
-                "phpunit/phpunit": "~4.0"
-=======
                 "phpunit/phpunit": "~4.0|~5.0"
->>>>>>> master
             },
             "type": "library",
             "extra": {
@@ -2215,11 +2156,7 @@
                 "security",
                 "xss"
             ],
-<<<<<<< HEAD
-            "time": "2017-01-10 16:48:30"
-=======
             "time": "2017-04-04 17:07:59"
->>>>>>> master
         },
         {
             "name": "voku/email-check",
@@ -2278,18 +2215,6 @@
         },
         {
             "name": "voku/portable-utf8",
-<<<<<<< HEAD
-            "version": "3.1.16",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/voku/portable-utf8.git",
-                "reference": "545094026ceefa9247a9a122b191150d7a2e6ba5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/voku/portable-utf8/zipball/545094026ceefa9247a9a122b191150d7a2e6ba5",
-                "reference": "545094026ceefa9247a9a122b191150d7a2e6ba5",
-=======
             "version": "3.1.17",
             "source": {
                 "type": "git",
@@ -2300,7 +2225,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/voku/portable-utf8/zipball/7fb737ddebc7801f9572daeec9f64cf7cc111088",
                 "reference": "7fb737ddebc7801f9572daeec9f64cf7cc111088",
->>>>>>> master
                 "shasum": ""
             },
             "require": {
@@ -2357,11 +2281,7 @@
                 "utf-8",
                 "utf8"
             ],
-<<<<<<< HEAD
-            "time": "2017-03-25 06:21:29"
-=======
             "time": "2017-04-05 02:20:36"
->>>>>>> master
         },
         {
             "name": "voku/stringy",

@@ -5,10 +5,10 @@ use Discord\Discord;
 use Discord\Parts\User\Game;
 use Discord\Parts\Embed\Embed;
 
-use BenBot\SerializedArray;
 use BenBot\Utils;
-use BenBot\FontConverter;
+use BenBot\SerializedArray;
 use BenBot\Command;
+use BenBot\DebugCommands;
 
 use Carbon\Carbon;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -44,8 +44,10 @@ class BenBot extends Discord {
         ]);
 
         $this->dir         = $dir;
+        $this->help        = [];
         $this->jokes       = explode("---", file_get_contents("$dir/miscjokes.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
+
 
         $this->game = $this->factory(Game::class, [
             'name' => 'type ;help for info',
@@ -53,7 +55,7 @@ class BenBot extends Discord {
 
         try {
             $this->defs   = new SerializedArray("$dir/bot_data/defs.mp");
-            $this->imgs   = new SerializedArray("$dir/bot_data/defs.mp");
+            $this->imgs   = new SerializedArray("$dir/bot_data/img_urls.mp");
             $this->cities = new SerializedArray("$dir/bot_data/cities.mp");
             $this->emails = new SerializedArray("$dir/bot_data/emails.mp");
         } catch (Exception $e) {
@@ -61,6 +63,7 @@ class BenBot extends Discord {
         }
 
         $this->on('ready', function () {
+            Utils::init($this);
             $this->updatePresence($this->game);
 
             $this->on('message', function ($msg) {
@@ -72,10 +75,10 @@ class BenBot extends Discord {
                         $qu = (string) $cmd;
 
                         if (isset($this->defs[$qu])) {
-                            $this->utils->send($msg, "**$qu**: " . $this->defs[$qu]);
+                            Utils::send($msg, "**$qu**: " . $this->defs[$qu]);
                         }
                         if (isset($this->imgs[$qu])) {
-                            $this->utils->sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$qu]}", $this->imgs[$qu], $qu);
+                            Utils::sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$qu]}", $this->imgs[$qu], $qu);
                         }
 
                         if (array_key_exists($qu, $this->cmds)) {
@@ -86,17 +89,20 @@ class BenBot extends Discord {
                             return;
                         }
 
+                        foreach ($args as $key => $arg) {
+                            $args[$key] = (string) $arg;
+                        }
                         $result = $command->handle($msg, $args);
 
                         if (is_string($result)) {
-                            $msg->reply($result);
+                            Utils::send($msg, $result);
                         }
                     }
 
                 } elseif (Utils::isDM($msg)) {
                     $msg->channel->broadcastTyping();
-                    $this->utils->askCleverbot($str)->then(function ($result) use ($msg) {
-                        $this->utils->send($msg, $result->output);
+                    Utils::askCleverbot($str)->then(function ($result) use ($msg) {
+                        Utils::send($msg, $result->output);
                     });
                 }
 
@@ -111,7 +117,6 @@ class BenBot extends Discord {
             });
 
             $this->start_time = Carbon::now();
-            // $this->utils->pingMe("bot started successfully");
 
             $this->registerCommand('help', function ($msg, $args) {
                 if (count($args) > 0) {
@@ -119,23 +124,47 @@ class BenBot extends Discord {
                     $command = $this->getCommand($cmdstr, true);
 
                     if (is_null($command)) {
-                        return "The command $cmdstr does not exist";
+                        return "The command `;$cmdstr` does not exist";
                     }
-
                     $help = $command->getHelp()["text"];
-                    Utils::ssend($msg, "```$help```");
+                    Utils::send($msg, "```$help```");
                 } else {
-                    $banner = file_get_contents(__DIR__.'/../banner.txt');
+                    $banner = file_get_contents("{$this->dir}/banner.txt");
                     $ret = "```$banner\n- a bot made by benh. avatar by hirose.\n\n";
+                    sort($this->help);
                     $ret .= implode("", $this->help);
                     $ret .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
-                    Utils::ssend($msg, $ret);
+                    Utils::send($msg, $ret);
                 }
-            });
+            }, [
+                'description' => 'shows help text',
+                'usage' => '<command>',
+            ]);
+
+            // $this->registerAllCommands();
+            // DebugCommands::register($this);
+            if (!class_exists('BenBot\DebugCommands')) {
+                throw new \Exception("DebugCommands not found");
+            } else {
+                echo "DebugCommands found...", PHP_EOL;
+            }
+            DebugCommands::test();
+            DebugCommands::init($this);
+            Utils::ping("bot started successfully");
 
         });
 
     }
+
+
+
+    public function registerAllCommands()
+    {
+        DebugCommands::register($this);
+        echo "registering all commands", PHP_EOL;
+    }
+
+
 
     public function registerCommand($command, $callable, array $options = [])
     {
@@ -157,6 +186,7 @@ class BenBot extends Discord {
         return $commandInstance;
     }
 
+
     public function unregisterCommand($command)
     {
         if (!array_key_exists($command, $this->cmds)) {
@@ -165,10 +195,12 @@ class BenBot extends Discord {
         unset($this->cmds[$command]);
     }
 
+
     public function registerAlias($alias, $command)
     {
         $this->aliases[$alias] = $command;
     }
+
 
     public function unregisterAlias($alias)
     {
@@ -177,6 +209,7 @@ class BenBot extends Discord {
         }
         unset($this->aliases[$alias]);
     }
+
 
     public function getCommand($command, $aliases = true)
     {
@@ -187,6 +220,7 @@ class BenBot extends Discord {
             return $this->cmds[$this->aliases[$command]];
         }
     }
+
 
     public function buildCommand($command, $callable, array $options = [])
     {
@@ -200,6 +234,7 @@ class BenBot extends Discord {
 
         return [$commandInstance, $options];
     }
+
 
     public function resolveCommandOptions(array $options)
     {
@@ -223,6 +258,7 @@ class BenBot extends Discord {
         }
         return $options;
     }
+
 
     public function __get($name)
     {

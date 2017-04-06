@@ -5,46 +5,67 @@ use Carbon\Carbon;
 use Discord\Parts\Embed\Embed;
 use React\Promise\Deferred;
 
-class Utils extends BenBot {
+class Utils {
 
-    public function mysend($msg, $txt, $embed = null)
+    private static $bot;
+
+    public static function init(&$that)
+    {
+        self::$bot = $that;
+        print_r(self::$bot);
+        self::$bot->registerCommand('hi', [__CLASS__, 'hifn']);
+        self::$bot->registerCommand('ping', [__CLASS__, 'pingfn']);
+        echo "Utils initialized.", PHP_EOL;
+    }
+
+    public static function hifn($msg, $args)
+    {
+        return "henlo";
+    }
+
+    public static function pingfn($msg, $args)
+    {
+        self::ping("this is a test")->then(function ($result) use ($msg) {
+            $msg->reply("thanks");
+        }, function ($e) {
+            echo $e->getMessage(), PHP_EOL;
+        });
+    }
+
+
+    public static function send($msg, $txt, $embed = null)
     {
         return $msg->channel->sendMessage($txt, false, $embed)
             ->otherwise(function($e) use ($msg) {
                 echo $e->getMessage(), PHP_EOL;
-                $this->pingMe($e->getMessage());
                 $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
+                self::ping($e->getMessage());
             });
     }
 
-    public static function ssend($msg, $txt, $embed = null)
-    {
-        return $msg->channel->sendMessage($txt, false, $embed)
-            ->otherwise(function($e) use ($msg) {
-                echo $e->getMessage(), PHP_EOL;
-                $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
-            });
-    }
 
-    public function sendFile($msg, $filepath, $filename, $txt)
+    public static function sendFile($msg, $filepath, $filename, $txt)
     {
         return $msg->channel->sendFile($filepath, $filename, $txt)
             ->otherwise(function($e) use ($msg) {
                 echo $e->getMessage(), PHP_EOL;
-                $this->pingMe($e->getMessage());
                 $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
+                self::ping($e->getMessage());
             });
     }
+
 
     public static function isDM($msg)
     {
         return $msg->channel->is_private;
     }
 
+
     public static function timestampFromSnowflake ($snowflake)
     {
         return (($snowflake / 4194304) + 1420070400000) / 1000;
     }
+
 
     public static function celsiusToFahrenheit($celsius)
     {
@@ -56,10 +77,10 @@ class Utils extends BenBot {
         return $fahrenheit * 5 / 9 + 32;
     }
 
-    public function formatWeatherJson($json, $timezone = null)
+    public static function formatWeatherJson($json, $timezone = null)
     {
 
-        return $this->factory(Embed::class, [
+        return self::$bot->factory(Embed::class, [
             'title' => "Weather in {$json->name}, {$json->sys->country}",
             'thumbnail' => ['url' => "http://openweathermap.org/img/w/{$json->weather[0]->icon}.png"],
             'fields' => [
@@ -103,14 +124,14 @@ class Utils extends BenBot {
 
 
 
-    public function askCleverbot($input)
+    public static function askCleverbot($input)
     {
         $deferred = new Deferred();
 
         $url = "https://www.cleverbot.com/getreply";
         $key = getenv('CLEVERBOT_API_KEY');
         $input = rawurlencode($input);
-        $this->discord->http->get("$url?input=$input&key=$key", null, [], false)->then(function ($apidata) use ($deferred) {
+        self::$bot->discord->http->get("$url?input=$input&key=$key", null, [], false)->then(function ($apidata) use ($deferred) {
             $deferred->resolve($apidata);
         }, function ($e) {
             $deferred->reject($e);
@@ -119,11 +140,15 @@ class Utils extends BenBot {
         return $deferred->promise();
     }
 
-    public function pingMe($msg)
+
+    public static function ping($msg)
     {
-        return $this
+        if (is_null(self::$bot)) {
+            throw new \Exception("Utils class not initialized");
+        }
+        return self::$bot
             ->guilds->get('id', '289410862907785216')
-            ->channels->get('id','289611811094003715')
+            ->channels->get('id','297082205048668160')
             ->sendMessage("<@193011352275648514>, $msg");
     }
 
