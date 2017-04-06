@@ -19,7 +19,6 @@ use function Stringy\create as s;
 class BenBot extends Discord {
 
     protected $dir;
-    protected $dotenv;
     protected $defs;
     protected $imgs;
     protected $cities;
@@ -29,13 +28,14 @@ class BenBot extends Discord {
     protected $yomamajokes;
     protected $start_time;
     protected $game;
-    protected $cmds;
+    protected $cmds    = [];
+    protected $aliases = [];
 
-    public function __construct($dir = __DIR__)
+    public function __construct($dir)
     {
 
-        $this->dotenv = new Dotenv($dir);
-        $this->dotenv->load();
+        $dotenv = new Dotenv($dir);
+        $dotenv->load();
 
         parent::__construct([
             'token'              => getenv('DISCORD_TOKEN'),
@@ -44,8 +44,6 @@ class BenBot extends Discord {
         ]);
 
         $this->dir         = $dir;
-        $this->utils       = new Utils();
-        $this->help        = [];
         $this->jokes       = explode("---", file_get_contents("$dir/miscjokes.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
 
@@ -71,18 +69,19 @@ class BenBot extends Discord {
                     if ($str->startsWith(';')) {
                         $args = $str->removeLeft(';')->split(' ');
                         $cmd = array_shift($args);
+                        $qu = (string) $cmd;
 
-                        if (isset($this->defs[$cmd])) {
-                            $this->utils->send($msg, "**$cmd**: " . $this->defs[$cmd]);
+                        if (isset($this->defs[$qu])) {
+                            $this->utils->send($msg, "**$qu**: " . $this->defs[$qu]);
                         }
-                        if (isset($this->imgs[$cmd])) {
-                            $this->utils->sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$cmd]}", $this->imgs[$cmd], $cmd);
+                        if (isset($this->imgs[$qu])) {
+                            $this->utils->sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$qu]}", $this->imgs[$qu], $qu);
                         }
 
-                        if (array_key_exists($cmd, $this->commands)) {
-                            $command = $this->commands[$cmd];
-                        } elseif (array_key_exists($cmd, $this->aliases)) {
-                            $command = $this->commands[$this->aliases[$cmd]];
+                        if (array_key_exists($qu, $this->cmds)) {
+                            $command = $this->cmds[$qu];
+                        } elseif (array_key_exists($qu, $this->aliases)) {
+                            $command = $this->cmds[$this->aliases[$qu]];
                         } else {
                             return;
                         }
@@ -140,12 +139,12 @@ class BenBot extends Discord {
 
     public function registerCommand($command, $callable, array $options = [])
     {
-        if (array_key_exists($command, $this->commands)) {
+        if (array_key_exists($command, $this->cmds)) {
             throw new \Exception("A command with the name $command already exists.");
         }
 
         list($commandInstance, $options) = $this->buildCommand($command, $callable, $options);
-        $this->commands[$command]        = $commandInstance;
+        $this->cmds[$command]        = $commandInstance;
 
         foreach ($options['aliases'] as $alias) {
             $this->registerAlias($alias, $command);
@@ -160,10 +159,10 @@ class BenBot extends Discord {
 
     public function unregisterCommand($command)
     {
-        if (!array_key_exists($command, $this->commands)) {
+        if (!array_key_exists($command, $this->cmds)) {
             throw new \Exception("A command with the name $command does not exist.");
         }
-        unset($this->commands[$command]);
+        unset($this->cmds[$command]);
     }
 
     public function registerAlias($alias, $command)
@@ -181,11 +180,11 @@ class BenBot extends Discord {
 
     public function getCommand($command, $aliases = true)
     {
-        if (array_key_exists($command, $this->commands)) {
-            return $this->commands[$command];
+        if (array_key_exists($command, $this->cmds)) {
+            return $this->cmds[$command];
         }
         if (array_key_exists($command, $this->aliases) && $aliases) {
-            return $this->commands[$this->aliases[$command]];
+            return $this->cmds[$this->aliases[$command]];
         }
     }
 
