@@ -12,25 +12,9 @@ class Utils {
     public static function init(&$that)
     {
         self::$bot = $that;
-        print_r(self::$bot);
-        self::$bot->registerCommand('hi', [__CLASS__, 'hifn']);
-        self::$bot->registerCommand('ping', [__CLASS__, 'pingfn']);
         echo "Utils initialized.", PHP_EOL;
     }
 
-    public static function hifn($msg, $args)
-    {
-        return "henlo";
-    }
-
-    public static function pingfn($msg, $args)
-    {
-        self::ping("this is a test")->then(function ($result) use ($msg) {
-            $msg->reply("thanks");
-        }, function ($e) {
-            echo $e->getMessage(), PHP_EOL;
-        });
-    }
 
 
     public static function send($msg, $txt, $embed = null)

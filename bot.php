@@ -64,16 +64,10 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
     $discord->on('message', function ($msg) use ($defs, $imgs, $utils) {
         // for stuff that isn't a command
         $str = s($msg->content);
-<<<<<<< HEAD
 
-        $author = $msg->author ?? false;
-        if ($author && !$msg->author->bot) {
-
-=======
 
         if (!$msg->author->bot) {
 
->>>>>>> master
             if ($str->startsWith(';')) {
                 // get first word to see if we have something saved
                 $qu = (string) $str->removeLeft(';')->split(' ', 1)[0]->toLowerCase();
@@ -584,13 +578,9 @@ $help->registerHelp('8ball');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('lenny', function ($msg, $args) use ($utils) {
-<<<<<<< HEAD
-    $utils->send($msg, "( ͡° ͜ʖ ͡°)");
-=======
     $utils->send($msg, "( ͡° ͜ʖ ͡°)")->then(function ($result) use ($msg) {
         Utils::deleteMessage($msg);
     });
->>>>>>> master
 }, [
     'description' => 'you should know what this does',
     'aliases' => [
@@ -750,16 +740,12 @@ $help->registerHelp('joke');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('block', function ($msg, $args) use ($utils) {
-<<<<<<< HEAD
-    $utils->send($msg, FontConverter::blockText(implode(" ", $args)));
-=======
     $utils->send($msg, FontConverter::blockText(implode(" ", $args)) . "\n--{$msg->author}")
     ->then(
         function ($result) use ($msg) {
             Utils::deleteMessage($msg);
         }
     );
->>>>>>> master
 }, [
     'description' => 'turn a message into block text',
     'usage' => '<msg>',
@@ -773,13 +759,9 @@ $help->registerHelp('block');
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('script', function($msg, $args) use ($utils) {
-<<<<<<< HEAD
-    $utils->send($msg, FontConverter::script(implode(" ", $args)));
-=======
     $utils->send($msg, FontConverter::script(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
         Utils::deleteMessage($msg);
     });
->>>>>>> master
 }, [
     'description' => 'script font',
     'usage' => '<msg>',
@@ -791,13 +773,9 @@ $discord->registerCommand('script', function($msg, $args) use ($utils) {
 
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('frak', function($msg, $args) use ($utils) {
-<<<<<<< HEAD
-    $utils->send($msg, FontConverter::gothic(implode(" ", $args)));
-=======
     $utils->send($msg, FontConverter::gothic(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
         Utils::deleteMessage($msg);
     });
->>>>>>> master
 }, [
     'description' => 'gothic font',
     'usage' => '<msg>',
@@ -813,13 +791,9 @@ $discord->registerCommand('frak', function($msg, $args) use ($utils) {
 ///////////////////////////////////////////////////////////
 $discord->registerCommand('text', function($msg, $args) use ($utils) {
     $font = array_shift($args);
-<<<<<<< HEAD
-    $utils->send($msg, FontConverter::$font(implode(" ", $args)));
-=======
     $utils->send($msg, FontConverter::$font(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
         Utils::deleteMessage($msg);
     });
->>>>>>> master
 }, [
     'description' => 'different fonts',
     'usage' => '<font> <message>',

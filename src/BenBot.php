@@ -8,7 +8,7 @@ use Discord\Parts\Embed\Embed;
 use BenBot\Utils;
 use BenBot\SerializedArray;
 use BenBot\Command;
-use BenBot\DebugCommands;
+use BenBot\Commands;
 
 use Carbon\Carbon;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,15 +18,16 @@ use function Stringy\create as s;
 
 class BenBot extends Discord {
 
-    protected $dir;
-    protected $defs;
-    protected $imgs;
-    protected $cities;
-    protected $emails;
+    public $start_time;
+    public $dir;
+    public $defs;
+    public $imgs;
+    public $cities;
+    public $emails;
+    public $jokes;
+    public $yomamajokes;
+
     protected $help;
-    protected $jokes;
-    protected $yomamajokes;
-    protected $start_time;
     protected $game;
     protected $cmds    = [];
     protected $aliases = [];
@@ -70,30 +71,36 @@ class BenBot extends Discord {
                 $str = s($msg->content);
                 if (!$msg->author->bot) {
                     if ($str->startsWith(';')) {
+                        // is command!
                         $args = $str->removeLeft(';')->split(' ');
-                        $cmd = array_shift($args);
-                        $qu = (string) $cmd;
+                        $cmd = (string) array_shift($args)->toLowerCase();
 
-                        if (isset($this->defs[$qu])) {
-                            Utils::send($msg, "**$qu**: " . $this->defs[$qu]);
+                        // look up definition
+                        if (isset($this->defs[$cmd])) {
+                            Utils::send($msg, "**$cmd**: " . $this->defs[$cmd]);
                         }
-                        if (isset($this->imgs[$qu])) {
-                            Utils::sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$qu]}", $this->imgs[$qu], $qu);
+                        // look up image
+                        if (isset($this->imgs[$cmd])) {
+                            Utils::sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$cmd]}", $this->imgs[$cmd], $cmd);
                         }
 
-                        if (array_key_exists($qu, $this->cmds)) {
-                            $command = $this->cmds[$qu];
-                        } elseif (array_key_exists($qu, $this->aliases)) {
-                            $command = $this->cmds[$this->aliases[$qu]];
+                        // look up command
+                        if (array_key_exists($cmd, $this->cmds)) {
+                            $command = $this->cmds[$cmd];
+                        } elseif (array_key_exists($cmd, $this->aliases)) {
+                            $command = $this->cmds[$this->aliases[$cmd]];
                         } else {
                             return;
                         }
 
+                        // make sure stringys are strings
                         foreach ($args as $key => $arg) {
                             $args[$key] = (string) $arg;
                         }
+                        // do the command
                         $result = $command->handle($msg, $args);
 
+                        // respond if the command handler returned a string
                         if (is_string($result)) {
                             Utils::send($msg, $result);
                         }
@@ -103,21 +110,25 @@ class BenBot extends Discord {
                     $msg->channel->broadcastTyping();
                     Utils::askCleverbot($str)->then(function ($result) use ($msg) {
                         Utils::send($msg, $result->output);
+                    }, function ($e) {
+                        echo $e->getMessage(), PHP_EOL;
                     });
                 }
 
 
-                if ($msg->channel->guild->id === "233603102047993856") {
+                if (!Utils::isDM($msg) && $msg->channel->guild->id === "233603102047993856") {
                     if ($str->contains('dib', false)) {
                         $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
                             echo $e->getMessage(), PHP_EOL;
                         });
                     }
                 }
-            });
+
+            }); // --onmsg
 
             $this->start_time = Carbon::now();
 
+            // register help function
             $this->registerCommand('help', function ($msg, $args) {
                 if (count($args) > 0) {
                     $cmdstr = implode(" ", $args);
@@ -130,26 +141,20 @@ class BenBot extends Discord {
                     Utils::send($msg, "```$help```");
                 } else {
                     $banner = file_get_contents("{$this->dir}/banner.txt");
-                    $ret = "```$banner\n- a bot made by benh. avatar by hirose.\n\n";
+                    $response = "```$banner\n- a bot made by benh. avatar by hirose.\n\n";
                     sort($this->help);
-                    $ret .= implode("", $this->help);
-                    $ret .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
-                    Utils::send($msg, $ret);
+                    $response .= implode("", $this->help);
+                    $response .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
+                    Utils::send($msg, $response);
                 }
             }, [
                 'description' => 'shows help text',
                 'usage' => '<command>',
             ]);
 
-            // $this->registerAllCommands();
-            // DebugCommands::register($this);
-            if (!class_exists('BenBot\DebugCommands')) {
-                throw new \Exception("DebugCommands not found");
-            } else {
-                echo "DebugCommands found...", PHP_EOL;
-            }
-            DebugCommands::test();
-            DebugCommands::init($this);
+
+            $this->registerAllCommands();
+
             Utils::ping("bot started successfully");
 
         });
@@ -160,8 +165,10 @@ class BenBot extends Discord {
 
     public function registerAllCommands()
     {
-        DebugCommands::register($this);
-        echo "registering all commands", PHP_EOL;
+        Commands\Fun::register($this);
+        Commands\Debug::register($this);
+        Commands\Misc::register($this);
+        Commands\Jokes::register($this);
     }
 
 
