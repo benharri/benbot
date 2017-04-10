@@ -80,12 +80,7 @@ class Images {
 
     public static function listImgs($msg, $args)
     {
-        $response = "avilable images:\n\n";
-        foreach (self::$bot->imgs as $name => $img) {
-            $response .= "$name, ";
-        }
-        $response = rtrim($response, ", ");
-        return $response;
+        return "avilable images:\n\n" . implode(", ", self::$bot->imgs->array_keys());
     }
 
 

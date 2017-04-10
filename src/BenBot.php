@@ -7,7 +7,7 @@ use Discord\Parts\User\Game;
 use Discord\Parts\Embed\Embed;
 
 use BenBot\Utils;
-use BenBot\SerializedArray;
+use BenBot\PersistentArray;
 use BenBot\Command;
 use BenBot\Commands;
 use BenBot\FontConverter;
@@ -32,6 +32,7 @@ class BenBot extends Discord {
 
     protected $help;
     protected $game;
+    protected $banner;
     protected $cmds    = [];
     protected $aliases = [];
 
@@ -51,6 +52,7 @@ class BenBot extends Discord {
         $this->jokes       = explode("---", file_get_contents("$dir/miscjokes.txt"));
         $this->copypastas  = explode("---", file_get_contents("$dir/copypasta.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
+        $this->banner      = file_get_contents("{$this->dir}/banner.txt");
 
 
         $this->game = $this->factory(Game::class, [
@@ -58,10 +60,10 @@ class BenBot extends Discord {
         ]);
 
         try {
-            $this->defs   = new SerializedArray("$dir/bot_data/defs.mp");
-            $this->imgs   = new SerializedArray("$dir/bot_data/img_urls.mp");
-            $this->cities = new SerializedArray("$dir/bot_data/cities.mp");
-            $this->emails = new SerializedArray("$dir/bot_data/emails.mp");
+            $this->defs   = new PersistentArray("$dir/bot_data/defs.mp");
+            $this->imgs   = new PersistentArray("$dir/bot_data/img_urls.mp");
+            $this->cities = new PersistentArray("$dir/bot_data/cities.mp");
+            $this->emails = new PersistentArray("$dir/bot_data/emails.mp");
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), PHP_EOL;
         }
@@ -148,7 +150,7 @@ class BenBot extends Discord {
 
             // register help function
             $this->registerCommand('help', function ($msg, $args) {
-                if (count($args) > 0) {
+                if (count($args) > 0 && $args[0] != "") {
                     $cmdstr = implode(" ", $args);
                     $command = $this->getCommand($cmdstr, true);
 
@@ -156,14 +158,13 @@ class BenBot extends Discord {
                         return "The command `;$cmdstr` does not exist";
                     }
                     $help = $command->getHelp()["text"];
-                    Utils::send($msg, "```$help```");
+                    return "```$help```";
                 } else {
-                    $banner = file_get_contents("{$this->dir}/banner.txt");
-                    $response = "```$banner\n- a bot made by benh. avatar by hirose.\n\n";
+                    $response = "```{$this->banner}\n- a bot made by benh. avatar by hirose.\n\n";
                     sort($this->help);
                     $response .= implode("", $this->help);
                     $response .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
-                    Utils::send($msg, $response);
+                    return $response;
                 }
             }, [
                 'description' => 'shows help text',

@@ -30,7 +30,7 @@ class Command
 
     public function handle(Message $message, array $args)
     {
-        $subCommand = array_shift($args);
+        $subCommand = strtolower(array_shift($args));
 
         if (array_key_exists($subCommand, $this->subCommands)) {
             return $this->subCommands[$subCommand]->handle($message, $args);

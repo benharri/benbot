@@ -89,8 +89,12 @@ class Definitions {
     {
         $response = "available definitions:\n\n";
 
-        foreach (self::$bot->defs as $name => $def) {
-            $response .= "**$name**: $def\n";
+        if (isset($args[0]) && strtolower($args[0]) == "show") {
+            foreach (self::$bot->defs as $name => $def) {
+                $response .= "**$name**: $def\n";
+            }
+        } else {
+            $response .= implode(", ", self::$bot->defs->array_keys()) . "\n\ntype `;listdefs show` to show all definitions";
         }
 
         if (strlen($response) > 2000) {
