@@ -1,5 +1,6 @@
 <?php
 namespace BenBot;
+error_reporting(-1);
 
 use Discord\Discord;
 use Discord\Parts\User\Game;
@@ -84,6 +85,7 @@ class BenBot extends Discord {
                             Utils::sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$cmd]}", $this->imgs[$cmd], $cmd);
                         }
 
+
                         // look up command
                         if (array_key_exists($cmd, $this->cmds)) {
                             $command = $this->cmds[$cmd];
@@ -156,6 +158,7 @@ class BenBot extends Discord {
             $this->registerAllCommands();
 
             Utils::ping("bot started successfully");
+            echo PHP_EOL, "BOT STARTED SUCCESSFULLY", PHP_EOL;
 
         });
 

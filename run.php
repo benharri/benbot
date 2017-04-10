@@ -1,7 +1,7 @@
 <?php
 
 ini_set('display_errors', true);
-error_reporting(E_ALL);
+error_reporting(-1);
 
 
 if (!cli_set_process_title("BenBot")) {

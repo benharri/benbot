@@ -1,5 +1,6 @@
 <?php
 namespace BenBot;
+error_reporting(-1);
 
 use Carbon\Carbon;
 use Discord\Parts\Embed\Embed;

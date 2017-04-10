@@ -1,5 +1,6 @@
 <?php
 namespace BenBot;
+error_reporting(-1);
 
 use MessagePack\Packer;
 use MessagePack\Unpacker;

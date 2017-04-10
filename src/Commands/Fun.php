@@ -1,5 +1,6 @@
 <?php
 namespace BenBot\Commands;
+error_reporting(-1);
 
 class Fun {
 
