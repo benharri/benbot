@@ -38,11 +38,10 @@ class BenBot extends Discord {
     public function __construct($dir)
     {
 
-        $dotenv = new Dotenv($dir);
-        $dotenv->load();
+        (new Dotenv($dir))->load();
 
         parent::__construct([
-            'token'              => getenv('DISCORD_TOKEN'),
+            'token'          => getenv('DISCORD_TOKEN'),
             'pmChannels'     => true,
             'loadAllMembers' => true,
         ]);
@@ -67,11 +66,13 @@ class BenBot extends Discord {
             echo 'Caught exception: ', $e->getMessage(), PHP_EOL;
         }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
         $this->on('ready', function () {
             Utils::init($this);
             FontConverter::init();
             $this->updatePresence($this->game);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
             $this->on('message', function ($msg) {
                 $str = s($msg->content);
                 if (!$msg->author->bot) {
@@ -181,7 +182,7 @@ class BenBot extends Discord {
 
 
 
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
     public function registerAllCommands()
     {
         Commands\CleverBot::register($this);
@@ -189,12 +190,13 @@ class BenBot extends Discord {
         Commands\Definitions::register($this);
         Commands\Fonts::register($this);
         Commands\Fun::register($this);
+        Commands\Images::register($this);
         Commands\Jokes::register($this);
         Commands\Misc::register($this);
     }
 
 
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
     public function registerCommand($command, $callable, array $options = [])
     {
         if (array_key_exists($command, $this->cmds)) {
@@ -202,7 +204,7 @@ class BenBot extends Discord {
         }
 
         list($commandInstance, $options) = $this->buildCommand($command, $callable, $options);
-        $this->cmds[$command]        = $commandInstance;
+        $this->cmds[$command] = $commandInstance;
 
         foreach ($options['aliases'] as $alias) {
             $this->registerAlias($alias, $command);
