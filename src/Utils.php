@@ -13,7 +13,7 @@ class Utils {
     public static function init(&$that)
     {
         self::$bot = $that;
-        echo "Utils initialized.", PHP_EOL;
+        echo PHP_EOL, "Utils initialized.", PHP_EOL;
     }
 
 
@@ -23,6 +23,7 @@ class Utils {
         return $msg->channel->sendMessage($txt, false, $embed)
             ->otherwise(function($e) use ($msg) {
                 echo $e->getMessage(), PHP_EOL;
+                echo $e->getTraceAsString(), PHP_EOL;
                 $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
                 self::ping($e->getMessage());
             });
@@ -34,6 +35,7 @@ class Utils {
         return $msg->channel->sendFile($filepath, $filename, $txt)
             ->otherwise(function($e) use ($msg) {
                 echo $e->getMessage(), PHP_EOL;
+                echo $e->getTraceAsString(), PHP_EOL;
                 $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
                 self::ping($e->getMessage());
             });
@@ -46,83 +48,15 @@ class Utils {
     }
 
 
+    public static function getUserIDFromMsg($msg)
+    {
+        return self::isDM($msg) ? $msg->author->id : $msg->author->user->id;
+    }
+
+
     public static function timestampFromSnowflake ($snowflake)
     {
         return (($snowflake / 4194304) + 1420070400000) / 1000;
-    }
-
-
-    public static function celsiusToFahrenheit($celsius)
-    {
-        return $celsius * 9 / 5 + 32;
-    }
-
-    public static function fahrenheitToCelsius($fahrenheit)
-    {
-        return $fahrenheit * 5 / 9 + 32;
-    }
-
-    public static function formatWeatherJson($json, $timezone = null)
-    {
-
-        return self::$bot->factory(Embed::class, [
-            'title' => "Weather in {$json->name}, {$json->sys->country}",
-            'thumbnail' => ['url' => "http://openweathermap.org/img/w/{$json->weather[0]->icon}.png"],
-            'fields' => [
-                ['name' => 'Current temperature'
-                , 'value' => "{$json->main->temp}°C (".self::celsiusToFahrenheit($json->main->temp)."°F)"
-                , 'inline' => true
-                ],
-                ['name' => 'Low/High Forecasted Temp'
-                , 'value' => "{$json->main->temp_min}/{$json->main->temp_max}°C  " . self::celsiusToFahrenheit($json->main->temp_min) . "/" . self::celsiusToFahrenheit($json->main->temp_max) . "°F"
-                , 'inline' => true
-                ],
-                ['name' => 'Current conditions'
-                , 'value' => $json->weather[0]->description
-                , 'inline' => true
-                ],
-                ['name' => 'Atmospheric Pressure'
-                , 'value' => "{$json->main->pressure} hPa"
-                , 'inline' => true
-                ],
-                ['name' => 'Humidity'
-                , 'value' => "{$json->main->humidity} %"
-                , 'inline' => true
-                ],
-                ['name' => 'Wind'
-                , 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°"
-                , 'inline' => true
-                ],
-                ['name' => 'Sunrise'
-                , 'value' => Carbon::createFromTimestamp($json->sys->sunrise, $timezone)->toTimeString()
-                , 'inline' => true
-                ],
-                ['name' => 'Sunset'
-                , 'value' => Carbon::createFromTimestamp($json->sys->sunset, $timezone)->toTimeString()
-                , 'inline' => true
-                ],
-            ],
-            'timestamp' => null,
-        ]);
-
-    }
-
-
-
-    public static function askCleverbot($input)
-    {
-        $deferred = new Deferred();
-
-        $url = "https://www.cleverbot.com/getreply";
-        $key = getenv('CLEVERBOT_API_KEY');
-        $input = rawurlencode($input);
-        self::$bot->discord->http->get("$url?input=$input&key=$key", null, [], false)->then(function ($apidata) use ($deferred) {
-            $deferred->resolve($apidata);
-        }, function ($e) {
-            $deferred->reject($e);
-        });
-
-        return $deferred->promise();
     }
 
 
@@ -136,6 +70,7 @@ class Utils {
             ->channels->get('id','297082205048668160')
             ->sendMessage("<@193011352275648514>, $msg");
     }
+
 
     public static function secondsConvert($uptime)
     {
@@ -152,22 +87,37 @@ class Utils {
         // Send out formatted string
         $return = array();
         if ($years > 0) {
-            $return[] = $years.' '.($years > 1 ? self::$lang['years'] : substr(self::$lang['years'], 0, strlen(self::$lang['years']) - 1));
+            $return[] = $years.' '.($years > 1 ? 'years' : 'year');
         }
         if ($days > 0) {
-            $return[] = $days.' '.self::$lang['days'];
+            $return[] = $days.' days';
         }
         if ($hours > 0) {
-            $return[] = $hours.' '.self::$lang['hours'];
+            $return[] = $hours.' hours';
         }
         if ($minutes > 0) {
-            $return[] = $minutes.' '.self::$lang['minutes'];
+            $return[] = $minutes.' minutes';
         }
         if ($seconds > 0) {
-            $return[] = $seconds.(date('m/d') == '06/03' ? ' sex' : ' '.self::$lang['seconds']);
+            $return[] = $seconds.(date('m/d') == '06/03' ? ' sex' : ' seconds');
         }
         return implode(', ', $return);
     }
+
+
+    public static function convertMemoryUsage($system = false)
+    {
+        $mem_usage = memory_get_usage($system);
+
+        if ($mem_usage < 1024) {
+            return "$mem_usage bytes";
+        } elseif ($mem_usage < 1048576) {
+            return round($mem_usage / 1024, 2) . " kilobytes";
+        } else {
+            return round($mem_usage / 1048576, 2) . " megabytes";
+        }
+    }
+
 
     public static function deleteMessage($msg)
     {
@@ -185,10 +135,12 @@ class Utils {
         return $deferred->promise();
     }
 
-    public function editMessage($msg, $text)
+
+    public static function editMessage($msg, $text)
     {
         $deferred = new Deferred();
-        $this->discord->http->patch(
+
+        self::$bot->http->patch(
             "channels/{$msg->channel->id}/messages/{$msg->id}",
             [
                 'content' => $text
@@ -198,9 +150,26 @@ class Utils {
                 $msg->fill($response);
                 $deferred->resolve($msg);
             },
-            \React\Partial\bind_right($msg->reject, $deferred)
+            \React\Partial\bind_right($this->reject, $deferred)
         );
         return $deferred->promise();
+    }
+
+
+    public static function arrayFlatten($array)
+    {
+        if (!is_array($array)) {
+            return false;
+        }
+        $result = [];
+        foreach ($array as $key => $val) {
+            if (is_array($val)) {
+                $result = array_merge($result, self::arrayFlatten($val));
+            } else {
+                $result[$key] = $val;
+            }
+        }
+        return $result;
     }
 
 }

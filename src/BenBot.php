@@ -10,6 +10,7 @@ use BenBot\Utils;
 use BenBot\SerializedArray;
 use BenBot\Command;
 use BenBot\Commands;
+use BenBot\FontConverter;
 
 use Carbon\Carbon;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,6 +28,7 @@ class BenBot extends Discord {
     public $emails;
     public $jokes;
     public $yomamajokes;
+    public $copypastas;
 
     protected $help;
     protected $game;
@@ -48,6 +50,7 @@ class BenBot extends Discord {
         $this->dir         = $dir;
         $this->help        = [];
         $this->jokes       = explode("---", file_get_contents("$dir/miscjokes.txt"));
+        $this->copypastas  = explode("---", file_get_contents("$dir/copypasta.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
 
 
@@ -66,6 +69,7 @@ class BenBot extends Discord {
 
         $this->on('ready', function () {
             Utils::init($this);
+            FontConverter::init();
             $this->updatePresence($this->game);
 
             $this->on('message', function ($msg) {
@@ -86,6 +90,20 @@ class BenBot extends Discord {
                         }
 
 
+                        // make sure stringys are strings
+                        foreach ($args as $key => $arg) {
+                            $args[$key] = (string) $arg;
+                        }
+
+                        // do the font stuff!
+                        if (array_key_exists($cmd, FontConverter::$fonts)) {
+                            Utils::send($msg, FontConverter::$cmd(implode(" ", $args)) . "\n--{$msg->author}")->then(function ($result) use ($msg) {
+                                Utils::deleteMessage($msg);
+                            });
+                            return;
+                        }
+
+
                         // look up command
                         if (array_key_exists($cmd, $this->cmds)) {
                             $command = $this->cmds[$cmd];
@@ -95,10 +113,6 @@ class BenBot extends Discord {
                             return;
                         }
 
-                        // make sure stringys are strings
-                        foreach ($args as $key => $arg) {
-                            $args[$key] = (string) $arg;
-                        }
                         // do the command
                         $result = $command->handle($msg, $args);
 
@@ -106,15 +120,16 @@ class BenBot extends Discord {
                         if (is_string($result)) {
                             Utils::send($msg, $result);
                         }
+
+                    } elseif (Utils::isDM($msg)) {
+                        $msg->channel->broadcastTyping();
+                        Commands\CleverBot::askCleverbot((string) $str)->then(function ($result) use ($msg) {
+                            Utils::send($msg, $result->output);
+                        }, function ($e) {
+                            echo $e->getMessage(), PHP_EOL;
+                        });
                     }
 
-                } elseif (Utils::isDM($msg)) {
-                    $msg->channel->broadcastTyping();
-                    Utils::askCleverbot($str)->then(function ($result) use ($msg) {
-                        Utils::send($msg, $result->output);
-                    }, function ($e) {
-                        echo $e->getMessage(), PHP_EOL;
-                    });
                 }
 
 
@@ -158,7 +173,7 @@ class BenBot extends Discord {
             $this->registerAllCommands();
 
             Utils::ping("bot started successfully");
-            echo PHP_EOL, "BOT STARTED SUCCESSFULLY", PHP_EOL;
+            echo PHP_EOL, "BOT STARTED SUCCESSFULLY", PHP_EOL, PHP_EOL;
 
         });
 
@@ -166,12 +181,16 @@ class BenBot extends Discord {
 
 
 
+
     public function registerAllCommands()
     {
-        Commands\Fun::register($this);
+        Commands\CleverBot::register($this);
         Commands\Debug::register($this);
-        Commands\Misc::register($this);
+        Commands\Definitions::register($this);
+        Commands\Fonts::register($this);
+        Commands\Fun::register($this);
         Commands\Jokes::register($this);
+        Commands\Misc::register($this);
     }
 
 

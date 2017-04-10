@@ -3,6 +3,7 @@ namespace BenBot\Commands;
 error_reporting(-1);
 
 use BenBot\Utils;
+use function Stringy\create as s;
 
 class Misc {
 
@@ -22,6 +23,28 @@ class Misc {
                 'textben',
             ],
             'registerHelp' => true,
+        ]);
+        self::$bot->registerCommand('say', [__CLASS__, 'say'], [
+            'description' => 'says stuff back to you',
+            'usage' => '<stuff to say>',
+            'registerHelp' => true,
+        ]);
+        self::$bot->registerCommand('dm', [__CLASS__, 'dm'], [
+            'description' => 'sends a dm',
+            'usage' => '<@user> <message>',
+            'registerHelp' => true,
+            'aliases' => [
+                'pm',
+            ],
+        ]);
+        self::$bot->registerCommand('avatar', [__CLASS__, 'avatar'], [
+            'description' => 'gets avatar for a user (gets your own if you don\'t mention anyone)',
+            'usage' => '<@user>',
+            'aliases' => [
+                'profilepic',
+                'pic',
+                'userpic',
+            ],
         ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
@@ -58,4 +81,62 @@ class Misc {
             return "message sent to benh";
         }
     }
+
+    public static function say($msg, $args)
+    {
+        $a = s(implode(" ", $args));
+        if ($a->contains("@everyone") || $a->contains("@here")) {
+            return "sorry can't do that! :P";
+        }
+        Utils::send($msg, "$a\n\n**love**, {$msg->author}")->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
+    }
+
+    public static function sing($msg, $args)
+    {
+        $a = s(implode(" ", $args));
+        if ($a->contains("@everyone") || $a->contains("@here")) {
+            return "sorry can't do that! :P";
+        }
+        Utils::send($msg, ":musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:\n\n$a\n\n:musical_note::musical_note::musical_note::musical_note::musical_note::musical_note:, {$msg->author}")->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+        });
+    }
+
+    public static function dm($msg, $args)
+    {
+        if (Utils::isDM($msg)) {
+            return "you're already in a DM, silly";
+        }
+        if (count($msg->mentions) == 0) {
+            $msg->author->user->sendMessage("hi, {$msg->author} said:\n" . implode(" ", $args));
+        } else {
+            foreach ($msg->mentions as $mention) {
+                $mention->sendMessage("hi!\n{$msg->author} said:\n\n" . implode(" ", $args));
+            }
+        }
+        Utils::send($msg, "sent!")->then(function ($result) use ($msg) {
+            Utils::deleteMessage($msg);
+            self::$bot->loop->addTimer(3, function ($timer) use ($msg, $result) {
+                Utils::deleteMessage($result);
+            });
+        });
+    }
+
+    public static function avatar($msg, $args)
+    {
+        if (count($msg->mentions) === 0) {
+            if (Utils::isDM($msg)) {
+                Utils::send($msg, $msg->author->avatar);
+            } else {
+                Utils::send($msg, $msg->author->user->avatar);
+            }
+        } else {
+            foreach ($msg->mentions as $mention) {
+                Utils::send($msg, $mention->avatar);
+            }
+        }
+    }
+
 }
