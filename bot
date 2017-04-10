@@ -3,57 +3,63 @@
 pid=$(ps -ef | grep bot.php | grep -v grep | awk '{print $2}')
 
 case "$1" in
-        nohup)
-            if [ "" == "$pid" ]; then
-		echo "starting bot in background (nohup)"
-                nohup php bot.php > bot.out 2> bot.err < /dev/null &
-            else
-                echo "bot already running"
-            fi
-            ;;
 
-        start)
-            if [ "" != "$pid" ]; then
-                kill $pid
-            fi
-            php bot.php
-            ;;
-
-        stop)
-            if [ "" != "$pid" ]; then
-                echo "killing bot ($pid)"
-                kill $pid
-            fi
-            ;;
-
-        status)
-            if [ "" != "$pid" ]; then
-                echo "bot running with pid $pid"
-            else
-                echo "bot not running"
-            fi
-            ;;
-
-	log)
-	    if [ "" != "$pid" ]; then
-		less bot.out
-	    else 
-		echo "bot not running"
-	    fi
-	    ;;
-
-        restart)
-            if [ "" != "$pid" ]; then
-                echo "killing bot ($pid)"
-                kill $pid
-            fi
-	    echo "starting bot in background (nohup)"
+    nohup)
+        if [ "" == "$pid" ]; then
+            echo "starting bot in background (nohup)"
             nohup php bot.php > bot.out 2> bot.err < /dev/null &
-            ;;
+        else
+            echo "bot already running"
+        fi
+        ;;
+
+    start)
+        if [ "" != "$pid" ]; then
+            kill $pid
+        fi
+        php bot.php
+        ;;
+
+    stop)
+        if [ "" != "$pid" ]; then
+            echo "killing bot ($pid)"
+            kill $pid
+        fi
+        ;;
+
+    status)
+        if [ "" != "$pid" ]; then
+            echo "bot running with pid $pid"
+        else
+            echo "bot not running"
+        fi
+        ;;
+
+    log)
+        if [ "" != "$pid" ]; then
+        less bot.out
+        else
+        echo "bot not running"
+        fi
+        ;;
+
+    check)
+        find ./src -name \*.php -exec php -l "{}" \;
+        php -l *.php
+        ;;
+
+    restart)
+        if [ "" != "$pid" ]; then
+            echo "killing bot ($pid)"
+            kill $pid
+        fi
+        echo "starting bot in background (nohup)"
+        nohup php bot.php > bot.out 2> bot.err < /dev/null &
+        ;;
 
 
-        *)
-            echo $"Usage: $0 {start|nohup|stop|restart|log|status}"
-            exit 1
+    *)
+        echo $"Usage: $0 {start|nohup|stop|restart|log|status}"
+        exit 1
 
 esac
