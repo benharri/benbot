@@ -35,14 +35,13 @@ case "$1" in
         fi
         ;;
 
-
-    log)
-        if [ "" != "$pid" ]; then
-            less bot.out
-        else
-            echo "bot not running"
-        fi
-        ;;
+	log)
+	    if [ "" != "$pid" ]; then
+		less bot.out
+	    else
+		echo "bot not running"
+	    fi
+	    ;;
 
     check)
         find ./src -name \*.php -exec php -l "{}" \;
