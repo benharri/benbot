@@ -13,14 +13,14 @@ class Fonts {
     {
         self::$bot = $that;
 
-        self::$bot->registerCommand('fontlist', [__CLASS__, 'fontlist'], [
+        self::$bot->registerCommand('fonts', [__CLASS__, 'fontlist'], [
             'description' => 'change your message to another font',
             'registerHelp' => true,
             'aliases' => [
                 'listfonts',
                 'font',
                 'text',
-                'fonts',
+                'fontlist',
             ],
         ]);
         self::$bot->registerCommand('block', [__CLASS__, 'blockText'], [

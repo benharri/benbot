@@ -5,6 +5,10 @@ error_reporting(-1);
 use BenBot\Utils;
 use BenBot\Cities;
 
+use Discord\Parts\Embed\Embed;
+use Carbon\Carbon;
+
+
 class Weather {
 
     private static $bot;
@@ -18,28 +22,70 @@ class Weather {
             'usage' => '<@user | city, country>',
             'registerHelp' => true,
         ]);
-            $weather->registerSubCommand('save', "BenBot\Commands\Cities::saveCity", [
+            $weather->registerSubCommand('save', ['BenBot\Commands\Cities', 'saveCity'], [
                 'description' => 'saves a city for a user to look up weather and current time',
             ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
 
+
+
     public static function weather($msg, $args)
     {
-        return "WIP";
+        $id = Utils::getUserIDFromMsg($msg);
+        $api_key = getenv('OWM_API_KEY');
+        $url = "http://api.openweathermap.org/data/2.5/weather?APPID=$api_key&units=metric&";
+
+        if (count($args) <= 1 && $args[0] == "") {
+            echo "looking up weather for {$msg->author} $id";
+            if (isset(self::$bot->cities[$id])) {
+                $city = self::$bot->cities[$id];
+                $url .= "id={$city["id"]}";
+                self::$bot->http->get($url)->then(function ($result) use ($msg, $city) {
+                    Utils::send($msg, "", self::formatWeatherJson($result, $city["timezone"]));
+                });
+            } else {
+                return "you can set your city with `;weather save <city>`";
+            }
+        } else {
+            if (count($msg->mentions) > 0) {
+                foreach ($msg->mentions as $mention) {
+                    if (isset(self::$bot->cities[$mention->id])) {
+                        $city = self::$bot->cities[$mention->id];
+                        $url .= "id={$city["id"]}";
+                        self::$bot->http->get($url)->then(function ($result) use ($msg, $city) {
+                            Utils::send($msg, "", self::formatWeatherJson($result, $city["timezone"]));
+                        });
+                    } else {
+                        return "no city saved for $mention.\nset a preferred city with `;weather save <city> $mention`";
+                    }
+                }
+            } else {
+                $query = rawurlencode(implode(" ", $args));
+                $url .= "q=$query";
+                self::$bot->http->get($url)->then(function ($result) use ($msg) {
+                    Utils::send($msg, "", self::formatWeatherJson($result));
+                });
+            }
+        }
     }
 
 
+    ////////////////////////////////////////////////////
+    // util fns
+    ////////////////////////////////////////////////////
     public static function celsiusToFahrenheit($celsius)
     {
         return $celsius * 9 / 5 + 32;
     }
 
+
     public static function fahrenheitToCelsius($fahrenheit)
     {
         return $fahrenheit * 5 / 9 + 32;
     }
+
 
     public static function formatWeatherJson($json, $timezone = null)
     {
