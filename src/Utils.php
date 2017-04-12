@@ -65,9 +65,12 @@ class Utils {
         if (is_null(self::$bot)) {
             throw new \Exception("Utils class not initialized");
         }
+
+        $channel_id = self::$bot->devbot ? '297082205048668160' : '289611811094003715';
+
         return self::$bot
             ->guilds->get('id', '289410862907785216')
-            ->channels->get('id','297082205048668160')
+            ->channels->get('id', $channel_id)
             ->sendMessage("<@193011352275648514>, $msg");
     }
 
