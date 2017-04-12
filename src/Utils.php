@@ -1,5 +1,6 @@
 <?php
 namespace BenBot;
+error_reporting(-1);
 
 use Carbon\Carbon;
 use Discord\Parts\Embed\Embed;
@@ -7,130 +8,72 @@ use React\Promise\Deferred;
 
 class Utils {
 
-    protected $discord;
+    private static $bot;
 
-    public function __construct($discord)
+    public static function init(&$that)
     {
-        $this->discord = $discord;
+        self::$bot = $that;
+        echo PHP_EOL, "Utils initialized.", PHP_EOL;
     }
 
-    public static function charIn($str)
-    {
-        for ($i = 0; $i <= strlen($str); $i++) {
-            yield substr($str, $i, 1);
-        }
-    }
 
-    public function send($msg, $txt, $embed = null)
+
+    public static function send($msg, $txt, $embed = null)
     {
         return $msg->channel->sendMessage($txt, false, $embed)
             ->otherwise(function($e) use ($msg) {
                 echo $e->getMessage(), PHP_EOL;
-                $this->pingMe($e->getMessage());
+                echo $e->getTraceAsString(), PHP_EOL;
                 $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
+                self::ping($e->getMessage());
             });
     }
 
-    public function sendFile($msg, $filepath, $filename, $txt)
+
+    public static function sendFile($msg, $filepath, $filename, $txt)
     {
         return $msg->channel->sendFile($filepath, $filename, $txt)
             ->otherwise(function($e) use ($msg) {
                 echo $e->getMessage(), PHP_EOL;
-                $this->pingMe($e->getMessage());
+                echo $e->getTraceAsString(), PHP_EOL;
                 $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
+                self::ping($e->getMessage());
             });
     }
+
 
     public static function isDM($msg)
     {
         return $msg->channel->is_private;
     }
 
+
+    public static function getUserIDFromMsg($msg)
+    {
+        return self::isDM($msg) ? $msg->author->id : $msg->author->user->id;
+    }
+
+
     public static function timestampFromSnowflake ($snowflake)
     {
         return (($snowflake / 4194304) + 1420070400000) / 1000;
     }
 
-    public static function celsiusToFahrenheit($celsius)
+
+    public static function ping($msg)
     {
-        return $celsius * 9 / 5 + 32;
-    }
+        if (is_null(self::$bot)) {
+            throw new \Exception("Utils class not initialized");
+        }
 
-    public static function fahrenheitToCelsius($fahrenheit)
-    {
-        return $fahrenheit * 5 / 9 + 32;
-    }
+        $channel_id = self::$bot->devbot ? '297082205048668160' : '289611811094003715';
 
-    public function formatWeatherJson($json, $timezone = null)
-    {
-
-        return $this->discord->factory(Embed::class, [
-            'title' => "Weather in {$json->name}, {$json->sys->country}",
-            'thumbnail' => ['url' => "http://openweathermap.org/img/w/{$json->weather[0]->icon}.png"],
-            'fields' => [
-                ['name' => 'Current temperature'
-                , 'value' => "{$json->main->temp}°C (".self::celsiusToFahrenheit($json->main->temp)."°F)"
-                , 'inline' => true
-                ],
-                ['name' => 'Low/High Forecasted Temp'
-                , 'value' => "{$json->main->temp_min}/{$json->main->temp_max}°C  " . self::celsiusToFahrenheit($json->main->temp_min) . "/" . self::celsiusToFahrenheit($json->main->temp_max) . "°F"
-                , 'inline' => true
-                ],
-                ['name' => 'Current conditions'
-                , 'value' => $json->weather[0]->description
-                , 'inline' => true
-                ],
-                ['name' => 'Atmospheric Pressure'
-                , 'value' => "{$json->main->pressure} hPa"
-                , 'inline' => true
-                ],
-                ['name' => 'Humidity'
-                , 'value' => "{$json->main->humidity} %"
-                , 'inline' => true
-                ],
-                ['name' => 'Wind'
-                , 'value' => "{$json->wind->speed} meters/second, {$json->wind->deg}°"
-                , 'inline' => true
-                ],
-                ['name' => 'Sunrise'
-                , 'value' => Carbon::createFromTimestamp($json->sys->sunrise, $timezone)->toTimeString()
-                , 'inline' => true
-                ],
-                ['name' => 'Sunset'
-                , 'value' => Carbon::createFromTimestamp($json->sys->sunset, $timezone)->toTimeString()
-                , 'inline' => true
-                ],
-            ],
-            'timestamp' => null,
-        ]);
-
-    }
-
-
-
-    public function askCleverbot($input)
-    {
-        $deferred = new Deferred();
-
-        $url = "https://www.cleverbot.com/getreply";
-        $key = getenv('CLEVERBOT_API_KEY');
-        $input = rawurlencode($input);
-        $this->discord->http->get("$url?input=$input&key=$key", null, [], false)->then(function ($apidata) use ($deferred) {
-            $deferred->resolve($apidata);
-        }, function ($e) {
-            $deferred->reject($e);
-        });
-
-        return $deferred->promise();
-    }
-
-    public function pingMe($msg)
-    {
-        return $this->discord
+        return self::$bot
             ->guilds->get('id', '289410862907785216')
-            ->channels->get('id','289611811094003715')
+            ->channels->get('id', $channel_id)
             ->sendMessage("<@193011352275648514>, $msg");
     }
+
 
     public static function secondsConvert($uptime)
     {
@@ -147,22 +90,37 @@ class Utils {
         // Send out formatted string
         $return = array();
         if ($years > 0) {
-            $return[] = $years.' '.($years > 1 ? self::$lang['years'] : substr(self::$lang['years'], 0, strlen(self::$lang['years']) - 1));
+            $return[] = $years.' '.($years > 1 ? 'years' : 'year');
         }
         if ($days > 0) {
-            $return[] = $days.' '.self::$lang['days'];
+            $return[] = $days.' days';
         }
         if ($hours > 0) {
-            $return[] = $hours.' '.self::$lang['hours'];
+            $return[] = $hours.' hours';
         }
         if ($minutes > 0) {
-            $return[] = $minutes.' '.self::$lang['minutes'];
+            $return[] = $minutes.' minutes';
         }
         if ($seconds > 0) {
-            $return[] = $seconds.(date('m/d') == '06/03' ? ' sex' : ' '.self::$lang['seconds']);
+            $return[] = $seconds.(date('m/d') == '06/03' ? ' sex' : ' seconds');
         }
         return implode(', ', $return);
     }
+
+
+    public static function convertMemoryUsage($system = false)
+    {
+        $mem_usage = memory_get_usage($system);
+
+        if ($mem_usage < 1024) {
+            return "$mem_usage bytes";
+        } elseif ($mem_usage < 1048576) {
+            return round($mem_usage / 1024, 2) . " kilobytes";
+        } else {
+            return round($mem_usage / 1048576, 2) . " megabytes";
+        }
+    }
+
 
     public static function deleteMessage($msg)
     {
@@ -180,10 +138,12 @@ class Utils {
         return $deferred->promise();
     }
 
-    public function editMessage($msg, $text)
+
+    public static function editMessage($msg, $text)
     {
         $deferred = new Deferred();
-        $this->discord->http->patch(
+
+        self::$bot->http->patch(
             "channels/{$msg->channel->id}/messages/{$msg->id}",
             [
                 'content' => $text
@@ -193,9 +153,26 @@ class Utils {
                 $msg->fill($response);
                 $deferred->resolve($msg);
             },
-            \React\Partial\bind_right($msg->reject, $deferred)
+            \React\Partial\bind_right($this->reject, $deferred)
         );
         return $deferred->promise();
+    }
+
+
+    public static function arrayFlatten($array)
+    {
+        if (!is_array($array)) {
+            return false;
+        }
+        $result = [];
+        foreach ($array as $key => $val) {
+            if (is_array($val)) {
+                $result = array_merge($result, self::arrayFlatten($val));
+            } else {
+                $result[$key] = $val;
+            }
+        }
+        return $result;
     }
 
 }

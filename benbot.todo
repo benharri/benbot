@@ -5,7 +5,7 @@
  ✔ Send direct message to any user [1 pts] @done (17-03-27 00:53)
  ☐ Permissions for commands based on user’s permissions [2 pts]
  ✔ Talk to Cleverbot [3 pts] @done (17-03-27 00:53)
- ☐ Save images and retrieve them later [5 pts]
+ ✔ Save images and retrieve them later [5 pts] @done (17-04-10 19:38)
  ✔ Save text and retrieve it later [2 pts] @done (17-03-27 00:53)
  ✔ Send me a text message [2 pts] @done (17-03-27 00:53)
  ☐ Send emails to a saved address for a user [2 pts]
@@ -18,6 +18,6 @@
    ☐ Stream music from YouTube to a voice channel [10 pts]
  ☐ Create and vote on polls [5 pts]
  ☐ Chat games (TicTacToe, Hangman, or both) [10 pts]
- ☐ Text transform (block emojis, unicode fonts, and ASCII art) [3 pts]
+ ✔ Text transform (block emojis, unicode fonts, and ASCII art) [3 pts] @done (17-04-10 19:38)
  ✔ Roll an n-sided die [1 pts] @done (17-03-27 00:53)
  ✔ 8-Ball style fortunes [2 pts] @done (17-03-27 00:53)

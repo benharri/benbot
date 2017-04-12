@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////
 // config
 ///////////////////////////////////////////////////////////
-error_reporting(E_ALL);
+error_reporting(-1);
 
 include __DIR__.'/vendor/autoload.php';
 
@@ -64,6 +64,7 @@ $discord->on('ready', function ($discord) use ($game, $defs, $imgs, $starttime, 
     $discord->on('message', function ($msg) use ($defs, $imgs, $utils) {
         // for stuff that isn't a command
         $str = s($msg->content);
+
 
         if (!$msg->author->bot) {
 

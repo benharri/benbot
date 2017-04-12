@@ -35,11 +35,12 @@ case "$1" in
         fi
         ;;
 
+
     log)
         if [ "" != "$pid" ]; then
-        less bot.out
+            less bot.out
         else
-        echo "bot not running"
+            echo "bot not running"
         fi
         ;;
 

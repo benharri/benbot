@@ -1,37 +1,17 @@
 <?php
 namespace BenBot;
+error_reporting(-1);
 
 use BenBot\Utils;
 use function Stringy\create as s;
 
 class FontConverter {
 
-    public static function blockText($text) {
-        $ret = "";
-        foreach (s($text)->toLowerCase() as $char) {
-            if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
-            else if (ctype_digit($char)) {
-                switch ($char) {
-                    case 0: $ret .= ":zero: "; break;
-                    case 1: $ret .= ":one: "; break;
-                    case 2: $ret .= ":two: "; break;
-                    case 3: $ret .= ":three: "; break;
-                    case 4: $ret .= ":four: "; break;
-                    case 5: $ret .= ":five: "; break;
-                    case 6: $ret .= ":six: "; break;
-                    case 7: $ret .= ":seven: "; break;
-                    case 8: $ret .= ":eight: "; break;
-                    case 9: $ret .= ":nine: "; break;
-                }
-            }
-            else if ($char == " ") $ret .= "   ";
-        }
-        return $ret;
-    }
+    public static $fonts;
 
-    public static function __callStatic($name, $args)
+    public static function init()
     {
-        $fonts = [
+        self::$fonts = [
             'full' => [
                 'lowers' => s('ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ'),
                 'uppers' => s('ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ'),
@@ -78,9 +58,37 @@ class FontConverter {
                 'nums' => s('０１２３４５６７８９'),
             ],
         ];
-        if (!isset($fonts[$name])) {
+    }
+
+    public static function blockText($text) {
+        $ret = "";
+        foreach (s($text)->toLowerCase() as $char) {
+            if (ctype_alpha($char)) $ret .= ":regional_indicator_" . $char . ": ";
+            else if (ctype_digit($char)) {
+                switch ($char) {
+                    case 0: $ret .= ":zero: "; break;
+                    case 1: $ret .= ":one: "; break;
+                    case 2: $ret .= ":two: "; break;
+                    case 3: $ret .= ":three: "; break;
+                    case 4: $ret .= ":four: "; break;
+                    case 5: $ret .= ":five: "; break;
+                    case 6: $ret .= ":six: "; break;
+                    case 7: $ret .= ":seven: "; break;
+                    case 8: $ret .= ":eight: "; break;
+                    case 9: $ret .= ":nine: "; break;
+                }
+            }
+            else if ($char == " ") $ret .= "   ";
+        }
+        return $ret;
+    }
+
+    public static function __callStatic($name, $args)
+    {
+
+        if (!isset(self::$fonts[$name])) {
             $ret = "sorry that font doesn't exist. try these fonts:\n";
-            $ret .= implode(", ", array_keys($fonts));
+            $ret .= implode(", ", array_keys(self::$fonts));
             return $ret;
         }
 
@@ -88,11 +96,11 @@ class FontConverter {
         foreach (s($args[0]) as $char) {
             $ord = ord($char);
             if ($ord >= ord('0') && $ord <= ord('9')) {
-                $ret .= $fonts[$name]["nums"][$ord - ord('0')];
+                $ret .= self::$fonts[$name]["nums"][$ord - ord('0')];
             } elseif ($ord >= ord('a') && $ord <= ord('z')) {
-                $ret .= $fonts[$name]["lowers"][$ord - ord('a')];
+                $ret .= self::$fonts[$name]["lowers"][$ord - ord('a')];
             } elseif ($ord >= ord('A') && $ord <= ord('Z')) {
-                $ret .= $fonts[$name]["uppers"][$ord - ord('A')];
+                $ret .= self::$fonts[$name]["uppers"][$ord - ord('A')];
             } elseif ($char == " ") {
                 $ret .= " ";
             } else {

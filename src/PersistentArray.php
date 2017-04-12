@@ -1,10 +1,11 @@
 <?php
 namespace BenBot;
+error_reporting(-1);
 
 use MessagePack\Packer;
 use MessagePack\Unpacker;
 
-class SerializedArray implements \ArrayAccess, \Iterator {
+class PersistentArray implements \ArrayAccess, \Iterator {
 
     protected $data;
     protected $filepath;
@@ -19,18 +20,22 @@ class SerializedArray implements \ArrayAccess, \Iterator {
         }
     }
 
+
     public function __debugInfo()
     {
         return print_r($this->data, true);
     }
 
+
     public function __call($func, $argv)
     {
         if (!is_callable($func) || substr($func, 0, 6) !== 'array_') {
-            throw new BadMethodCallException(__CLASS__.'->'.$func);
+            throw new \BadMethodCallException(__CLASS__ . "->$func");
         }
-        return call_user_func_array($func, array_merge(array($this->getArrayCopy()), $argv));
+        $copy = $this->data;
+        return call_user_func_array($func, array_merge([$copy], $argv));
     }
+
 
     // array access methods
     public function offsetGet($offset)
