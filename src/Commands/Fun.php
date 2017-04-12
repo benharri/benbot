@@ -88,7 +88,7 @@ class Fun {
             "Very doubtful",
         ];
 
-        if (count($args > 0)) {
+        if (count($args) > 0) {
             $response = "Your question: *" . implode(" ", $args) . "*\n\n**";
             $response .= $fortunes[array_rand($fortunes)] . "**";
             Utils::send($msg, $response)->then(function ($result) use ($msg) {
