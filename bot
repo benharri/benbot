@@ -6,7 +6,7 @@ case "$1" in
 
     nohup)
         if [ "" == "$pid" ]; then
-        	echo "starting bot in background (nohup)"
+            echo "starting bot in background (nohup)"
             nohup php bot.php > bot.out 2> bot.err < /dev/null &
         else
             echo "bot already running"
