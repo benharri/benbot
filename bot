@@ -1,15 +1,15 @@
 #!/bin/bash
 
-pid=$(ps -ef | grep bot.php | grep -v grep | awk '{print $2}')
+pid=$(ps -ef | grep BenBot | grep -v grep | awk '{print $2}')
 
 case "$1" in
 
     nohup)
         if [ "" == "$pid" ]; then
-            echo "starting bot in background (nohup)"
-            nohup php bot.php > bot.out 2> bot.err < /dev/null &
+            echo "starting BenBot in background (nohup)"
+            nohup php run.php > bot.out 2> bot.err < /dev/null &
         else
-            echo "bot already running"
+            echo "BenBot already running"
         fi
         ;;
 
@@ -17,21 +17,21 @@ case "$1" in
         if [ "" != "$pid" ]; then
             kill $pid
         fi
-        php bot.php
+        php run.php
         ;;
 
     stop)
         if [ "" != "$pid" ]; then
-            echo "killing bot ($pid)"
+            echo "killing BenBot ($pid)"
             kill $pid
         fi
         ;;
 
     status)
         if [ "" != "$pid" ]; then
-            echo "bot running with pid $pid"
+            echo "BenBot running with pid $pid"
         else
-            echo "bot not running"
+            echo "BenBot not running"
         fi
         ;;
 
@@ -39,7 +39,7 @@ case "$1" in
 	    if [ "" != "$pid" ]; then
 		less bot.out
 	    else
-		echo "bot not running"
+		echo "BenBot not running"
 	    fi
 	    ;;
 
@@ -50,11 +50,11 @@ case "$1" in
 
     restart)
         if [ "" != "$pid" ]; then
-            echo "killing bot ($pid)"
+            echo "killing BenBot ($pid)"
             kill $pid
         fi
-        echo "starting bot in background (nohup)"
-        nohup php bot.php > bot.out 2> bot.err < /dev/null &
+        echo "starting BenBot in background (nohup)"
+        nohup php run.php > bot.out 2> bot.err < /dev/null &
         ;;
 
 
