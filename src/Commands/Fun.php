@@ -60,7 +60,7 @@ class Fun {
 
     public static function rollDie($msg, $args)
     {
-        return "{$msg->author}, you rolled a " . rand(1, $args[0] ?? 6);
+        return "{$msg->author}, you rolled a " . rand(1, $args[0] == "" ? 6 : $args[0]);
     }
 
     public static function ask8Ball($msg, $args)
