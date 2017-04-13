@@ -1,11 +1,12 @@
 #!/bin/bash
 
-pid=$(ps -ef | grep BenBot | grep -v grep | awk '{print $2}')
+# pid=$(ps -ef | grep BenBot | grep -v grep | awk '{print $2}')
+pid=$(pidof BenBot)
 
 case "$1" in
 
     nohup)
-        if [ "" == "$pid" ]; then
+        if [ $pid ]; then
             echo "starting BenBot in background (nohup)"
             nohup php run.php > bot.out 2> bot.err < /dev/null &
         else
@@ -14,21 +15,22 @@ case "$1" in
         ;;
 
     start)
-        if [ "" != "$pid" ]; then
+        if [ $pid ]; then
             kill $pid
         fi
         php run.php
         ;;
 
     stop)
-        if [ "" != "$pid" ]; then
+        if [ $pid ]; then
             echo "killing BenBot ($pid)"
             kill $pid
         fi
         ;;
 
     status)
-        if [ "" != "$pid" ]; then
+        #pgrep BenBot && echo "Running"
+        if [ $pid ]; then
             echo "BenBot running with pid $pid"
         else
             echo "BenBot not running"
@@ -36,7 +38,7 @@ case "$1" in
         ;;
 
 	log)
-	    if [ "" != "$pid" ]; then
+	    if [ $pid ]; then
 		less bot.out
 	    else
 		echo "BenBot not running"
@@ -49,7 +51,7 @@ case "$1" in
         ;;
 
     restart)
-        if [ "" != "$pid" ]; then
+        if [ $pid ]; then
             echo "killing BenBot ($pid)"
             kill $pid
         fi
