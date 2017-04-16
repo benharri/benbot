@@ -30,6 +30,7 @@ class BenBot extends Discord {
     public $yomamajokes;
     public $copypastas;
     public $devbot;
+    public $chatgame;
 
     protected $help;
     protected $game;
@@ -54,7 +55,8 @@ class BenBot extends Discord {
         $this->copypastas  = explode("---", file_get_contents("$dir/copypasta.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
         $this->banner      = file_get_contents("{$this->dir}/banner.txt");
-        $this->devbot      = false;
+        $this->devbot      = true;
+        $this->chatgame    = [];
 
 
         $this->game = $this->factory(Game::class, [
@@ -197,6 +199,8 @@ class BenBot extends Discord {
         Commands\Images::register($this);
         Commands\Jokes::register($this);
         Commands\Misc::register($this);
+        Commands\Music::register($this);
+        Commands\Poll::register($this);
         Commands\Time::register($this);
         Commands\Weather::register($this);
     }
