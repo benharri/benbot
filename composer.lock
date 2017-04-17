@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "676653468ab450908cc80f8e315b4ac6",
-    "content-hash": "c419b7e23d4287a3eb4ed04700ff50e4",
+    "hash": "ebaa22f9bfd5738bf9031baa7ee7cb9a",
+    "content-hash": "b5e3abc5220abe545c89c3112bdb484f",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -894,6 +894,22 @@
                 "random"
             ],
             "time": "2017-03-13 16:27:32"
+        },
+        {
+            "name": "phpclasses/phpfiglet",
+            "version": "1.0.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://www.phpclasses.org/install/package/phpfiglet.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "phpfiglet_class.php"
+                ]
+            }
         },
         {
             "name": "psr/cache",

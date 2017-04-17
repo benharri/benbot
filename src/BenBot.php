@@ -190,6 +190,7 @@ class BenBot extends Discord {
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     public function registerAllCommands()
     {
+        Commands\AsciiArt::register($this);
         Commands\Cities::register($this);
         Commands\CleverBot::register($this);
         Commands\Debug::register($this);
