@@ -22,10 +22,12 @@ class AsciiArt {
         $it = new \RecursiveIteratorIterator($di);
         foreach ($it as $fileinfo) {
             if (pathinfo($fileinfo, PATHINFO_EXTENSION) == "flf") {
-                echo $fileinfo->getBasename(".flf"), PHP_EOL;
-                self::$fonts[] = $fileinfo->getBasename(".flf");
+                // echo $fileinfo->getBasename(".flf"), PHP_EOL;
+                self::$fonts[$fileinfo->getBasename(".flf")] = $fileinfo;
             }
         }
+
+        print_r(self::$fonts);
 
 
         self::$bot->registerCommand('ascii', [__CLASS__, 'ascii'], [
@@ -52,9 +54,11 @@ class AsciiArt {
 
         $process->stdout->on('data', function ($chunk) use ($msg, &$response) {
             Utils::send($msg, "```$chunk```");
+            print_r($chunk);
             $response .= $chunk;
             echo $chunk, PHP_EOL;
         });
+        print_r($response);
 
     }
 
