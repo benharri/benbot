@@ -18,10 +18,12 @@ class AsciiArt {
         self::$fonts = [];
 
         $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS;
-        $dir_iter = new DirectoryIterator(self::$bot->dir . "/fonts", $flags);
-        foreach ($dir_iter as $fileinfo) {
-            if ($fileinfo->isDir()) {
-                echo $fileinfo->getFilename(), PHP_EOL;
+        $di = new \RecursiveDirectoryIterator(self::$bot->dir . "/fonts", $flags);
+        $it = new \RecursiveIteratorIterator($di);
+        foreach ($it as $fileinfo) {
+            if (pathinfo($fileinfo, PATHINFO_EXTENSION) == "flf") {
+                echo $fileinfo->getBasename(".flf"), PHP_EOL;
+                self::$fonts[] = $fileinfo->getBasename(".flf");
             }
         }
 
@@ -58,10 +60,23 @@ class AsciiArt {
 
     public static function ascii2($msg, $args)
     {
-        $text = implode(" ", $args);
-        if (self::$figlet->loadfont())
+        if (array_key_exists($args[0], self::$fonts)) {
+            $filename = glob(self::$bot->dir . "/fonts/*/{$args[0]}.flf");
+            echo $filename, PHP_EOL;
+            if (self::$figlet->loadfont($filename)) {
+                array_shift($args);
+                $text = implode(" ", $args);
+                return "```" . self::$figlet->fetch($text) . "```";
+            } else {
+                return "something borked";
+            }
+        } else {
+            if (self::$figlet->loadfont(self::$bot->dir . "/fonts/ours/standard.flf")) {
+                $text = implode(" ", $args);
+                return "```" . self::$figlet->fetch($text) . "```";
+            }
+        }
 
-        return "```" . self::$figlet->fetch($text) . "```";
     }
 
 }
