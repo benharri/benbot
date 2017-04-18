@@ -33,7 +33,7 @@ class AsciiArt {
             'registerHelp' => true,
         ]);
             $ascii->registerSubCommand('list', [__CLASS__, 'listFonts'], [
-                'description' => 'lists available ascii fonts',
+                'description' => 'lists all ' . count(self::$fonts) . ' available ascii fonts',
                 'aliases' => [
                     'listfonts'
                 ],
