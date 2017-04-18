@@ -55,7 +55,7 @@ class BenBot extends Discord {
         $this->copypastas  = explode("---", file_get_contents("$dir/copypasta.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
         $this->banner      = file_get_contents("{$this->dir}/banner.txt");
-        $this->devbot      = true;
+        $this->devbot      = false;
         $this->chatgame    = [];
 
 
