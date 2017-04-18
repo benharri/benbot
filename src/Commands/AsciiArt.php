@@ -3,7 +3,7 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 use Discord\Helpers\Process;
-// use phpclasses\phpFiglet;
+use function Stringy\create as s;
 
 class AsciiArt {
 
@@ -14,31 +14,31 @@ class AsciiArt {
     public static function register(&$that)
     {
         self::$bot = $that;
-        self::$figlet = new \phpFiglet();
         self::$fonts = [];
 
-        $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS;
+        $flags = \FilesystemIterator::SKIP_DOTS
+               | \FilesystemIterator::UNIX_PATHS;
         $di = new \RecursiveDirectoryIterator(self::$bot->dir . "/fonts", $flags);
         $it = new \RecursiveIteratorIterator($di);
         foreach ($it as $fileinfo) {
             if (pathinfo($fileinfo, PATHINFO_EXTENSION) == "flf") {
-                // echo $fileinfo->getBasename(".flf"), PHP_EOL;
-                self::$fonts[$fileinfo->getBasename(".flf")] = $fileinfo;
+                self::$fonts[$fileinfo->getBasename(".flf")] = $fileinfo->getPathName();
             }
         }
+        asort(self::$fonts);
 
-        print_r(self::$fonts);
-
-
-        self::$bot->registerCommand('ascii', [__CLASS__, 'ascii'], [
+        $ascii = self::$bot->registerCommand('ascii', [__CLASS__, 'ascii'], [
             'description' => 'creates ascii word art',
-            'usage' => '<words>',
+            'usage' => '[font] <words>',
+            'registerHelp' => true,
         ]);
+            $ascii->registerSubCommand('list', [__CLASS__, 'listFonts'], [
+                'description' => 'lists available ascii fonts',
+                'aliases' => [
+                    'listfonts'
+                ],
+            ]);
 
-        self::$bot->registerCommand('ascii2', [__CLASS__, 'ascii2'], [
-            'description' => 'thanks',
-            'usage' => '<words>',
-        ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
@@ -46,41 +46,33 @@ class AsciiArt {
 
     public static function ascii($msg, $args)
     {
-        $text = implode(" ", $args);
-        $process = new Process('figlet ' . escapeshellarg($text));
-        $process->start(self::$bot->loop);
-
-        $response = "";
-
-        $process->stdout->on('data', function ($chunk) use ($msg, &$response) {
-            Utils::send($msg, "```$chunk```");
-            print_r($chunk);
-            $response .= $chunk;
-            echo $chunk, PHP_EOL;
-        });
-        print_r($response);
-
-    }
-
-    public static function ascii2($msg, $args)
-    {
         if (array_key_exists($args[0], self::$fonts)) {
-            $filename = glob(self::$bot->dir . "/fonts/*/{$args[0]}.flf");
-            echo $filename, PHP_EOL;
-            if (self::$figlet->loadfont($filename)) {
-                array_shift($args);
-                $text = implode(" ", $args);
-                return "```" . self::$figlet->fetch($text) . "```";
-            } else {
-                return "something borked";
-            }
+            $filepath = self::$fonts[$args[0]];
+            array_shift($args);
         } else {
-            if (self::$figlet->loadfont(self::$bot->dir . "/fonts/ours/standard.flf")) {
-                $text = implode(" ", $args);
-                return "```" . self::$figlet->fetch($text) . "```";
-            }
+            $filepath = self::$fonts["standard"];
         }
 
+        $text = implode(" ", $args);
+
+        $process = new Process("figlet -f $filepath '" . escapeshellarg($text) . "'");
+        $process->start(self::$bot->loop);
+
+        $process->stdout->on('data', function ($chunk) use ($msg) {
+            Utils::send($msg, "```$chunk```");
+        });
+
     }
+
+    public static function listFonts($msg, $args)
+    {
+        $response = "**available ASCII art fonts**:\n";
+        $response .= implode(", ", array_keys(self::$fonts));
+        $split = str_split($response, 2000);
+        foreach ($split as $part) {
+            Utils::send($msg, $part);
+        }
+    }
+
 
 }

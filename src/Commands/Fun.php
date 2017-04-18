@@ -14,8 +14,8 @@ class Fun {
         self::$bot = $that;
 
         self::$bot->registerCommand('roll', [__CLASS__, 'rollDie'], [
-            'description'  => 'rolls an n-sided die',
-            'usage'        => '<number of sides>',
+            'description'  => 'rolls an n-sided die (defaults to 6-sided)',
+            'usage'        => '[number of sides]',
             'registerHelp' => true,
         ]);
         self::$bot->registerCommand('8ball', [__CLASS__, 'ask8Ball'], [
@@ -44,12 +44,15 @@ class Fun {
         ]);
         self::$bot->registerCommand('kaomoji', [__CLASS__, 'kaomoji'], [
             'description' => 'shows a cool japanese emoji face thing',
-            'usage' => '<sad|happy|angry|confused|surprised>',
+            'usage' => '[sad|happy|angry|confused|surprised]',
             'registerHelp' => true,
         ]);
         self::$bot->registerCommand('bamboozle', [__CLASS__, 'bamboozle'], [
             'description' => 'bamboozled again',
-            'usage' => '<@user>',
+            'usage' => '[@user]',
+        ]);
+        self::$bot->registerCommand('trap', [__CLASS__, 'trap'], [
+            'description' => 'hmm',
         ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
@@ -181,6 +184,16 @@ $bs = "
         $response .= ", you've been heccin' bamboozled again!!!!!!!!!!!!!!!!!!!!!!!!";
         Utils::sendFile($msg, 'img/bamboozled.jpg', 'bamboozle.jpg', $response)->then(function ($result) use ($msg) {
             Utils::deleteMessage($msg);
+        });
+    }
+
+    public static function trap($msg, $args)
+    {
+        Utils::deleteMessage($msg);
+        Utils::send($msg, "traps are gay")->then(function ($result) {
+            self::$bot->loop->addTimer(5, function ($timer) use ($result) {
+                Utils::editMessage($result, "traps aren't gay");
+            });
         });
     }
 

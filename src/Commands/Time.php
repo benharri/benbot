@@ -18,7 +18,7 @@ class Time {
 
         $timeCmd = self::$bot->registerCommand('time', [__CLASS__, 'getUserTime'], [
             'description' => 'looks up times in different time zones. you can save a preferred city.',
-            'usage' => '<@user>',
+            'usage' => '[@user]',
             'registerHelp' => true,
         ]);
             $timeCmd->registerSubCommand('save', ['BenBot\Commands\Cities','saveCity'], [

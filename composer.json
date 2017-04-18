@@ -14,18 +14,8 @@
         "guzzlehttp/guzzle": "~6.0",
         "vlucas/phpdotenv": "^2.4",
         "rybakit/msgpack": "^0.2.2",
-        "voku/stringy": "^2.2",
-        "phpclasses/phpfiglet": ">=1.0.0"
+        "voku/stringy": "^2.2"
     },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https:\/\/www.phpclasses.org\/"
-        },
-        {
-            "packagist": false
-        }
-    ],
     "autoload": {
         "psr-4": {
             "BenBot\\": "src/"
