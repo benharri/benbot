@@ -23,6 +23,9 @@ class Poll {
 
     public static function createPoll($msg, $args)
     {
+        if ($args[0] == "") {
+            return "you didn't ask a question...";
+        }
         $question = implode(" ", $args);
         $response = "{$msg->author}'s poll:\n\n*$question*";
 

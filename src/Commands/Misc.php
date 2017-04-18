@@ -18,7 +18,7 @@ class Misc {
         ]);
         self::$bot->registerCommand('text_benh', [__CLASS__, 'textBenh'], [
             'description' => 'sends an SMS to benh',
-            'usage' => '<message>',
+            'usage' => '[message]',
             'aliases' => [
                 'textben',
             ],
@@ -26,7 +26,7 @@ class Misc {
         ]);
         self::$bot->registerCommand('say', [__CLASS__, 'say'], [
             'description' => 'says stuff back to you',
-            'usage' => '<stuff to say>',
+            'usage' => '[stuff to say]',
         ]);
         self::$bot->registerCommand('dm', [__CLASS__, 'dm'], [
             'description' => 'sends a dm',

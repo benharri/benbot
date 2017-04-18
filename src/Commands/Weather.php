@@ -23,8 +23,8 @@ class Weather {
             'registerHelp' => true,
         ]);
             $weather->registerSubCommand('save', ['BenBot\Commands\Cities', 'saveCity'], [
-                'description' => 'saves a city for a user to look up weather and current time',
-                'usage' => '<city search>',
+                'description' => "saves a city for a user (or yourself if you don't mention anyone)",
+                'usage' => '<city search> [@user]',
             ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
