@@ -14,7 +14,7 @@ class Images {
 
         $img = self::$bot->registerCommand('img', [__CLASS__, 'img'], [
             'description' => 'save and retrieve images',
-            'usage' => '<image to show>',
+            'usage' => '<name of image to show|list|save|rm>',
             'registerHelp' => true,
         ]);
             $img->registerSubCommand('save', [__CLASS__, 'save'], [

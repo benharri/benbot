@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "676653468ab450908cc80f8e315b4ac6",
-    "content-hash": "c419b7e23d4287a3eb4ed04700ff50e4",
+    "hash": "09f4876b867821345035442780bffc72",
+    "content-hash": "1d2019dc226f17f3580127036c7c2b6a",
     "packages": [
         {
             "name": "TrafficCophp/ByteBuffer",
@@ -1221,16 +1221,16 @@
         },
         {
             "name": "react/dns",
-            "version": "v0.4.7",
+            "version": "v0.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/dns.git",
-                "reference": "e09ca286e3e18fea93317315dd7fc59d7963af8a"
+                "reference": "86d3da64ebfbecddf6b940c6e69daa67c0f21a05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/dns/zipball/e09ca286e3e18fea93317315dd7fc59d7963af8a",
-                "reference": "e09ca286e3e18fea93317315dd7fc59d7963af8a",
+                "url": "https://api.github.com/repos/reactphp/dns/zipball/86d3da64ebfbecddf6b940c6e69daa67c0f21a05",
+                "reference": "86d3da64ebfbecddf6b940c6e69daa67c0f21a05",
                 "shasum": ""
             },
             "require": {
@@ -1259,7 +1259,7 @@
                 "dns",
                 "dns-resolver"
             ],
-            "time": "2017-03-31 16:21:48"
+            "time": "2017-04-16 11:20:57"
         },
         {
             "name": "react/event-loop",
@@ -1488,29 +1488,31 @@
         },
         {
             "name": "react/socket",
-            "version": "v0.6.0",
+            "version": "v0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "8bcba5679d6e58e19da6684136d7d6b5aff68e7a"
+                "reference": "57e3262b4b6098f7343cf16df393099dad5d5f11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/8bcba5679d6e58e19da6684136d7d6b5aff68e7a",
-                "reference": "8bcba5679d6e58e19da6684136d7d6b5aff68e7a",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/57e3262b4b6098f7343cf16df393099dad5d5f11",
+                "reference": "57e3262b4b6098f7343cf16df393099dad5d5f11",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "~2.0|~1.0",
                 "php": ">=5.3.0",
+                "react/dns": "0.4.*|0.3.*",
                 "react/event-loop": "0.4.*|0.3.*",
-                "react/promise": "^2.0 || ^1.1",
+                "react/promise": "^2.1 || ^1.2",
+                "react/promise-timer": "~1.0",
                 "react/stream": "^0.6 || ^0.5 || ^0.4.5"
             },
             "require-dev": {
                 "clue/block-react": "^1.1",
                 "phpunit/phpunit": "~4.8",
-                "react/socket-client": "^0.6"
+                "react/stream": "^0.6"
             },
             "type": "library",
             "autoload": {
@@ -1522,11 +1524,15 @@
             "license": [
                 "MIT"
             ],
-            "description": "Async, streaming plaintext TCP/IP and secure TLS socket server for React PHP",
+            "description": "Async, streaming plaintext TCP/IP and secure TLS socket server and client connections for ReactPHP",
             "keywords": [
-                "Socket"
+                "Connection",
+                "Socket",
+                "async",
+                "reactphp",
+                "stream"
             ],
-            "time": "2017-04-04 15:40:25"
+            "time": "2017-04-10 20:52:43"
         },
         {
             "name": "react/socket-client",
@@ -2215,16 +2221,16 @@
         },
         {
             "name": "voku/portable-utf8",
-            "version": "3.1.17",
+            "version": "3.1.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/portable-utf8.git",
-                "reference": "7fb737ddebc7801f9572daeec9f64cf7cc111088"
+                "reference": "0c7b1d471f36fd7a1178cca9bfea0db40bb63a6e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/portable-utf8/zipball/7fb737ddebc7801f9572daeec9f64cf7cc111088",
-                "reference": "7fb737ddebc7801f9572daeec9f64cf7cc111088",
+                "url": "https://api.github.com/repos/voku/portable-utf8/zipball/0c7b1d471f36fd7a1178cca9bfea0db40bb63a6e",
+                "reference": "0c7b1d471f36fd7a1178cca9bfea0db40bb63a6e",
                 "shasum": ""
             },
             "require": {
@@ -2281,7 +2287,7 @@
                 "utf-8",
                 "utf8"
             ],
-            "time": "2017-04-05 02:20:36"
+            "time": "2017-04-08 14:24:19"
         },
         {
             "name": "voku/stringy",

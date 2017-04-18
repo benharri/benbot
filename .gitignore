@@ -2,6 +2,7 @@
 uploaded_images/
 bot_data/
 .env
+music/
 # composer packages
 vendor/
 # unneccessary

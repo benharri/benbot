@@ -15,7 +15,7 @@ class Jokes {
 
         $joke = self::$bot->registerCommand('joke', [__CLASS__, 'joke'], [
             'description' => 'tells a random joke',
-            'usage' => '',
+            'usage' => '[chucknorris|yomama|dad]',
             'registerHelp' => true,
         ]);
             $joke->registerSubCommand('chucknorris', [__CLASS__, 'chucknorris'], [

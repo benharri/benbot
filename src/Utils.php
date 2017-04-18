@@ -149,11 +149,11 @@ class Utils {
                 'content' => $text
             ]
         )->then(
-            function ($response) use ($deferred) {
+            function ($response) use ($deferred, $msg) {
                 $msg->fill($response);
                 $deferred->resolve($msg);
             },
-            \React\Partial\bind_right($this->reject, $deferred)
+            \React\Partial\bind_right($msg->reject, $deferred)
         );
         return $deferred->promise();
     }

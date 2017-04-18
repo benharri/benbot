@@ -18,7 +18,6 @@ class Debug {
 
         self::$bot->registerCommand('up', [__CLASS__, 'up'], [
             'description' => 'shows uptime',
-            'registerHelp' => true,
         ]);
         self::$bot->registerCommand('dbg', [__CLASS__, 'dbg'], [
             'description' => 'logs message details',

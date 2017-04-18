@@ -27,11 +27,10 @@ class Misc {
         self::$bot->registerCommand('say', [__CLASS__, 'say'], [
             'description' => 'says stuff back to you',
             'usage' => '<stuff to say>',
-            'registerHelp' => true,
         ]);
         self::$bot->registerCommand('dm', [__CLASS__, 'dm'], [
             'description' => 'sends a dm',
-            'usage' => '<@user> <message>',
+            'usage' => '[@user] [message]',
             'registerHelp' => true,
             'aliases' => [
                 'pm',

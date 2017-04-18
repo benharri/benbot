@@ -19,11 +19,12 @@ class Weather {
 
         $weather = self::$bot->registerCommand('weather', [__CLASS__, 'weather'], [
             'description' => 'get current weather',
-            'usage' => '<@user | city, country>',
+            'usage' => '[@user|city search]',
             'registerHelp' => true,
         ]);
             $weather->registerSubCommand('save', ['BenBot\Commands\Cities', 'saveCity'], [
                 'description' => 'saves a city for a user to look up weather and current time',
+                'usage' => '<city search>',
             ]);
 
         echo __CLASS__ . " registered", PHP_EOL;

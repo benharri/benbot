@@ -91,7 +91,7 @@ class Command
         $helpString = ";{$this->command} {$this->usage}- {$this->description}\n";
 
         foreach ($this->subCommands as $command) {
-            $help = $command->getHelp($prefix.$this->command.' ');
+            $help = $command->getHelp(';'.$this->command.' ');
             $helpString .= "    {$help['text']}\n";
         }
 

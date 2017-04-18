@@ -167,7 +167,7 @@ class BenBot extends Discord {
                     $response = "```{$this->banner}\n- a bot made by benh. avatar by hirose.\n\n";
                     sort($this->help);
                     $response .= implode("", $this->help);
-                    $response .= "\n;help <command> - get more information about a specific command\ncommands will still work if the first letter is capitalized.```";
+                    $response .= "\n-------------------------------------------------------------\n;help [command] - get more information about a specific command\ncommands are case-insensitive.\n\n[] denotes an optional argument.\n<> denotes a required argument.\n|  denotes available options.```";
                     return $response;
                 }
             }, [
@@ -190,6 +190,7 @@ class BenBot extends Discord {
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     public function registerAllCommands()
     {
+        Commands\AsciiArt::register($this);
         Commands\Cities::register($this);
         Commands\CleverBot::register($this);
         Commands\Debug::register($this);
