@@ -80,7 +80,9 @@ class Images {
 
     public static function listImgs($msg, $args)
     {
-        return "avilable images:\n\n" . implode(", ", self::$bot->imgs->array_keys());
+        $imgs = self::$bot->imgs->array_keys();
+        sort($imgs);
+        return "avilable images:\n\n" . implode(", ", $imgs);
     }
 
 
