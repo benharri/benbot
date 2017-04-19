@@ -48,8 +48,10 @@ class Images {
                     $msg,
                     self::$bot->dir . "/uploaded_images/" . self::$bot->imgs[$imgname],
                     self::$bot->imgs[$imgname],
-                    $imgname
-                );
+                    "$imgname\nby {$msg->author}"
+                )->then(function ($result) use ($msg) {
+                    Utils::deleteMessage($msg);
+                });
             } else {
                 return "$imgname does not exist. you can save it by attaching the image with `;img save $imgname`";
             }

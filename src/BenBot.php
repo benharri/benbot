@@ -94,7 +94,13 @@ class BenBot extends Discord {
                         // look up image
                         if (isset($this->imgs[$cmd])) {
                             $msg->channel->broadcastTyping();
-                            Utils::sendFile($msg, "{$this->dir}/uploaded_images/{$this->imgs[$cmd]}", $this->imgs[$cmd], $cmd);
+                            Utils::sendFile($msg,
+                                "{$this->dir}/uploaded_images/{$this->imgs[$cmd]}",
+                                $this->imgs[$cmd],
+                                "$cmd\nby {$msg->author}"
+                            )->then(function ($result) use ($msg) {
+                                Utils::deleteMessage($msg);
+                            });
                         }
 
 
