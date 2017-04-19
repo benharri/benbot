@@ -44,6 +44,7 @@ class Images {
         if (isset($args[0])) {
             $imgname = strtolower($args[0]);
             if (isset(self::$bot->imgs[$imgname])) {
+                $msg->channel->broadcastTyping();
                 Utils::sendFile(
                     $msg,
                     self::$bot->dir . "/uploaded_images/" . self::$bot->imgs[$imgname],
