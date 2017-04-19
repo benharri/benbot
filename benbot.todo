@@ -9,14 +9,14 @@
  ✔ Save text and retrieve it later [2 pts] @done (17-03-27 00:53)
  ✔ Send me a text message [2 pts] @done (17-03-27 00:53)
  ☐ Send emails to a saved address for a user [2 pts]
- ☐ Internet lookups
+ ✔ Internet lookups @done (17-04-18 23:43)
    ✔ Weather for any city [3 pts] @done (17-03-27 00:53)
    ✔ Time for any city (by looking up timezone) and formatting correctly [3 pts] @done (17-03-27 00:53)
    ✔ Save a preferred city for each user for time and weather [2 pts] @done (17-03-27 00:53)
    ✔ Look up a random joke [2 pts] @done (17-03-27 00:53)
    ☐ Send an image from Google Image Search Results [5 pts]
    ☐ Stream music from YouTube to a voice channel [10 pts]
- ☐ Create and vote on polls [5 pts]
+ ✔ Create and vote on polls [5 pts] @done (17-04-18 23:22)
  ☐ Chat games (TicTacToe, Hangman, or both) [10 pts]
  ✔ Text transform (block emojis, unicode fonts, and ASCII art) [3 pts] @done (17-04-10 19:38)
  ✔ Roll an n-sided die [1 pts] @done (17-03-27 00:53)
