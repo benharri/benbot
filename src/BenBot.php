@@ -85,7 +85,7 @@ class BenBot extends Discord {
                     if ($this->game['active'] && in_array($msg->author->id, $this->game['players'])) {
                         $move = intval($str);
                         if ($move > 0 && $move < 10) {
-
+                            Utils::send($msg, TicTacToe::handleMove(array_search($msg->author->id, $this->game['players']), $move));
                         } else {
                             Utils::send($msg, "enter a valid move (1-9) or quit the game with `;tic stop`");
                             return;

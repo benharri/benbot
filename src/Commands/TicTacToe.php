@@ -24,26 +24,72 @@ class TicTacToe {
     }
 
 
+
+    // 1 2 3
+    // 4 5 6
+    // 7 8 9
+    // 0 = no piece, 1, 2 for players
+    // for position i, x = intval(($i - 1) / 3), y = ($i - 1) % 3
+    // $board = [
+    //     [0, 0, 0],
+    //     [0, 0, 0],
+    //     [0, 0, 0],
+    // ];
+
+
+    // functions to register
     public static function startGame($msg, $args)
     {
         self::$bot->game = [
-            'board' => [],
+            'board' => [
+                [":white_circle:", ":white_circle:", ":white_circle:"],
+                [":white_circle:", ":white_circle:", ":white_circle:"],
+                [":white_circle:", ":white_circle:", ":white_circle:"],
+            ],
             'game' => 'TicTacToe',
             'players' => [
-                $msg->author->id
+                ":x:" => $msg->author->id
             ],
-            'turn' => 0,
+            'turn' => ":x:",
             'active' => false,
         ];
         if (count($msg->mentions) == 0) {
             return "mention someone who you would like to play with!";
         } elseif (count($msg->mentions) == 1) {
-            self::$bot->game['players'][1] = $msg->mentions[0]->id;
+            self::$bot->game['players'][":o:"] = $msg->mentions[0]->id;
             self::$bot->game['active'] = true;
             Utils::send($msg, "<@" . self::$bot->game['players'][0] . ">, it's your turn!");
         } else {
             return "can't play tictactoe with more than two people!";
         }
+    }
+
+
+    public static function handleMove($player, $move)
+    {
+        if (self::placePieceAt($move, $player)) {
+            if (self::checkWin()) {
+                self::$bot->game['active'] = false;
+                return "you won";
+            } else {
+                self::$bot->game['turn'] = self::$bot->game['turn'] == ":x:" ? ":o:" : ":x:";
+                return self::printBoard() . "\n<@" . self::$bot->game['players'] . ">, it's your turn!";
+            }
+        } else {
+            return "position already occupied!";
+        }
+    }
+
+    private static function printBoard()
+    {
+        $response = "";
+        foreach (self::$bot->game['board'] as $row) {
+            foreach ($row as $col) {
+                $response .= $col;
+            }
+            $response .= "\n";
+        }
+        return $response;
     }
 
 
@@ -57,5 +103,22 @@ class TicTacToe {
             });
         });
     }
+
+
+    // internal functions
+    private static function getPieceAt($i)
+    {
+        return self::$bot->game['board'][intval(($i - 1) / 3)][($i - 1) % 3];
+    }
+
+    private static function placePieceAt($i, $piece)
+    {
+        if (getPieceAt($i)) {
+            return false;
+        } else {
+            self::$bot->game['board'][intval(($i - 1) / 3)][($i - 1) % 3] = $piece;
+        }
+    }
+
 
 }
