@@ -30,10 +30,9 @@ class BenBot extends Discord {
     public $yomamajokes;
     public $copypastas;
     public $devbot;
-    public $chatgame;
+    public $game;
 
     protected $help;
-    protected $game;
     protected $banner;
     protected $cmds    = [];
     protected $aliases = [];
@@ -55,13 +54,7 @@ class BenBot extends Discord {
         $this->copypastas  = explode("---", file_get_contents("$dir/copypasta.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
         $this->banner      = file_get_contents("{$this->dir}/banner.txt");
-        $this->devbot      = false;
-        $this->chatgame    = [];
-
-
-        $this->game = $this->factory(Game::class, [
-            'name' => 'type ;help for info',
-        ]);
+        $this->game        = [];
 
         try {
             $this->defs   = new PersistentArray("$dir/bot_data/defs.mp");
@@ -74,14 +67,45 @@ class BenBot extends Discord {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
         $this->on('ready', function () {
+
             Utils::init($this);
             FontConverter::init();
-            $this->updatePresence($this->game);
+            $this->updatePresence($this->factory(Game::class, [
+                'name' => ';help for info',
+            ]));
+            $this->devbot = $this->client->user->id == 296304785018322947;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
             $this->on('message', function ($msg) {
                 $str = s($msg->content);
                 if (!$msg->author->bot) {
+
+
+                    // game invite
+                    if ($this->game['pending']) {
+                        if ($this->game['players'][0] == $msg->author->id && count($msg->mentions) == 1) {
+                            $this->game['players'][] = $msg->mentions[0]->id;
+                            $this->game['active'] = true;
+                            Utils::send($msg, "<@" . $this->game['players'][$this->game['turn']] . ">, it's your turn! make a move 1-9");
+                        } else {
+                            Utils::send($msg, "mention someone to play with or quit the game with `;tic stop`");
+                            return;
+                        }
+                    }
+
+                    // handle game move for players
+                    if ($this->game['active'] && in_array($msg->author->id, $this->game['players'])) {
+                        $move = intval($str);
+                        if ($move > 0 && $move < 10) {
+
+                        } else {
+                            Utils::send($msg, "enter a valid move (1-9) or quit the game with `;tic stop`");
+                            return;
+                        }
+                    }
+
+
+
                     if ($str->startsWith(';')) {
                         // is command!
                         $args = $str->removeLeft(';')->split(' ');
@@ -209,6 +233,7 @@ class BenBot extends Discord {
         Commands\Misc::register($this);
         Commands\Music::register($this);
         Commands\Poll::register($this);
+        Commands\TicTacToe::register($this);
         Commands\Time::register($this);
         Commands\Weather::register($this);
     }

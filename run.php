@@ -11,7 +11,6 @@ if (!cli_set_process_title("BenBot")) {
 
 require_once __DIR__.'/vendor/autoload.php';
 
-
 $benbot = new BenBot\BenBot(__DIR__);
 
 $benbot->run();
