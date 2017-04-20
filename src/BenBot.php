@@ -81,18 +81,6 @@ class BenBot extends Discord {
                 if (!$msg->author->bot) {
 
 
-                    // game invite
-                    if ($this->game['pending']) {
-                        if ($this->game['players'][0] == $msg->author->id && count($msg->mentions) == 1) {
-                            $this->game['players'][] = $msg->mentions[0]->id;
-                            $this->game['active'] = true;
-                            Utils::send($msg, "<@" . $this->game['players'][$this->game['turn']] . ">, it's your turn! make a move 1-9");
-                        } else {
-                            Utils::send($msg, "mention someone to play with or quit the game with `;tic stop`");
-                            return;
-                        }
-                    }
-
                     // handle game move for players
                     if ($this->game['active'] && in_array($msg->author->id, $this->game['players'])) {
                         $move = intval($str);

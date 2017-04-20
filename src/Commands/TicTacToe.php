@@ -36,8 +36,7 @@ class TicTacToe {
             'active' => false,
         ];
         if (count($msg->mentions) == 0) {
-            self::$bot->game['pending'] = true;
-            return "whom would you like to play with?";
+            return "mention someone who you would like to play with!";
         } elseif (count($msg->mentions) == 1) {
             self::$bot->game['players'][1] = $msg->mentions[0]->id;
             self::$bot->game['active'] = true;
