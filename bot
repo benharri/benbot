@@ -50,6 +50,14 @@ case "$1" in
         php -l *.php
         ;;
 
+    loc)
+        wc src/*.php src/Commands/*.php
+        ;;
+
+    cloc)
+        cloc src/*.php src/Commands/*.php
+        ;;
+
     restart)
         if [ $pid ]; then
             echo "killing BenBot ($pid)"
