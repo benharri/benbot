@@ -11,6 +11,8 @@ class TicTacToe {
     {
         self::$bot = $that;
 
+        self::$bot->game['active'] = false;
+
         $tic = self::$bot->registerCommand('tic', [__CLASS__, 'startGame'], [
             'description' => 'play tic tac toe!',
             'usage' => '<@user>',
@@ -80,18 +82,6 @@ class TicTacToe {
         }
     }
 
-    private static function printBoard()
-    {
-        $response = "";
-        foreach (self::$bot->game['board'] as $row) {
-            foreach ($row as $col) {
-                $response .= $col;
-            }
-            $response .= "\n";
-        }
-        return $response;
-    }
-
 
     public static function stopGame($msg, $args)
     {
@@ -102,6 +92,43 @@ class TicTacToe {
                 Utils::deleteMessage($result);
             });
         });
+    }
+
+
+    private static function checkWin()
+    {
+        if ((self::getPieceAt(1) === self::getPieceAt(4)) && (self::getPieceAt(4) === self::getPieceAt(7))) {
+            return self::getPieceAt(1);
+        } else if ((self::getPieceAt(2) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(8))) {
+            return self::getPieceAt(2);
+        } else if ((self::getPieceAt(3) === self::getPieceAt(6)) && (self::getPieceAt(6) === self::getPieceAt(9))) {
+            return self::getPieceAt(3);
+        } else if ((self::getPieceAt(1) === self::getPieceAt(2)) && (self::getPieceAt(2) === self::getPieceAt(3))) {
+            return self::getPieceAt(1);
+        } else if ((self::getPieceAt(4) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(6))) {
+            return self::getPieceAt(4);
+        } else if ((self::getPieceAt(7) === self::getPieceAt(8)) && (self::getPieceAt(8) === self::getPieceAt(9))) {
+            return self::getPieceAt(7);
+        } else if ((self::getPieceAt(1) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(9))) {
+            return self::getPieceAt(1);
+        } else if ((self::getPieceAt(3) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(7))) {
+            return self::getPieceAt(3);
+        } else {
+            return false;
+        }
+    }
+
+
+    private static function printBoard()
+    {
+        $response = "";
+        foreach (self::$bot->game['board'] as $row) {
+            foreach ($row as $col) {
+                $response .= $col;
+            }
+            $response .= "\n";
+        }
+        return $response;
     }
 
 

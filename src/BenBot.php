@@ -75,6 +75,8 @@ class BenBot extends Discord {
             ]));
             $this->devbot = $this->client->user->id == 296304785018322947;
 
+            $this->registerAllCommands();
+
 
             $this->on('message', function ($msg) {
                 $str = s($msg->content);
@@ -195,7 +197,6 @@ class BenBot extends Discord {
             ]);
 
 
-            $this->registerAllCommands();
 
             Utils::ping("bot started successfully");
             echo PHP_EOL, "BOT STARTED SUCCESSFULLY", PHP_EOL, PHP_EOL;
