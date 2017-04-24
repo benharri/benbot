@@ -23,6 +23,10 @@ class Emails {
                 'description' => 'save an email address',
                 'usage' => '[@user] <your_email_here@example.com>',
             ]);
+            $emailcmd->registerSubCommand('show', [__CLASS__, 'showEmail'], [
+                'description' => 'show a saved email address',
+                'usage' => '[@user]',
+            ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
@@ -72,6 +76,29 @@ class Emails {
         }
         self::$bot->emails[$id] = $args[0];
         return "email for <@$id> set to {$args[0]}";
+    }
+
+
+    public static function showEmail($msg, $args)
+    {
+        if (count($msg->mentions) === 0) {
+            $id = Utils::getUserIDFromMsg($msg);
+            if (isset(self::$bot->emails[$id])) {
+                return "your email is " . self::$bot->emails[$id];
+            } else {
+                return "you don't have an email set. use `;email save <your_email_here@domain.tld>`";
+            }
+        } else {
+            $response = "";
+            foreach ($msg->mentions as $mention) {
+                if (isset(self::$bot->emails[$mention->id])) {
+                    $response .= "{$mention->id}'s email is " . self::$bot->emails[$mention->id] . "\n";
+                } else {
+                    $response .= "no email found for {$mention->id}\n";
+                }
+            }
+            return $response;
+        }
     }
 
 }
