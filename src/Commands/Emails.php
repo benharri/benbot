@@ -27,6 +27,16 @@ class Emails {
                 'description' => 'show a saved email address',
                 'usage' => '[@user]',
             ]);
+            $emailcmd->registerSubCommand('remove', [__CLASS__, 'rmEmail'], [
+                'description' => 'remove your saved email',
+                'aliases' => [
+                    'rm',
+                    'clear',
+                    'stop',
+                    'delete',
+                    'del',
+                ],
+            ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
@@ -98,6 +108,22 @@ class Emails {
                 }
             }
             return $response;
+        }
+    }
+
+
+    public static function rmEmail($msg, $args)
+    {
+        if (count($msg->mentions) === 0) {
+            $id = Utils::getUserIDFromMsg($msg);
+            if (isset(self::$bot->emails[$id])) {
+                unset(self::$bot->emails[$id]);
+                return "your email has been removed";
+            } else {
+                return "you didn't have an email saved";
+            }
+        } else {
+            return "you can't remove someone else's email";
         }
     }
 
