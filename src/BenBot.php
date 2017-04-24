@@ -5,6 +5,7 @@ error_reporting(-1);
 use Discord\Discord;
 use Discord\Parts\User\Game;
 use Discord\Parts\Embed\Embed;
+use Discord\WebSockets\Event;
 
 use BenBot\Utils;
 use BenBot\PersistentArray;
@@ -78,7 +79,7 @@ class BenBot extends Discord {
             $this->registerAllCommands();
 
 
-            $this->on('message', function ($msg) {
+            $msghandler = function ($msg) {
                 $str = s($msg->content);
                 if (!$msg->author->bot) {
 
@@ -169,7 +170,10 @@ class BenBot extends Discord {
                     }
                 }
 
-            }); // --onmsg
+            }; // --onmsg
+
+            $this->on('message', $msghandler);
+            $this->on(Event::MESSAGE_UPDATE, $msghandler);
 
             $this->start_time = Carbon::now();
 
@@ -215,6 +219,7 @@ class BenBot extends Discord {
         Commands\CleverBot::register($this);
         Commands\Debug::register($this);
         Commands\Definitions::register($this);
+        Commands\Emails::register($this);
         Commands\Fonts::register($this);
         Commands\Fun::register($this);
         Commands\Images::register($this);
