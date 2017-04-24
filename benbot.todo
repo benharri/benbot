@@ -8,7 +8,7 @@
  ✔ Save images and retrieve them later [5 pts] @done (17-04-10 19:38)
  ✔ Save text and retrieve it later [2 pts] @done (17-03-27 00:53)
  ✔ Send me a text message [2 pts] @done (17-03-27 00:53)
- ☐ Send emails to a saved address for a user [2 pts]
+ ✔ Send emails to a saved address for a user [2 pts] @done (17-04-24 00:55)
  ✔ Internet lookups @done (17-04-18 23:43)
    ✔ Weather for any city [3 pts] @done (17-03-27 00:53)
    ✔ Time for any city (by looking up timezone) and formatting correctly [3 pts] @done (17-03-27 00:53)

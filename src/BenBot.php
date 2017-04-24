@@ -151,12 +151,7 @@ class BenBot extends Discord {
                         }
 
                     } elseif (Utils::isDM($msg)) {
-                        $msg->channel->broadcastTyping();
-                        Commands\CleverBot::askCleverbot((string) $str)->then(function ($result) use ($msg) {
-                            Utils::send($msg, $result->output);
-                        }, function ($e) {
-                            echo $e->getMessage(), PHP_EOL;
-                        });
+                        return call_user_func_array(["BenBot\Commands\CleverBot", "chat"], [$msg, explode(' ', $msg->content)]);
                     }
 
                 }
