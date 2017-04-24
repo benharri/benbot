@@ -92,9 +92,9 @@ class Emails {
             $response = "";
             foreach ($msg->mentions as $mention) {
                 if (isset(self::$bot->emails[$mention->id])) {
-                    $response .= "{$mention->id}'s email is " . self::$bot->emails[$mention->id] . "\n";
+                    $response .= "{$mention}'s email is " . self::$bot->emails[$mention->id] . "\n";
                 } else {
-                    $response .= "no email found for {$mention->id}\n";
+                    $response .= "no email found for {$mention}\n";
                 }
             }
             return $response;
