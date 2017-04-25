@@ -11,9 +11,10 @@ class Music {
     {
         self::$bot = $that;
 
-        self::$bot->registerCommand('play', [__CLASS__, 'playSong'], [
+        self::$bot->registerCommand('play', [__CLASS__, 'playTest'], [
             'description' => 'plays',
         ]);
+
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
@@ -25,6 +26,22 @@ class Music {
             $vc->playFile(self::$bot->dir . "/music/mytype.m4a");
         }, function ($e) {
             echo "there was an error joining the voice channel: {$e->getMessage()}", PHP_EOL, $e->getTraceAsString(), PHP_EOL;
+        });
+    }
+
+    public static function playTest($msg, $args)
+    {
+        $guild = self::$bot->guilds->get('id', '289410862907785216');
+        $channel = $guild->channels->get('id', '294208856970756106');
+
+        self::$bot->joinVoiceChannel($channel)->then(function (\Discord\Voice\VoiceClient $vc) {
+            $vc->playFile(self::$bot->dir . '/music/mytype.m4a')->then(function ($test) use ($vc){
+                //Leave voice channel
+                $vc->close();
+            });
+        }, function ($e) {
+            echo $e->getMessage(), PHP_EOL;
+            echo $e->getTraceAsString(), PHP_EOL;
         });
     }
 
