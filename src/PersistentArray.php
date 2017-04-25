@@ -16,7 +16,8 @@ class PersistentArray implements \ArrayAccess, \Iterator {
         if (!is_file($this->filepath)) throw new Exception("Invalid filepath");
         $rawfiledata = file_get_contents($this->filepath);
         if (strlen($rawfiledata) > 3) {
-            $this->data = (new Unpacker())->unpack($rawfiledata);
+            $this->data = msgpack_unpack($rawfiledata);
+            // $this->data = (new Unpacker())->unpack($rawfiledata);
         }
     }
 
@@ -91,7 +92,8 @@ class PersistentArray implements \ArrayAccess, \Iterator {
 
     private function save()
     {
-        file_put_contents($this->filepath, (new Packer())->packMap($this->data));
+        file_put_contents($this->filepath, msgpack_pack($this->data));
+        // file_put_contents($this->filepath, (new Packer())->packMap($this->data));
     }
 
 
