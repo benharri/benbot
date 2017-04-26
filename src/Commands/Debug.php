@@ -1,14 +1,14 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 
-use Carbon\Carbon;
 use Discord\Parts\Embed\Embed;
+use Carbon\Carbon;
 use function Stringy\create as s;
 
-class Debug {
+class Debug
+{
 
     private static $bot;
 
@@ -24,6 +24,9 @@ class Debug {
         ]);
         self::$bot->registerCommand('sys', [__CLASS__, 'sys'], [
             'description' => 'run server command and show output',
+        ]);
+        self::$bot->registerCommand('eval', [__CLASS__, 'botEval'], [
+            'description' => 'only for owner',
         ]);
         self::$bot->registerCommand('status', [__CLASS__, 'status'], [
             'description' => 'get status of bot and server',
@@ -71,6 +74,17 @@ class Debug {
     {
         if (Utils::getUserIDFromMsg($msg) == "193011352275648514") {
             return "```" . shell_exec(implode(" ", $args)) . "```";
+        } else {
+            return "**you're not allowed to use that command**";
+        }
+    }
+
+
+    public static function botEval($msg, $args)
+    {
+        if (Utils::getUserIDFromMsg($msg) == "193011352275648514") {
+            $cmd = implode(" ", $args);
+            return "```" . eval("return $cmd;") . "```";
         } else {
             return "**you're not allowed to use that command**";
         }

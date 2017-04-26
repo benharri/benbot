@@ -5,7 +5,8 @@ use BenBot\Utils;
 use Discord\Helpers\Process;
 use function Stringy\create as s;
 
-class AsciiArt {
+class AsciiArt
+{
 
     private static $bot;
     private static $figlet;

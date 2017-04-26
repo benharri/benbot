@@ -1,10 +1,10 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 
-class Cities {
+class Cities
+{
 
     private static $bot;
 
@@ -41,8 +41,7 @@ class Cities {
                         ];
                         $mentions[] = "$mention";
                     }
-                    $response .= implode(", ", $mentions);
-                    $response .= " has been set to {$json->name}";
+                    $response .= implode(", ", $mentions) . " has been set to {$json->name}";
                     Utils::send($msg, $response);
                 } else {
                     self::$bot->cities[$msg->author->id] = [

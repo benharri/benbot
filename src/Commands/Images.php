@@ -1,10 +1,10 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 
-class Images {
+class Images
+{
 
     private static $bot;
 

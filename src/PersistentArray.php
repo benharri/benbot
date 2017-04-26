@@ -1,7 +1,8 @@
 <?php
 namespace BenBot;
 
-class PersistentArray implements \ArrayAccess, \Iterator {
+class PersistentArray implements \ArrayAccess, \Iterator
+{
 
     protected $data;
     protected $filepath;

@@ -1,6 +1,5 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 use BenBot\Commands\Cities;
@@ -8,7 +7,8 @@ use BenBot\Commands\Cities;
 use Carbon\Carbon;
 
 
-class Time {
+class Time
+{
 
     private static $bot;
 

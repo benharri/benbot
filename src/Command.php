@@ -1,6 +1,5 @@
 <?php
 namespace BenBot;
-error_reporting(-1);
 
 use BenBot\BenBot;
 use Discord\Parts\Channel\Message;

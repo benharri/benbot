@@ -1,11 +1,11 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 use React\Promise\Deferred;
 
-class CleverBot {
+class CleverBot
+{
 
     private static $bot;
     private static $cs;

@@ -1,12 +1,12 @@
 <?php
 namespace BenBot;
-error_reporting(-1);
 
 use Carbon\Carbon;
 use Discord\Parts\Embed\Embed;
 use React\Promise\Deferred;
 
-class Utils {
+class Utils
+{
 
     private static $bot;
 

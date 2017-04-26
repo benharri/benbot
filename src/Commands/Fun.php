@@ -1,11 +1,10 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
-ini_set('display_errors', 1);
 
 use BenBot\Utils;
 
-class Fun {
+class Fun
+{
 
     private static $bot;
 

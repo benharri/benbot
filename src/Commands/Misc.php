@@ -1,11 +1,11 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 use function Stringy\create as s;
 
-class Misc {
+class Misc
+{
 
     private static $bot;
 

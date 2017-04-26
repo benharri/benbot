@@ -1,11 +1,10 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 
-
-class Jokes {
+class Jokes
+{
 
     private static $bot;
 

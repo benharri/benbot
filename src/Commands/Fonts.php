@@ -1,11 +1,11 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
-use BenBot\FontConverter;
 use BenBot\Utils;
+use BenBot\FontConverter;
 
-class Fonts {
+class Fonts
+{
 
     private static $bot;
 

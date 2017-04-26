@@ -3,7 +3,8 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class TicTacToe {
+class TicTacToe
+{
 
     private static $bot;
 

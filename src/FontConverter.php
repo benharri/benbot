@@ -1,11 +1,11 @@
 <?php
 namespace BenBot;
-error_reporting(-1);
 
 use BenBot\Utils;
 use function Stringy\create as s;
 
-class FontConverter {
+class FontConverter
+{
 
     public static $fonts;
 

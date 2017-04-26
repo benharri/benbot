@@ -3,7 +3,8 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class Music {
+class Music
+{
 
     private static $bot;
 

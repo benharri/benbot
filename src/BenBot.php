@@ -1,6 +1,5 @@
 <?php
 namespace BenBot;
-error_reporting(-1);
 
 use Discord\Discord;
 use Discord\Parts\User\Game;
@@ -19,7 +18,8 @@ use Dotenv\Dotenv;
 use function Stringy\create as s;
 
 
-class BenBot extends Discord {
+class BenBot extends Discord
+{
 
     public $start_time;
     public $dir;
@@ -85,8 +85,8 @@ class BenBot extends Discord {
 
 
                     // handle game move for players
-                    if ($this->game['active'] && in_array($msg->author->id, $this->game['players'])) {
-                        $move = intval((string) $str);
+                    if ($this->game['active'] && $msg->author->id === $this->game['players'][$this->game['turn']]) {
+                        $move = intval($msg->content);
                         if ($move > 0 && $move < 10) {
                             $player = array_search($msg->author->id, $this->game['players']);
                             $response = Commands\TicTacToe::handleMove($player, $move);
@@ -245,7 +245,7 @@ class BenBot extends Discord {
             throw new \Exception("A command with the name $command already exists.");
         }
 
-        list($commandInstance, $options) = $this->buildCommand($command, $callable, $options);
+        [$commandInstance, $options] = $this->buildCommand($command, $callable, $options);
         $this->cmds[$command] = $commandInstance;
 
         foreach ($options['aliases'] as $alias) {
@@ -335,7 +335,7 @@ class BenBot extends Discord {
 
     public function __get($name)
     {
-        $allowed = ['commands', 'aliases'];
+        $allowed = ['cmds', 'aliases'];
         if (array_search($name, $allowed) !== false) {
             return $this->$name;
         }

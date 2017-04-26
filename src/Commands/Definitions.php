@@ -1,11 +1,11 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 use function String\create as s;
 
-class Definitions {
+class Definitions
+{
 
     private static $bot;
 

@@ -1,6 +1,5 @@
 <?php
 namespace BenBot\Commands;
-error_reporting(-1);
 
 use BenBot\Utils;
 use BenBot\Cities;
@@ -9,7 +8,8 @@ use Discord\Parts\Embed\Embed;
 use Carbon\Carbon;
 
 
-class Weather {
+class Weather
+{
 
     private static $bot;
 
