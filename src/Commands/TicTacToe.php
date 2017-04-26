@@ -109,18 +109,19 @@ class TicTacToe
 
             if (self::checkWin($gameid)) {
                 self::$bot->game[$gameid]['active'] = false;
-                return "<@" . self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']] . "> won";
+                $response = "<@" . self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']] . "> (" . self::$bot->game[$gameid]['turn'] . ") won!";
             } elseif (isset(self::$bot->game[$gameid]['tied']) && self::$bot->game[$gameid]['tied']) {
                 self::$bot->game[$gameid]['active'] = false;
-                return "it's a tie";
+                $response = "it's a tie... game over";
             } else {
                 self::$bot->game[$gameid]['turn'] = self::$bot->game[$gameid]['turn'] == ":x:" ? ":o:" : ":x:";
-                return self::printBoard($gameid) . "\n<@" . self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']] . ">, it's your turn!";
+                $response = "<@" . self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']] . ">, it's your turn! (you're " . self::$bot->game[$gameid]['turn'] . "'s)";
             }
 
         } else {
-            return "position already occupied!";
+            $response = "position $move occupied! try again.";
         }
+        return self::printBoard($gameid) . "\n$response";
     }
 
 
