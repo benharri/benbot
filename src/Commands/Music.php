@@ -45,4 +45,10 @@ class Music {
         });
     }
 
+
+    public static function playFromYouTube($msg, $args)
+    {
+        $cmd = "youtube-dl --extract-audio --audio-format mp3 --audio-quality 0 ";
+    }
+
 }

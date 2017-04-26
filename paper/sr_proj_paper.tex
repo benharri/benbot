@@ -15,9 +15,9 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
 
 \documentclass[12pt]{article} % Font size (can be 10pt, 11pt or 12pt) and paper size (remove a4paper for US letter paper)
 
@@ -70,9 +70,9 @@
 \end{flushright}
 }
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
 %	TITLE
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
 
 \title{\textbf{Senior Project Paper}\\ % Title
 Discord Chat Bot: Asynchronous PHP} % Subtitle
@@ -82,30 +82,16 @@ Discord Chat Bot: Asynchronous PHP} % Subtitle
 
 \date{April 25, 2017} % Date
 
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
 
 \begin{document}
 
 \maketitle % Print the title section
 
-%----------------------------------------------------------------------------------------
-%	ABSTRACT AND KEYWORDS
-%----------------------------------------------------------------------------------------
 
-% \renewcommand{\abstractname}{Summary} % Uncomment to change the name of the
-% %abstract to something else
-
-% \begin{abstract}
-% Morbi tempor congue porta. Proin semper, leo vitae faucibus dictum, metus mauris lacinia lorem, ac congue leo felis eu turpis. Sed nec nunc pellentesque, gravida eros at, porttitor ipsum. Praesent consequat urna a lacus lobortis ultrices eget ac metus. In tempus hendrerit rhoncus. Mauris dignissim turpis id sollicitudin lacinia. Praesent libero tellus, fringilla nec ullamcorper at, ultrices id nulla. Phasellus placerat a tellus a malesuada.
-% \end{abstract}
-
-% \hspace*{3,6mm}\textit{Keywords:} lorem , ipsum , dolor , sit amet , lectus % Keywords
-
-% \vspace{30pt} % Some vertical space between the abstract and first section
-
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
 %	ESSAY BODY
-%----------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
 
 \section*{Introduction}
 
@@ -114,7 +100,7 @@ I chose to build a chat bot for my senior project. It started as a side project 
 My original plan for my senior project was to make a social beer rating site as an optimized mobile website (leveraging the latest browser tech to make it feel native). However, the more time I spent working on the bot, the more I dreaded starting on this site. I ended up deciding that I should commit to the project that I was more passionate about. After submitting a new project proposal, I continued work on my project.
 
 My bot now has over 2000 lines of code and is able to fulfill many generic purposes that one would look for in a large chat group. The bot is now being used in over a dozen public Discord servers.
-%------------------------------------------------
+
 
 \section*{What I Learned}
 
@@ -122,14 +108,14 @@ The biggest thing that I've learned is that being excited about the project you'
 
 In terms of tangible skills, I have learned a great deal about writing asynchronous code, as well as modern, style-compliant PHP, following the PHP Standards Recommendations by the PHP Framework Interop Group (FIG). 
 
+I also learned a lot about the Standard PHP Library (SPL) and the cool features included in it. I especially liked the interfaces defined by the SPL that provide easy solutions to common problems. I like the various Iterator and Array Access interfaces. Combining these two interfaces, I created my \verb|PersistentArray| class. Since the only data that the bot would need to store are simple key/value pairs, I decided to access them as associative arrays and writing a serialized version of that array to file. It was a fun learning experience to implement something from the SPL.
+
 %\begin{wrapfigure}{l}{0.4\textwidth} % Inline image example
 %\begin{center}
 %\includegraphics[width=0.38\textwidth]{fish.png}
 %\end{center}
 %\caption{Fish}
 %\end{wrapfigure}
-
-%------------------------------------------------
 
 \section*{What I would do differently}
 
@@ -170,7 +156,11 @@ The first iteration of my bot was a single file over 1000 lines long. This was u
 
 \section*{The Hardest Part}
 
+I have continually found that the poor quality of documentation for DiscordPHP and lack of community around it has been the most difficult part of this project. I have spent many hours reading through the source code of DiscordPHP to understand the implementation details.
 
+Other than the difficulty of finding solutions to my problems, it has also been difficult to wrap my brain around asynchronous code, especially the Promises paradigm. It finally began to click once I realized how I could interact with the results of promises and deal with exceptions (as rejected promises). When something failed or acted unexpectedly during the first few weeks of development, I didn't see any error messages. I thought it was due to PHP's strange handling of error messages, but it turned out that I needed to attach an \verb|onRejected| handler to the methods I was using.
+
+Now that I have a better handle on these issues, I have been able to move forward with the bot.
 
 \section*{Complex Data Structures and/or Algorithms}
 
@@ -185,14 +175,5 @@ The first iteration of my bot was a single file over 1000 lines long. This was u
 
 
 
-%----------------------------------------------------------------------------------------
-%	BIBLIOGRAPHY
-%----------------------------------------------------------------------------------------
-
-%\bibliographystyle{unsrt}
-
-%\bibliography{sample}
-
-%----------------------------------------------------------------------------------------
 
 \end{document}

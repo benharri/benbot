@@ -13,7 +13,10 @@
         "team-reflex/discord-php": "dev-develop",
         "guzzlehttp/guzzle": "~6.0",
         "vlucas/phpdotenv": "^2.4",
-        "voku/stringy": "^2.2"
+        "voku/stringy": "^2.2",
+        "ext-libsodium": "*",
+        "ext-msgpack": "*",
+        "php": ">=7.1.4"
     },
     "autoload": {
         "psr-4": {

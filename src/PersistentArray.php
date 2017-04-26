@@ -1,9 +1,5 @@
 <?php
 namespace BenBot;
-error_reporting(-1);
-
-use MessagePack\Packer;
-use MessagePack\Unpacker;
 
 class PersistentArray implements \ArrayAccess, \Iterator {
 
@@ -17,7 +13,6 @@ class PersistentArray implements \ArrayAccess, \Iterator {
         $rawfiledata = file_get_contents($this->filepath);
         if (strlen($rawfiledata) > 3) {
             $this->data = msgpack_unpack($rawfiledata);
-            // $this->data = (new Unpacker())->unpack($rawfiledata);
         }
     }
 
@@ -93,7 +88,6 @@ class PersistentArray implements \ArrayAccess, \Iterator {
     private function save()
     {
         file_put_contents($this->filepath, msgpack_pack($this->data));
-        // file_put_contents($this->filepath, (new Packer())->packMap($this->data));
     }
 
 
