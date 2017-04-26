@@ -181,7 +181,7 @@ class BenBot extends Discord
                     $response = "```{$this->banner}\n- a bot made by benh. avatar by hirose.\n\n";
                     sort($this->help);
                     $response .= implode("", $this->help);
-                    $response .= "\n-------------------------------------------------------------\n;help [command] - get more information about a specific command\ncommands are case-insensitive.\n\n[] denotes an optional argument.\n<> denotes a required argument.\n|  denotes available options.```";
+                    $response .= "\n-------------------------------------------------------------\n;help [command] - get more information about a specific command\ncommands are case-insensitive.\n\n[optional]\n<require>\n| = available options```";
                     return $response;
                 }
             }, [
