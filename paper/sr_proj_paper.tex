@@ -34,35 +34,7 @@
 
 \usepackage{color}
 
-%New colors defined below
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-
-%Code listing style named "mystyle"
-\lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\footnotesize,
-    breakatwhitespace=false,
-    breaklines=true,
-    captionpos=b,
-    keepspaces=true,
-    numbers=left,
-    numbersep=5pt,
-    showspaces=false,
-    showstringspaces=false,
-    showtabs=false,
-    tabsize=2
-}
-
-%"mystyle" code listing set
-\lstset{style=mystyle}
-
-
+\setcounter{secnumdepth}{0}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -106,13 +78,6 @@
 \end{flushright}
 }
 
-% example wrapped image
-% \begin{wrapfigure}{l}{0.4\textwidth} % Inline image example
-% \begin{center}
-% \includegraphics[width=0.38\textwidth]{fish.png}
-% \end{center}
-% \caption{Fish}
-% \end{wrapfigure}
 
 %-------------------------------------------------------------------------------
 %   TITLE
@@ -132,13 +97,16 @@ Discord Chat Bot: Asynchronous PHP} % Subtitle
 
 \maketitle % Print the title section
 
+\tableofcontents
+\newpage
+
 %-------------------------------------------------------------------------------
 %   ESSAY BODY
 %-------------------------------------------------------------------------------
 
 
 %-------------------------------------------------------------------------------
-\section*{Introduction}
+\section{Introduction}
 
 I chose to build a chat bot for my senior project. It started as a side project that I happened upon while chatting with friends in a Discord chat. I started spending a lot of time on this project as I added more and more features to the bot.
 
@@ -148,7 +116,7 @@ My bot now has over 2000 lines of code and is able to fulfill many generic purpo
 
 
 %-------------------------------------------------------------------------------
-\section*{What I Learned}
+\section{What I Learned}
 
 The biggest thing that I've learned is that being excited about the project you're doing makes everything a whole lot easier and more fun.
 
@@ -158,7 +126,7 @@ I also learned a lot about the Standard PHP Library (SPL) and the cool features 
 
 
 %-------------------------------------------------------------------------------
-\section*{What I would do differently}
+\section{What I would do differently}
 
 The main thing that I would have done differently would have been to choose the framework to use based on something other than familiarity with the language. While I made the project quite hard for myself, I feel that some of the things that I built for my bot would have been much easier to complete in a different language or with a framework that has a larger support community (see the DiscordPHP section under Technologies Used).
 
@@ -166,7 +134,7 @@ Something that I would like to look into in the future is Redis. I've read a bit
 
 
 %-------------------------------------------------------------------------------
-\section*{Technologies Used}
+\section{Technologies Used}
 
 \begin{itemize}
     \item Discord API
@@ -192,7 +160,7 @@ Composer is the de-facto standard for PHP package management. As any package man
 
 
 %-------------------------------------------------------------------------------
-\section*{Source organization}
+\section{Source organization}
 
 The source code for my bot is organized into classes under the \verb|src/| directory. Classes that contain code that will not be called as commands in Discord are in the root directory of \verb|src/|. Classes that contain commands are in \verb|src/Commands/|.
 
@@ -202,7 +170,7 @@ The first iteration of my bot was a single file over 1000 lines long. This was u
 
 
 %-------------------------------------------------------------------------------
-\section*{The Hardest Part}
+\section{The Hardest Part}
 
 I have continually found that the poor quality of documentation for DiscordPHP and lack of community around it has been the most difficult part of this project. I have spent many hours reading through the source code of DiscordPHP to understand the implementation details.
 
@@ -212,7 +180,7 @@ Now that I have a better handle on these issues, I have been able to move forwar
 
 
 %-------------------------------------------------------------------------------
-\section*{Complex Data Structures and/or Algorithms}
+\section{Complex Data Structures and/or Algorithms}
 
 I'm rather proud of my implementation of TicTacToe. Players enter a number 1-9 to make moves, referring to each cell of the TicTacToe grid.
 
@@ -280,8 +248,9 @@ public static function weather($msg, $args)
 }
 \end{lstlisting}
 
+
 %-------------------------------------------------------------------------------
-\section*{Expected Difficulty}
+\section{Expected Difficulty}
 
 This project has been a fun challenge. I have enjoyed working on it immensely. It has been an interesting mix of both easy and difficult. One one hand, it feels easy because of my familiarity with PHP, but on the other hand, the features that I planned on implementing in my Project Proposal turned out to be much harder than I anticipated.
 
@@ -299,7 +268,7 @@ Hopefully I will be able to build these features within the next week.
 
 
 %-------------------------------------------------------------------------------
-\section*{Grade}
+\section{Grade}
 
 This is the grading scale that I included with my Project Proposal.
 

@@ -58,6 +58,7 @@ class TicTacToe
                 ],
                 'turn' => ":x:",
                 'active' => true,
+                'move_count' => 0,
             ];
             foreach ($msg->mentions as $mention) {
                 self::$bot->game['players'][":o:"] = $mention->id;
@@ -69,14 +70,37 @@ class TicTacToe
     }
 
 
-    public static function handleMove($player, $move)
+    public static function handleMove($msg)
+    {
+        $player = self::$bot->game['turn'];
+        $text   = $msg->content;
+        $move   = intval($text);
+        if (strtolower($text) == "stop" || strtolower($text) == ";tic stop") {
+            self::stopGame($msg, []);
+            return;
+        }
+        if ($move > 0 && $move < 10) {
+            Utils::send($msg, self::doMove($player, $move));
+            return;
+        } else {
+            Utils::send($msg, "invalid move. enter a number 1-9 or quit with `;tic stop`");
+            return;
+        }
+    }
+
+
+    public static function doMove($player, $move)
     {
         if (self::placePieceAt($move, $player)) {
             if (self::checkWin()) {
                 self::$bot->game['active'] = false;
                 return "<@" . self::$bot->game['players'][self::$bot->game['turn']] . "> won";
+            } elseif (self::$bot->game['move_count'] >= 9) {
+                self::$bot->game['active'] = false;
+                return "it's a tie";
             } else {
                 self::$bot->game['turn'] = self::$bot->game['turn'] == ":x:" ? ":o:" : ":x:";
+                self::$bot->game['move_count']++;
                 return self::printBoard() . "\n<@" . self::$bot->game['players'][self::$bot->game['turn']] . ">, it's your turn!";
             }
         } else {
@@ -88,7 +112,9 @@ class TicTacToe
     public static function stopGame($msg, $args)
     {
         Utils::deleteMessage($msg);
-        self::$bot->game = [];
+        self::$bot->game = [
+            'active' => false,
+        ];
         Utils::send($msg, "game stopped")->then(function ($result) {
             self::$bot->loop->addTimer(5, function ($timer) use ($result) {
                 Utils::deleteMessage($result);
