@@ -85,11 +85,10 @@ class BenBot extends Discord
 
 
                     // handle game move for players
-                    if ($this->game['active'] && $msg->author->id === $this->game['players'][$this->game['turn']]) {
+                    if (Commands\TicTacToe::isActive($msg)) {
                         Commands\TicTacToe::handleMove($msg);
                         return;
                     }
-
 
 
                     if ($str->startsWith(';')) {

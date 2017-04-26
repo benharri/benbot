@@ -12,7 +12,9 @@ class TicTacToe
     {
         self::$bot = $that;
 
-        self::$bot->game['active'] = false;
+        self::$bot->game[] = [
+            'active' => false
+        ];
 
         $tic = self::$bot->registerCommand('tic', [__CLASS__, 'startGame'], [
             'description' => 'play tic tac toe!',
@@ -46,7 +48,8 @@ class TicTacToe
         if (count($msg->mentions) === 0) {
             return "mention someone who you would like to play with!";
         } elseif (count($msg->mentions) === 1) {
-            self::$bot->game = [
+            $gameid = $msg->channel->id;
+            self::$bot->game[$gameid] = [
                 'board' => [
                     [":one:", ":two:", ":three:"],
                     [":four:", ":five:", ":six:"],
@@ -58,29 +61,40 @@ class TicTacToe
                 ],
                 'turn' => ":x:",
                 'active' => true,
-                'move_count' => 0,
             ];
             foreach ($msg->mentions as $mention) {
-                self::$bot->game['players'][":o:"] = $mention->id;
+                self::$bot->game[$gameid]['players'][":o:"] = $mention->id;
             }
-            Utils::send($msg, self::printBoard() . "\n<@" . self::$bot->game['players'][self::$bot->game['turn']] . ">, it's your turn!");
+            Utils::send($msg, self::printBoard($gameid) . "\n<@" . self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']] . ">, it's your turn!");
         } else {
             return "can't play tictactoe with more than two people!";
         }
     }
 
 
+    public static function isActive($msg)
+    {
+        $gameid = $msg->channel->id;
+
+        return isset(self::$bot->game[$gameid])
+        && self::$bot->game[$gameid]['active']
+        && $msg->author->id === self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']];
+    }
+
+
     public static function handleMove($msg)
     {
-        $player = self::$bot->game['turn'];
+        $gameid = $msg->channel->id;
+        $player = self::$bot->game[$gameid]['turn'];
         $text   = $msg->content;
         $move   = intval($text);
+
         if (strtolower($text) == "stop" || strtolower($text) == ";tic stop") {
             self::stopGame($msg, []);
             return;
         }
         if ($move > 0 && $move < 10) {
-            Utils::send($msg, self::doMove($player, $move));
+            Utils::send($msg, self::doMove($gameid, $player, $move));
             return;
         } else {
             Utils::send($msg, "invalid move. enter a number 1-9 or quit with `;tic stop`");
@@ -89,20 +103,21 @@ class TicTacToe
     }
 
 
-    public static function doMove($player, $move)
+    public static function doMove($gameid, $player, $move)
     {
-        if (self::placePieceAt($move, $player)) {
-            if (self::checkWin()) {
-                self::$bot->game['active'] = false;
-                return "<@" . self::$bot->game['players'][self::$bot->game['turn']] . "> won";
-            } elseif (self::$bot->game['move_count'] >= 9) {
-                self::$bot->game['active'] = false;
+        if (self::placePieceAt($gameid, $move, $player)) {
+
+            if (self::checkWin($gameid)) {
+                self::$bot->game[$gameid]['active'] = false;
+                return "<@" . self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']] . "> won";
+            } elseif (isset(self::$bot->game[$gameid]['tied']) && self::$bot->game[$gameid]['tied']) {
+                self::$bot->game[$gameid]['active'] = false;
                 return "it's a tie";
             } else {
-                self::$bot->game['turn'] = self::$bot->game['turn'] == ":x:" ? ":o:" : ":x:";
-                self::$bot->game['move_count']++;
-                return self::printBoard() . "\n<@" . self::$bot->game['players'][self::$bot->game['turn']] . ">, it's your turn!";
+                self::$bot->game[$gameid]['turn'] = self::$bot->game[$gameid]['turn'] == ":x:" ? ":o:" : ":x:";
+                return self::printBoard($gameid) . "\n<@" . self::$bot->game[$gameid]['players'][self::$bot->game[$gameid]['turn']] . ">, it's your turn!";
             }
+
         } else {
             return "position already occupied!";
         }
@@ -112,7 +127,8 @@ class TicTacToe
     public static function stopGame($msg, $args)
     {
         Utils::deleteMessage($msg);
-        self::$bot->game = [
+        $gameid = $msg->channel->id;
+        self::$bot->game[$gameid] = [
             'active' => false,
         ];
         Utils::send($msg, "game stopped")->then(function ($result) {
@@ -125,34 +141,46 @@ class TicTacToe
 
 
     // internal functions
-    private static function checkWin()
+    private static function checkWin($gameid)
     {
-        if ((self::getPieceAt(1) === self::getPieceAt(4)) && (self::getPieceAt(4) === self::getPieceAt(7))) {
-            return self::getPieceAt(1);
-        } else if ((self::getPieceAt(2) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(8))) {
-            return self::getPieceAt(2);
-        } else if ((self::getPieceAt(3) === self::getPieceAt(6)) && (self::getPieceAt(6) === self::getPieceAt(9))) {
-            return self::getPieceAt(3);
-        } else if ((self::getPieceAt(1) === self::getPieceAt(2)) && (self::getPieceAt(2) === self::getPieceAt(3))) {
-            return self::getPieceAt(1);
-        } else if ((self::getPieceAt(4) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(6))) {
-            return self::getPieceAt(4);
-        } else if ((self::getPieceAt(7) === self::getPieceAt(8)) && (self::getPieceAt(8) === self::getPieceAt(9))) {
-            return self::getPieceAt(7);
-        } else if ((self::getPieceAt(1) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(9))) {
-            return self::getPieceAt(1);
-        } else if ((self::getPieceAt(3) === self::getPieceAt(5)) && (self::getPieceAt(5) === self::getPieceAt(7))) {
-            return self::getPieceAt(3);
+        if ((self::getPieceAt($gameid, 1) === self::getPieceAt($gameid, 4)) && (self::getPieceAt($gameid, 4) === self::getPieceAt($gameid, 7))) {
+            return true;
+        } else if ((self::getPieceAt($gameid, 2) === self::getPieceAt($gameid, 5)) && (self::getPieceAt($gameid, 5) === self::getPieceAt($gameid, 8))) {
+            return true;
+        } else if ((self::getPieceAt($gameid, 3) === self::getPieceAt($gameid, 6)) && (self::getPieceAt($gameid, 6) === self::getPieceAt($gameid, 9))) {
+            return true;
+        } else if ((self::getPieceAt($gameid, 1) === self::getPieceAt($gameid, 2)) && (self::getPieceAt($gameid, 2) === self::getPieceAt($gameid, 3))) {
+            return true;
+        } else if ((self::getPieceAt($gameid, 4) === self::getPieceAt($gameid, 5)) && (self::getPieceAt($gameid, 5) === self::getPieceAt($gameid, 6))) {
+            return true;
+        } else if ((self::getPieceAt($gameid, 7) === self::getPieceAt($gameid, 8)) && (self::getPieceAt($gameid, 8) === self::getPieceAt($gameid, 9))) {
+            return true;
+        } else if ((self::getPieceAt($gameid, 1) === self::getPieceAt($gameid, 5)) && (self::getPieceAt($gameid, 5) === self::getPieceAt($gameid, 9))) {
+            return true;
+        } else if ((self::getPieceAt($gameid, 3) === self::getPieceAt($gameid, 5)) && (self::getPieceAt($gameid, 5) === self::getPieceAt($gameid, 7))) {
+            return true;
         } else {
+            for ($i = 1; $i <= 9; $i++) {
+                if (in_array(self::getPieceAt($gameid, $i), [':o:', ':x:'])) {
+                    $tmp = true;
+                } else {
+                    $tmp = false;
+                    break;
+                }
+            }
+            if ($tmp) {
+                self::$bot->game[$gameid]['active'] = false;
+                self::$bot->game[$gameid]['tied'] = true;
+            }
             return false;
         }
     }
 
 
-    private static function printBoard()
+    private static function printBoard($gameid)
     {
         $response = "";
-        foreach (self::$bot->game['board'] as $row) {
+        foreach (self::$bot->game[$gameid]['board'] as $row) {
             foreach ($row as $col) {
                 $response .= $col;
             }
@@ -162,17 +190,17 @@ class TicTacToe
     }
 
 
-    private static function getPieceAt($i)
+    private static function getPieceAt($gameid, $i)
     {
-        return self::$bot->game['board'][intval(($i - 1) / 3)][($i - 1) % 3];
+        return self::$bot->game[$gameid]['board'][intval(($i - 1) / 3)][($i - 1) % 3];
     }
 
-    private static function placePieceAt($i, $piece)
+    private static function placePieceAt($gameid, $i, $piece)
     {
-        if (self::getPieceAt($i) == ":x:" || self::getPieceAt($i) == ":o:") {
+        if (self::getPieceAt($gameid, $i) == ":x:" || self::getPieceAt($gameid, $i) == ":o:") {
             return false;
         } else {
-            self::$bot->game['board'][intval(($i - 1) / 3)][($i - 1) % 3] = $piece;
+            self::$bot->game[$gameid]['board'][intval(($i - 1) / 3)][($i - 1) % 3] = $piece;
             return true;
         }
     }
