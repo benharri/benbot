@@ -2,6 +2,7 @@
 namespace BenBot\Commands;
 
 use BenBot\Utils;
+use Discord\Helpers\Process;
 
 class Music
 {
@@ -50,6 +51,25 @@ class Music
     public static function playFromYouTube($msg, $args)
     {
         $cmd = "youtube-dl --extract-audio --audio-format mp3 --audio-quality 0 ";
+        $process = new Process($cmd);
+        $process->start(self::$bot->loop);
+
+        self::$bot->joinVoiceChannel($channel)->then(function (\Discord\Voice\VoiceClient $vc) use ($process) {
+            $process->stdout->on('data', function ($chunk) use ($vc) {
+                $vc->playRawStream($chunk)->then(function ($test) use ($vc) {
+                    $vc->close();
+                }, function ($e) {
+                    echo $e->getMessage(), PHP_EOL;
+                    echo $e->getTraceAsString(), PHP_EOL;
+                });
+            }, function ($e) {
+                echo $e->getMessage(), PHP_EOL;
+                echo $e->getTraceAsString(), PHP_EOL;
+            });
+        }, function ($e) {
+            echo $e->getMessage(), PHP_EOL;
+            echo $e->getTraceAsString(), PHP_EOL;
+        });
     }
 
 }
