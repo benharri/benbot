@@ -51,11 +51,17 @@ case "$1" in
         ;;
 
     loc)
-        wc src/*.php src/Commands/*.php
+        find src -name '*.php' | xargs wc -l
         ;;
 
     cloc)
-        cloc src/*.php src/Commands/*.php
+        cloc --exclude-dir=vendor --include-lang=PHP .
+        ;;
+
+    sync)
+        rsync -av ben@benharris.ch:workspace/benbot/uploaded_images/ uploaded_images/
+	rsync -av ben@benharris.ch:workspace/benbot/bot_data/ bot_data/
+
         ;;
 
     restart)
