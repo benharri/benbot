@@ -31,7 +31,8 @@ class BenBot extends Discord
     public $yomamajokes;
     public $copypastas;
     public $devbot;
-    public $game;
+    public $tictactoe;
+    public $hangman;
 
     protected $help;
     protected $banner;
@@ -55,7 +56,8 @@ class BenBot extends Discord
         $this->copypastas  = explode("---", file_get_contents("$dir/copypasta.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
         $this->banner      = file_get_contents("{$this->dir}/banner.txt");
-        $this->game        = [];
+        $this->tictactoe   = [];
+        $this->hangman     = [];
 
         try {
             $this->defs   = new PersistentArray("$dir/bot_data/defs.mp");
