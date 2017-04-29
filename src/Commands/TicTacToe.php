@@ -12,10 +12,6 @@ class TicTacToe
     {
         self::$bot = $that;
 
-        self::$bot->tictactoe[] = [
-            'active' => false
-        ];
-
         $tic = self::$bot->registerCommand('tic', [__CLASS__, 'startGame'], [
             'description' => 'play tic tac toe!',
             'usage' => '<@user>',
@@ -70,7 +66,10 @@ class TicTacToe
             foreach ($msg->mentions as $mention) {
                 self::$bot->tictactoe[$gameid]['players'][":o:"] = $mention->id;
             }
-            Utils::send($msg, self::printBoard($gameid) . "\n<@" . self::$bot->tictactoe[$gameid]['players'][self::$bot->tictactoe[$gameid]['turn']] . ">, it's your turn!");
+            Utils::send($msg, self::printBoard($gameid) . "\n<@" . self::$bot->tictactoe[$gameid]['players'][self::$bot->tictactoe[$gameid]['turn']] . ">, it's your turn!")->then(function ($result) use ($gameid, $msg) {
+                self::$bot->tictactoe[$gameid]['last_msg'] = $result;
+                Utils::deleteMessage($msg);
+            });
         } else {
             return "can't play tictactoe with more than two people!";
         }
@@ -99,10 +98,14 @@ class TicTacToe
             return;
         }
         if ($move > 0 && $move < 10) {
-            Utils::send($msg, self::doMove($gameid, $player, $move));
+            Utils::deleteMessage(self::$bot->tictactoe[$gameid]['last_msg']);
+            Utils::send($msg, self::doMove($gameid, $player, $move))->then(function ($result) use ($gameid, $msg) {
+                self::$bot->tictactoe[$gameid]['last_msg'] = $result;
+                Utils::deleteMessage($msg);
+            });
             return;
         } else {
-            Utils::send($msg, "invalid move. enter a number 1-9 or quit with `;tic stop`");
+            Utils::send($msg, "invalid move. enter a number 1-9 or quit with `;tic stop`\n" . self::printBoard($gameid));
             return;
         }
     }

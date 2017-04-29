@@ -2,6 +2,7 @@
 namespace BenBot\Commands;
 
 use BenBot\Utils;
+use BenBot\EmbedColors;
 
 use Discord\Parts\Embed\Embed;
 use Carbon\Carbon;
@@ -44,6 +45,17 @@ class Debug
                 'role'
             ],
         ]);
+        self::$bot->registerCommand('whois', [__CLASS__, 'userInfo'], [
+            'description' => 'get info about a user',
+            'usage' => '[@user]',
+            'aliases' => [
+                'user',
+                'info',
+                'userinfo',
+                'whoami',
+            ],
+        ]);
+
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
@@ -98,7 +110,7 @@ class Debug
             $usercount += $guild->member_count;
         }
 
-        $url = "http://test.benharris.ch/phpsysinfo/xml.php?plugin=complete&json";
+        $url = "http://test.benharr.is/phpsysinfo/xml.php?plugin=complete&json";
         self::$bot->http->get($url, null, [], false)->then(function ($result) use ($msg, $usercount) {
             print_r($result);
             $vitals = $result->Vitals->{"@attributes"};
@@ -106,6 +118,7 @@ class Debug
             $embed = self::$bot->factory(Embed::class, [
                 'title' => 'Benbot status',
                 'thumbnail' => ['url' => self::$bot->avatar],
+                'color' => EmbedColor::BLUE,
                 'fields' => [
                     ['name' => 'Server Uptime'
                     ,'value' => Utils::secondsConvert($vitals->Uptime)
@@ -154,9 +167,10 @@ class Debug
             'thumbnail' => [
                 'url' => $guild->icon
             ],
+            'color' => EmbedColors::BLUE,
             'fields' => [
                 ['name' => 'Owner'
-                ,'value' => "@{$guild->owner->username}#{$guild->owner->discriminator}"
+                ,'value' => "$guild->owner"
                 ,'inline' => true
                 ],
                 ['name' => 'Region'
@@ -201,6 +215,53 @@ class Debug
         Utils::send($msg, $response);
     }
 
+
+    public static function userInfo($msg, $args)
+    {
+        if (Utils::isDM($msg)) {
+            return "you're not in a server, silly";
+        }
+
+        $users = [];
+        if (count($msg->mentions) === 0) {
+            $users[] = $msg->author;
+        } else {
+            foreach ($msg->mentions as $mention) {
+                $users[] = $msg->channel->guild->members->get('id', $mention->id);
+            }
+        }
+        foreach ($users as $user) {
+            $roles = [];
+            foreach ($user->roles as $role) {
+                $roles[] = $role->name;
+            }
+            $embed = self::$bot->factory(Embed::class, [
+                'title' => "User info for",
+                'description' => "$user",
+                'thumbnail' => ['url' => $user->user->avatar],
+                'color' => EmbedColors::BLUE,
+                'fields' => [
+                    ['name' => 'Roles'
+                    ,'value' => implode(", ", $roles)
+                    ],
+                    ['name' => 'ID'
+                    ,'value' => $user->id
+                    ],
+                    ['name' => 'Status'
+                    ,'value' => $user->status
+                    ],
+                    ['name' => 'Game'
+                    ,'value' => $user->game->name ?? 'not playing anything right now'
+                    ],
+                    ['name' => 'Member since'
+                    ,'value' => $user->joined_at->format('g:i A \o\n l F j, Y') . " ({$user->joined_at->diffForHumans()})"
+                    ],
+                ],
+                'timestamp' => null,
+            ]);
+            Utils::send($msg, "", $embed);
+        }
+    }
 
 
 }
