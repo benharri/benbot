@@ -4,7 +4,7 @@ namespace BenBot;
 use BenBot\Utils;
 use function Stringy\create as s;
 
-class FontConverter
+final class FontConverter
 {
 
     public static $fonts;

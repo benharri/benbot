@@ -4,7 +4,7 @@ namespace BenBot\Commands;
 use BenBot\Utils;
 use Discord\Helpers\Process;
 
-class Music
+final class Music
 {
 
     private static $bot;

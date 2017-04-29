@@ -3,7 +3,7 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class Jokes
+final class Jokes
 {
 
     private static $bot;

@@ -1,7 +1,7 @@
 <?php
 namespace BenBot;
 
-class EmbedColors
+final class EmbedColors
 {
     const DEFAULT = 0;
     const AQUA = 1752220;

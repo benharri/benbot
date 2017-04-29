@@ -4,7 +4,7 @@ namespace BenBot\Commands;
 use BenBot\Utils;
 use function Stringy\create as s;
 
-class Misc
+final class Misc
 {
 
     private static $bot;

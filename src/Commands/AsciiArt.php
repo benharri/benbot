@@ -5,7 +5,7 @@ use BenBot\Utils;
 use Discord\Helpers\Process;
 use function Stringy\create as s;
 
-class AsciiArt
+final class AsciiArt
 {
 
     private static $bot;
@@ -47,8 +47,9 @@ class AsciiArt
 
     public static function ascii($msg, $args)
     {
-        if (array_key_exists($args[0], self::$fonts)) {
-            $filepath = self::$fonts[$args[0]];
+
+        if (isset(self::$fonts[strtolower($args[0])])) {
+            $filepath = self::$fonts[strtolower($args[0])];
             array_shift($args);
         } else {
             $filepath = self::$fonts["standard"];

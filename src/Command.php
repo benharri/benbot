@@ -4,7 +4,7 @@ namespace BenBot;
 use BenBot\BenBot;
 use Discord\Parts\Channel\Message;
 
-class Command
+final class Command
 {
     protected $command;
     protected $description;

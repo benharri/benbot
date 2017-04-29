@@ -4,7 +4,7 @@ namespace BenBot\Commands;
 use BenBot\Utils;
 use BenBot\FontConverter;
 
-class Fonts
+final class Fonts
 {
 
     private static $bot;

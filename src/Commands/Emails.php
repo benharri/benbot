@@ -3,7 +3,7 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class Emails
+final class Emails
 {
 
     private static $bot;

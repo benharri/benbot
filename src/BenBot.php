@@ -18,7 +18,7 @@ use Dotenv\Dotenv;
 use function Stringy\create as s;
 
 
-class BenBot extends Discord
+final class BenBot extends Discord
 {
 
     public $start_time;
@@ -213,6 +213,7 @@ class BenBot extends Discord
         Commands\Emails::register($this);
         Commands\Fonts::register($this);
         Commands\Fun::register($this);
+        Commands\Hangman::register($this);
         Commands\Images::register($this);
         Commands\Jokes::register($this);
         Commands\Misc::register($this);

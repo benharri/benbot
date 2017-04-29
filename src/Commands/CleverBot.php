@@ -4,7 +4,7 @@ namespace BenBot\Commands;
 use BenBot\Utils;
 use React\Promise\Deferred;
 
-class CleverBot
+final class CleverBot
 {
 
     private static $bot;

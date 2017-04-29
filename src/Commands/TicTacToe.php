@@ -3,7 +3,7 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class TicTacToe
+final class TicTacToe
 {
 
     private static $bot;
@@ -105,7 +105,11 @@ class TicTacToe
             });
             return;
         } else {
-            Utils::send($msg, "invalid move. enter a number 1-9 or quit with `;tic stop`\n" . self::printBoard($gameid));
+            Utils::deleteMessage(self::$bot->tictactoe[$gameid]['last_msg']);
+            Utils::send($msg, self::printBoard($gameid) . "\ninvalid move. enter a number 1-9 or quit with `;tic stop`")->then(function ($result) use ($gameid, $msg) {
+                self::$bot->tictactoe[$gameid]['last_msg'] = $result;
+                Utils::deleteMessage($msg);
+            });
             return;
         }
     }

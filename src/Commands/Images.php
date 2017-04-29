@@ -3,7 +3,7 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class Images
+final class Images
 {
 
     private static $bot;

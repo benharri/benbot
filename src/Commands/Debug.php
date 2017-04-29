@@ -8,7 +8,7 @@ use Discord\Parts\Embed\Embed;
 use Carbon\Carbon;
 use function Stringy\create as s;
 
-class Debug
+final class Debug
 {
 
     private static $bot;

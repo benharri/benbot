@@ -7,7 +7,7 @@ use BenBot\Commands\Cities;
 use Carbon\Carbon;
 
 
-class Time
+final class Time
 {
 
     private static $bot;

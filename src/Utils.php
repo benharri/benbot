@@ -5,7 +5,7 @@ use Carbon\Carbon;
 use Discord\Parts\Embed\Embed;
 use React\Promise\Deferred;
 
-class Utils
+final class Utils
 {
 
     private static $bot;

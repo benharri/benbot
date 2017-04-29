@@ -3,7 +3,7 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class Cities
+final class Cities
 {
 
     private static $bot;

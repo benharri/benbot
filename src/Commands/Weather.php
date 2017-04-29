@@ -8,7 +8,7 @@ use Discord\Parts\Embed\Embed;
 use Carbon\Carbon;
 
 
-class Weather
+final class Weather
 {
 
     private static $bot;

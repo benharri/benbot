@@ -4,7 +4,7 @@ namespace BenBot\Commands;
 use BenBot\Utils;
 use function String\create as s;
 
-class Definitions
+final class Definitions
 {
 
     private static $bot;

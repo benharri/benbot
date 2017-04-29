@@ -3,7 +3,7 @@ namespace BenBot\Commands;
 
 use BenBot\Utils;
 
-class Poll
+final class Poll
 {
 
     private static $bot;

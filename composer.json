@@ -22,5 +22,13 @@
         "psr-4": {
             "BenBot\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BenBot\\Tests\\": "test/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.1"
     }
 }
