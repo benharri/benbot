@@ -1,16 +1,14 @@
 <?php
+
 namespace BenBot\Commands;
 
-use BenBot\Utils;
 use BenBot\EmbedColors;
-
-use Discord\Parts\Embed\Embed;
+use BenBot\Utils;
 use Carbon\Carbon;
-use function Stringy\create as s;
+use Discord\Parts\Embed\Embed;
 
 final class Debug
 {
-
     private static $bot;
 
     public static function register(&$that)
@@ -33,22 +31,22 @@ final class Debug
             'description' => 'get status of bot and server',
         ]);
         self::$bot->registerCommand('server', [__CLASS__, 'server'], [
-            'description' => 'displays information about the server',
+            'description'  => 'displays information about the server',
             'registerHelp' => true,
-            'aliases' => [
+            'aliases'      => [
                 'guild',
             ],
         ]);
         self::$bot->registerCommand('roles', [__CLASS__, 'roles'], [
             'description' => 'lists all roles in the server',
-            'aliases' => [
-                'role'
+            'aliases'     => [
+                'role',
             ],
         ]);
         self::$bot->registerCommand('whois', [__CLASS__, 'userInfo'], [
             'description' => 'get info about a user',
-            'usage' => '[@user]',
-            'aliases' => [
+            'usage'       => '[@user]',
+            'aliases'     => [
                 'user',
                 'info',
                 'userinfo',
@@ -58,22 +56,19 @@ final class Debug
 
         self::$bot->registerCommand('edittest', [__CLASS__, 'editMsgTest']);
 
-
-        echo __CLASS__ . " registered", PHP_EOL;
+        echo __CLASS__.' registered', PHP_EOL;
     }
-
 
     public static function up($msg, $args)
     {
-        return "benbot has been up for " . self::$bot->start_time->diffForHumans(Carbon::now(), true);
+        return 'benbot has been up for '.self::$bot->start_time->diffForHumans(Carbon::now(), true);
     }
-
 
     public static function dbg($msg, $args)
     {
-        if (Utils::getUserIDFromMsg($msg) == "193011352275648514") {
+        if (Utils::getUserIDFromMsg($msg) == '193011352275648514') {
             print_r($msg);
-            Utils::send($msg, "check logs!")->then(function ($result) {
+            Utils::send($msg, 'check logs!')->then(function ($result) {
                 self::$bot->loop->addTimer(3, function ($timer) use ($result) {
                     Utils::deleteMessage($result);
                 });
@@ -83,27 +78,25 @@ final class Debug
         }
     }
 
-
     public static function sys($msg, $args)
     {
-        if (Utils::getUserIDFromMsg($msg) == "193011352275648514") {
-            return "```" . shell_exec(implode(" ", $args)) . "```";
+        if (Utils::getUserIDFromMsg($msg) == '193011352275648514') {
+            return '```'.shell_exec(implode(' ', $args)).'```';
         } else {
             return "**you're not allowed to use that command**";
         }
     }
-
 
     public static function botEval($msg, $args)
     {
-        if (Utils::getUserIDFromMsg($msg) == "193011352275648514") {
-            $cmd = implode(" ", $args);
-            return "```" . eval("return $cmd;") . "```";
+        if (Utils::getUserIDFromMsg($msg) == '193011352275648514') {
+            $cmd = implode(' ', $args);
+
+            return '```'.eval("return $cmd;").'```';
         } else {
             return "**you're not allowed to use that command**";
         }
     }
-
 
     public static function status($msg, $args)
     {
@@ -112,42 +105,35 @@ final class Debug
             $usercount += $guild->member_count;
         }
 
-        $url = "http://test.benharr.is/phpsysinfo/xml.php?plugin=complete&json";
+        $url = 'http://test.benharr.is/phpsysinfo/xml.php?plugin=complete&json';
         self::$bot->http->get($url, null, [], false)->then(function ($result) use ($msg, $usercount) {
             print_r($result);
-            $vitals = $result->Vitals->{"@attributes"};
+            $vitals = $result->Vitals->{'@attributes'};
 
             $embed = self::$bot->factory(Embed::class, [
-                'title' => 'Benbot status',
+                'title'     => 'Benbot status',
                 'thumbnail' => ['url' => self::$bot->avatar],
-                'color' => EmbedColors::BLUE,
-                'fields' => [
-                    ['name' => 'Server Uptime'
-                    ,'value' => Utils::secondsConvert($vitals->Uptime)
+                'color'     => EmbedColors::BLUE,
+                'fields'    => [
+                    ['name' => 'Server Uptime', 'value' => Utils::secondsConvert($vitals->Uptime),
                     ],
-                    ['name' => 'Bot Uptime'
-                    ,'value' => self::$bot->start_time->diffForHumans(Carbon::now(), true)
+                    ['name' => 'Bot Uptime', 'value' => self::$bot->start_time->diffForHumans(Carbon::now(), true),
                     ],
-                    ['name' => 'Server Load Average'
-                    ,'value' => $vitals->LoadAvg
+                    ['name' => 'Server Load Average', 'value' => $vitals->LoadAvg,
                     ],
-                    ['name' => 'Bot Server Count'
-                    ,'value' => count(self::$bot->guilds)
+                    ['name' => 'Bot Server Count', 'value' => count(self::$bot->guilds),
                     ],
-                    ['name' => 'User Count'
-                    ,'value' => $usercount
+                    ['name' => 'User Count', 'value' => $usercount,
                     ],
-                    ['name' => 'Bot Memory Usage'
-                    ,'value' => Utils::convertMemoryUsage()
+                    ['name' => 'Bot Memory Usage', 'value' => Utils::convertMemoryUsage(),
                     ],
                 ],
                 'timestamp' => null,
             ]);
 
-            Utils::send($msg, "", $embed);
+            Utils::send($msg, '', $embed);
         });
     }
-
 
     public static function server($msg, $args)
     {
@@ -156,55 +142,42 @@ final class Debug
         }
 
         $verification_levels = [
-            0 => "None: must have discord account",
-            1 => "Low: must have verified email",
-            2 => "Medium: must have verified email for more than 5 minutes",
-            3 => "(╯°□°）╯︵ ┻━┻: must have verified email, be registered on discord for more than 5 minutes, and must wait 10 minutes before speaking in any channel",
+            0 => 'None: must have discord account',
+            1 => 'Low: must have verified email',
+            2 => 'Medium: must have verified email for more than 5 minutes',
+            3 => '(╯°□°）╯︵ ┻━┻: must have verified email, be registered on discord for more than 5 minutes, and must wait 10 minutes before speaking in any channel',
         ];
         $guild = $msg->channel->guild;
         $created_at = Carbon::createFromTimestamp(Utils::timestampFromSnowflake($guild->id));
 
         $embed = self::$bot->factory(Embed::class, [
-            'title' => "{$guild->name} server info",
+            'title'     => "{$guild->name} server info",
             'thumbnail' => [
-                'url' => $guild->icon
+                'url' => $guild->icon,
             ],
-            'color' => EmbedColors::BLUE,
+            'color'  => EmbedColors::BLUE,
             'fields' => [
-                ['name' => 'Owner'
-                ,'value' => "$guild->owner"
-                ,'inline' => true
+                ['name' => 'Owner', 'value' => "$guild->owner", 'inline' => true,
                 ],
-                ['name' => 'Region'
-                ,'value' => $guild->region
-                ,'inline' => true
+                ['name' => 'Region', 'value' => $guild->region, 'inline' => true,
                 ],
-                ['name' => 'Member Count'
-                ,'value' => $guild->member_count
-                ,'inline' => true
+                ['name' => 'Member Count', 'value' => $guild->member_count, 'inline' => true,
                 ],
-                ['name' => 'Channel Count'
-                ,'value' => count($guild->channels)
-                ,'inline' => true
+                ['name' => 'Channel Count', 'value' => count($guild->channels), 'inline' => true,
                 ],
-                ['name' => 'Server Created'
-                ,'value' => $created_at->format('g:i A \o\n l F j, Y') . " (" . $created_at->diffForHumans() . ")"
+                ['name' => 'Server Created', 'value' => $created_at->format('g:i A \o\n l F j, Y').' ('.$created_at->diffForHumans().')',
                 ],
-                ['name' => 'Verification level'
-                ,'value' => $verification_levels[$guild->verification_level]
+                ['name' => 'Verification level', 'value' => $verification_levels[$guild->verification_level],
                 ],
-                ['name' => 'Server ID'
-                ,'value' => $guild->id
+                ['name' => 'Server ID', 'value' => $guild->id,
                 ],
-                ['name' => 'benbot joined'
-                ,'value' => $guild->joined_at->format('g:i A \o\n l F j, Y') . " (" . $guild->joined_at->diffForHumans() . ")"
+                ['name' => 'benbot joined', 'value' => $guild->joined_at->format('g:i A \o\n l F j, Y').' ('.$guild->joined_at->diffForHumans().')',
                 ],
             ],
             'timestamp' => null,
         ]);
-        Utils::send($msg, "", $embed);
+        Utils::send($msg, '', $embed);
     }
-
 
     public static function roles($msg, $args)
     {
@@ -213,10 +186,9 @@ final class Debug
         foreach ($guild->roles as $role) {
             $response .= "{$role->name} ({$role->id})\n";
         }
-        $response .= "```";
+        $response .= '```';
         Utils::send($msg, $response);
     }
-
 
     public static function userInfo($msg, $args)
     {
@@ -238,33 +210,27 @@ final class Debug
                 $roles[] = $role->name;
             }
             $embed = self::$bot->factory(Embed::class, [
-                'title' => "User info for",
+                'title'       => 'User info for',
                 'description' => "$user",
-                'thumbnail' => ['url' => $user->user->avatar],
-                'color' => EmbedColors::BLUE,
-                'fields' => [
-                    ['name' => 'Roles'
-                    ,'value' => implode(", ", $roles)
+                'thumbnail'   => ['url' => $user->user->avatar],
+                'color'       => EmbedColors::BLUE,
+                'fields'      => [
+                    ['name' => 'Roles', 'value' => implode(', ', $roles),
                     ],
-                    ['name' => 'ID'
-                    ,'value' => $user->id
+                    ['name' => 'ID', 'value' => $user->id,
                     ],
-                    ['name' => 'Status'
-                    ,'value' => $user->status
+                    ['name' => 'Status', 'value' => $user->status,
                     ],
-                    ['name' => 'Game'
-                    ,'value' => $user->game->name ?? 'not playing anything right now'
+                    ['name' => 'Game', 'value' => $user->game->name ?? 'not playing anything right now',
                     ],
-                    ['name' => 'Member since'
-                    ,'value' => $user->joined_at->format('g:i A \o\n l F j, Y') . " ({$user->joined_at->diffForHumans()})"
+                    ['name' => 'Member since', 'value' => $user->joined_at->format('g:i A \o\n l F j, Y')." ({$user->joined_at->diffForHumans()})",
                     ],
                 ],
                 'timestamp' => null,
             ]);
-            Utils::send($msg, "", $embed);
+            Utils::send($msg, '', $embed);
         }
     }
-
 
     public static function editMsgTest($msg, $args)
     {
@@ -282,6 +248,4 @@ final class Debug
             });
         });
     }
-
-
 }
