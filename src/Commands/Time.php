@@ -29,6 +29,7 @@ final class Time
         echo __CLASS__ . " registered", PHP_EOL;
     }
 
+
     public static function getUserTime($msg, $args)
     {
         $id = Utils::getUserIDFromMsg($msg);
@@ -37,9 +38,12 @@ final class Time
             // look up the user's time
             if (isset(self::$bot->cities[$id])) {
                 $city = self::$bot->cities[$id];
-                return "It's " . Carbon::now($city["timezone"])->format('g:i A \o\n l F j, Y') . " in {$city["city"]}.";
+                return self::sayTime($city);
             } else {
-                return "It's " . Carbon::now()->format('g:i A \o\n l F j, Y') . " Eastern Time (USA).\nyou can set a preferred city with `;time save <city>` or `;weather save <city>`";
+                return self::sayTime([
+                    'timezone' => 'America/Detroit',
+                    'city' => 'Eastern Time (USA)'
+                ]) . "\n you can set a preferred city with `;time save <city>`";
             }
 
         } else {
@@ -48,7 +52,7 @@ final class Time
                 foreach ($msg->mentions as $mention) {
                     if (isset(self::$bot->cities[$mention->id])) {
                         $city = self::$bot->cities[$mention->id];
-                        return "It's " . Carbon::now($city["timezone"])->format('g:i A \o\n l F j, Y') . " in {$city["city"]}.";
+                        return self::sayTime($city);
                     } else {
                         return "No city found for {$mention}.\nset a preferred city with `;time save <city> <@user>`";
                     }
@@ -66,11 +70,29 @@ final class Time
                     $geonamesurl = "http://api.geonames.org/timezoneJSON?username=benharri&lat={$coord->lat}&lng={$coord->lon}";
 
                     self::$bot->http->get($geonamesurl)->then(function ($json) use ($msg, $weatherjson) {
-                        Utils::send($msg, "It's " . Carbon::now($json->timezoneId)->format('g:i A \o\n l F j, Y') . " in {$weatherjson->name}.");
+                        Utils::send($msg, self::sayTime([
+                            'timezone' => $json->timezoneId,
+                            'city' => $weatherjson->name
+                        ]));
                     });
                 });
             }
         }
+    }
+
+
+    public static function sayTime($city)
+    {
+        $time = Carbon::now($city['timezone']);
+        return "It's " . $time->format('g:i A \o\n l F j, Y') . " in {$city["city"]}. " . self::clockEmojiForTime($time);
+    }
+
+
+    public static function clockEmojiForTime(Carbon $emojitime)
+    {
+        $hour = $emojitime->hour % 12;
+        $minute = $emojitime->minute >= 30 ? "30" : "";
+        return ":clock$hour$minute:";
     }
 
 
