@@ -1,4 +1,5 @@
 <?php
+
 namespace BenBot;
 
 final class EmbedColors

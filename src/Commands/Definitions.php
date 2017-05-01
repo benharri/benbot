@@ -1,12 +1,11 @@
 <?php
+
 namespace BenBot\Commands;
 
 use BenBot\Utils;
-use function String\create as s;
 
 final class Definitions
 {
-
     private static $bot;
 
     public static function register(&$that)
@@ -17,7 +16,7 @@ final class Definitions
             'description'  => 'sets this to that',
             'usage'        => '<this> <that>',
             'registerHelp' => true,
-            'aliases' => [
+            'aliases'      => [
                 'define',
             ],
         ]);
@@ -35,20 +34,17 @@ final class Definitions
             'description' => 'sends all definitions to DM',
         ]);
 
-
-        echo __CLASS__ . " registered", PHP_EOL;
+        echo __CLASS__.' registered', PHP_EOL;
     }
-
-
 
     public static function setDef($msg, $args)
     {
         $def = strtolower(array_shift($args));
-        if ($def == "san" && $msg->author->id != 190933157430689792) {
+        if ($def == 'san' && $msg->author->id != 190933157430689792) {
             return "you're not san...";
         }
-        self::$bot->defs[$def] = implode(" ", $args);
-        Utils::send($msg, $def . " set to: " . implode(" ", $args))->then(function ($result) use ($msg) {
+        self::$bot->defs[$def] = implode(' ', $args);
+        Utils::send($msg, $def.' set to: '.implode(' ', $args))->then(function ($result) use ($msg) {
             Utils::deleteMessage($msg);
             self::$bot->loop->addTimer(5, function ($timer) use ($result) {
                 Utils::deleteMessage($result);
@@ -61,7 +57,7 @@ final class Definitions
         if (isset($args[0])) {
             $def = strtolower($args[0]);
             if (isset(self::$bot->defs[$def])) {
-                Utils::send($msg, "**$def**: " . self::$bot->defs[$def])->then(function ($result) use ($msg) {
+                Utils::send($msg, "**$def**: ".self::$bot->defs[$def])->then(function ($result) use ($msg) {
                     Utils::deleteMessage($msg);
                 });
             } else {
@@ -81,6 +77,7 @@ final class Definitions
             } else {
                 return "doesn't exist... aborting.";
             }
+
             return "$def removed";
         }
     }
@@ -89,12 +86,12 @@ final class Definitions
     {
         $response = "available definitions:\n\n";
 
-        if (isset($args[0]) && strtolower($args[0]) == "show") {
+        if (isset($args[0]) && strtolower($args[0]) == 'show') {
             foreach (self::$bot->defs as $name => $def) {
                 $response .= "**$name**: $def\n";
             }
         } else {
-            $response .= implode(", ", self::$bot->defs->array_keys()) . "\n\ntype `;listdefs show` to show all definitions";
+            $response .= implode(', ', self::$bot->defs->array_keys())."\n\ntype `;listdefs show` to show all definitions";
         }
 
         if (strlen($response) > 2000) {
@@ -112,5 +109,4 @@ final class Definitions
             });
         });
     }
-
 }

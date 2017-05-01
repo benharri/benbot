@@ -1,7 +1,7 @@
 <?php
+
 namespace BenBot;
 
-use BenBot\BenBot;
 use Discord\Parts\Channel\Message;
 
 final class Command
@@ -9,7 +9,7 @@ final class Command
     protected $command;
     protected $description;
     protected $usage;
-    protected $subCommands       = [];
+    protected $subCommands = [];
     protected $subCommandAliases = [];
 
     public function __construct(
@@ -19,13 +19,12 @@ final class Command
         $description,
         $usage
     ) {
-        $this->client      = $client;
-        $this->command     = $command;
-        $this->callable    = $callable;
+        $this->client = $client;
+        $this->command = $command;
+        $this->callable = $callable;
         $this->description = $description;
-        $this->usage       = $usage;
+        $this->usage = $usage;
     }
-
 
     public function handle(Message $message, array $args)
     {
@@ -45,7 +44,6 @@ final class Command
         return call_user_func_array($this->callable, [$message, $args]);
     }
 
-
     public function registerSubCommand($command, $callable, array $options = [])
     {
         if (array_key_exists($command, $this->subCommands)) {
@@ -58,9 +56,9 @@ final class Command
         foreach ($options['aliases'] as $alias) {
             $this->registerSubCommandAlias($alias, $command);
         }
+
         return $commandInstance;
     }
-
 
     public function unregisterSubCommand($command)
     {
@@ -70,12 +68,10 @@ final class Command
         unset($this->subCommands[$command]);
     }
 
-
     public function registerSubCommandAlias($alias, $command)
     {
         $this->subCommandAliases[$alias] = $command;
     }
-
 
     public function unregisterSubCommandAlias($alias)
     {
@@ -85,14 +81,13 @@ final class Command
         unset($this->subCommandAliases[$alias]);
     }
 
-
     public function getHelp()
     {
         $helpString = ";{$this->command} {$this->usage}- {$this->description}\n";
 
         foreach ($this->subCommands as $command) {
             $help = $command->getHelp($this->command.' ');
-            $helpString .= "    ;{$this->command} " . ltrim($help['text'], ';');
+            $helpString .= "    ;{$this->command} ".ltrim($help['text'], ';');
         }
 
         return [
@@ -101,7 +96,6 @@ final class Command
         ];
     }
 
-
     public function __get($variable)
     {
         $allowed = ['command', 'description', 'usage'];
@@ -109,5 +103,4 @@ final class Command
             return $this->{$variable};
         }
     }
-
 }
