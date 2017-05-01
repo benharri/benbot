@@ -17,7 +17,9 @@ final class Hangman
         self::$gallows = explode("==", file_get_contents(self::$bot->dir . "/gallows.txt"));
 
         self::$bot->registerCommand('hangman', [__CLASS__, 'startGame'], [
-            'description' => 'play hangman. everyone in the channel can play',
+            'description' => 'play hangman. everyone in the channel plays. `;hangman stop` to cancel a game in progress.',
+            'usage' => '[stop]',
+            'registerHelp' => true,
         ]);
 
         echo __CLASS__ . " registered", PHP_EOL;
@@ -43,9 +45,13 @@ final class Hangman
     public static function initGameWithWord($msg)
     {
         $gameid = self::$bot->hangman['readymsg']->channel->id;
-        self::$bot->hangman[$gameid]['secret_word'] = $msg->content;
+        self::$bot->hangman[$gameid]['secret_word'] = strtolower($msg->content);
         self::$bot->hangman[$gameid]['active'] = true;
-        Utils::send(self::$bot->hangman['readymsg'], self::showGameState($gameid));
+        Utils::send(self::$bot->hangman['readymsg'], self::showGameState($gameid))->then(function ($result) use ($msg, $gameid) {
+            Utils::deleteMessage(self::$bot->hangman[$gameid]['last_msg']);
+            self::$bot->hangman[$gameid]['last_msg'] = $result;
+            Utils::deleteMessage($msg);
+        });
         self::$bot->hangman['readymsg'] = null;
     }
 
@@ -53,12 +59,76 @@ final class Hangman
     public static function handleMove($msg)
     {
         $gameid = $msg->channel->id;
-        if (strlen($msg->content) === 1) {
-            self::$bot->hangman[$gameid]['guessed_letters'][] = $msg->content;
-            if (!in_array($msg->content, str_split(self::$bot->hangman[$gameid]['secret_word']))) {
-                self::$bot->hangman[$gameid]['state']++;
+        $text = strtolower($msg->content);
+        if (strlen($text) === 1) {
+
+            if (in_array($text, self::$bot->hangman[$gameid]['guessed_letters'])) {
+                Utils::send($msg, self::showGameState($gameid) . "\nalready guessed...")->then(function ($result) use ($msg, $gameid) {
+                    Utils::deleteMessage(self::$bot->hangman[$gameid]['last_msg']);
+                    self::$bot->hangman[$gameid]['last_msg'] = $result;
+                    Utils::deleteMessage($msg);
+                });
+                return;
+            } else {
+
+                self::$bot->hangman[$gameid]['guessed_letters'][] = $text;
+                if (!in_array($text, str_split(self::$bot->hangman[$gameid]['secret_word']))) {
+                    self::$bot->hangman[$gameid]['state']++;
+                    if (self::$bot->hangman[$gameid]['state'] >= 7) {
+                        self::$bot->hangman[$gameid]['active'] = false;
+                        self::$bot->hangman[$gameid]['guessed_letters'] = array_unique(str_split(self::$bot->hangman[$gameid]['secret_word']));
+                        Utils::send($msg,
+                            self::showGameState($gameid) .
+                            "\n**you lose**. the word was:\n" .
+                            self::$bot->hangman[$gameid]['secret_word']
+                        )->then(function ($result) use ($msg, $gameid) {
+                            Utils::deleteMessage(self::$bot->hangman[$gameid]['last_msg']);
+                            self::$bot->hangman[$gameid]['last_msg'] = $result;
+                            Utils::deleteMessage($msg);
+                        });
+                        return;
+                    }
+                } else {
+                    $secretletters = array_unique(str_split(self::$bot->hangman[$gameid]['secret_word']));
+                    if (count(array_intersect($secretletters, self::$bot->hangman[$gameid]['guessed_letters'])) === count($secretletters)) {
+                        self::$bot->hangman[$gameid]['active'] = false;
+                        self::$bot->hangman[$gameid]['guessed_letters'] = $secretletters;
+                        Utils::send($msg, self::showGameState($gameid) . "\n**you win!**")->then(function ($result) use ($msg, $gameid) {
+                            Utils::deleteMessage(self::$bot->hangman[$gameid]['last_msg']);
+                            self::$bot->hangman[$gameid]['last_msg'] = $result;
+                            Utils::deleteMessage($msg);
+                        });
+                        return;
+                    }
+                }
+
             }
-            Utils::send($msg, self::showGameState($gameid));
+            Utils::send($msg, self::showGameState($gameid))->then(function ($result) use ($msg, $gameid) {
+                Utils::deleteMessage(self::$bot->hangman[$gameid]['last_msg']);
+                self::$bot->hangman[$gameid]['last_msg'] = $result;
+                Utils::deleteMessage($msg);
+            });
+
+        } elseif ($text === strtolower(self::$bot->hangman[$gameid]['secret_word'])) {
+            self::$bot->hangman[$gameid]['active'] = false;
+            self::$bot->hangman[$gameid]['guessed_letters'] = array_unique(str_split(self::$bot->hangman[$gameid]['secret_word']));
+            Utils::send($msg, self::showGameState($gameid) . "\nyou guessed the word! **you win!!**")->then(function ($result) use ($msg, $gameid) {
+                Utils::deleteMessage(self::$bot->hangman[$gameid]['last_msg']);
+                self::$bot->hangman[$gameid]['last_msg'] = $result;
+                Utils::deleteMessage($msg);
+            });
+        } elseif ($text === ";hangman stop") {
+            self::$bot->hangman[$gameid]['active'] = false;
+            self::$bot->hangman[$gameid]['guessed_letters'] = array_unique(str_split(self::$bot->hangman[$gameid]['secret_word']));
+            Utils::send($msg,
+                self::showGameState($gameid) .
+                "\n**game forfeited**. the word was:\n" .
+                self::$bot->hangman[$gameid]['secret_word']
+            )->then(function ($result) use ($msg, $gameid) {
+                Utils::deleteMessage(self::$bot->hangman[$gameid]['last_msg']);
+                self::$bot->hangman[$gameid]['last_msg'] = $result;
+                Utils::deleteMessage($msg);
+            });
         }
     }
 
@@ -69,14 +139,16 @@ final class Hangman
         self::$bot->hangman[$gameid] = [
             'active' => false,
             'state' => 0,
-            'guessed_letters' => [],
+            'guessed_letters' => [' '],
         ];
         self::$bot->hangman['readymsg'] = $msg;
         $msg->author->user->sendMessage("enter the secret word")->otherwise(function ($e) {
             echo $e->getMessage(), PHP_EOL;
             echo $e->getTraceAsString(), PHP_EOL;
         });
-        return "waiting for {$msg->author} to enter a word";
+        Utils::send($msg, "waiting for {$msg->author} to enter a word")->then(function ($result) use ($gameid) {
+            self::$bot->hangman[$gameid]['last_msg'] = $result;
+        });
     }
 
 
@@ -84,7 +156,7 @@ final class Hangman
     {
         $ret = "Word: ";
         foreach (s(self::$bot->hangman[$gameid]['secret_word']) as $char) {
-            $ret .= in_array($char, self::$bot->hangman[$gameid]['guessed_letters']) ? $char : "_";
+            $ret .= $char == ' ' ? ' ' : in_array($char, self::$bot->hangman[$gameid]['guessed_letters']) ? $char : "_";
             $ret .= " ";
         }
         return $ret;
@@ -94,9 +166,9 @@ final class Hangman
     private static function showGameState($gameid)
     {
         return "```" . self::$gallows[self::$bot->hangman[$gameid]['state']] . "\n" .
-            self::showSecretWord($gameid) . "\n" .
+            self::showSecretWord($gameid) . "\n\n" .
             "Incorrect letters: " . implode(" ", array_diff(self::$bot->hangman[$gameid]['guessed_letters'], str_split(self::$bot->hangman[$gameid]['secret_word']))) . "\n" .
-            "Guessed letters: " . implode(" ", self::$bot->hangman[$gameid]['guessed_letters']) . "```";
+            "Guessed letters:" . implode(" ", self::$bot->hangman[$gameid]['guessed_letters']) . "```";
     }
 
 }
