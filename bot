@@ -2,17 +2,16 @@
 
 source .env
 
-# pid=$(ps -ef | grep BenBot | grep -v grep | awk '{print $2}')
 pid=$(pidof $WHICHBOT)
 
 case "$1" in
 
     nohup)
         if [ $pid ]; then
-            echo "starting BenBot in background (nohup)"
-            nohup php run.php $WHICHBOT > bot.out 2> bot.err < /dev/null &
+            echo "${WHICHBOT} already running"
         else
-            echo "BenBot already running"
+            echo "starting ${WHICHBOT} in background (nohup)"
+            nohup php run.php > bot.out 2> bot.err < /dev/null &
         fi
         ;;
 
@@ -25,25 +24,24 @@ case "$1" in
 
     stop)
         if [ $pid ]; then
-            echo "killing BenBot ($pid)"
+            echo "killing ${WHICHBOT} ($pid)"
             kill $pid
         fi
         ;;
 
     status)
-        #pgrep BenBot && echo "Running"
         if [ $pid ]; then
-            echo "BenBot running with pid $pid"
+            echo "${WHICHBOT} running with pid $pid"
         else
-            echo "BenBot not running"
+            echo "${WHICHBOT} not running"
         fi
         ;;
 
 	log)
 	    if [ $pid ]; then
-		less bot.out
+    		less bot.out
 	    else
-		echo "BenBot not running"
+    		echo "${WHICHBOT} not running"
 	    fi
 	    ;;
 
@@ -62,17 +60,17 @@ case "$1" in
 
     sync)
         rsync -av ben@benharris.ch:workspace/benbot/uploaded_images/ uploaded_images/
-	rsync -av ben@benharris.ch:workspace/benbot/bot_data/ bot_data/
+    	rsync -av ben@benharris.ch:workspace/benbot/bot_data/ bot_data/
 
         ;;
 
     restart)
         if [ $pid ]; then
-            echo "killing BenBot ($pid)"
+            echo "killing ${WHICHBOT} ($pid)"
             kill $pid
         fi
-        echo "starting BenBot in background (nohup)"
-        nohup php run.php $WHICHBOT > bot.out 2> bot.err < /dev/null &
+        echo "starting ${WHICHBOT} in background (nohup)"
+        nohup php run.php > bot.out 2> bot.err < /dev/null &
         ;;
 
 
@@ -81,3 +79,4 @@ case "$1" in
         exit 1
 
 esac
+
