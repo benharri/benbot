@@ -1,4 +1,5 @@
 <?php
+
 namespace BenBot\Tests;
 
 use PHPUnit\Framework\TestCase;

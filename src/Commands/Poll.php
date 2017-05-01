@@ -1,11 +1,11 @@
 <?php
+
 namespace BenBot\Commands;
 
 use BenBot\Utils;
 
 final class Poll
 {
-
     private static $bot;
 
     public static function register(&$that)
@@ -13,30 +13,29 @@ final class Poll
         self::$bot = $that;
 
         self::$bot->registerCommand('poll', [__CLASS__, 'createPoll'], [
-            'description' => 'yes/no poll. lasts 30 seconds.',
-            'usage' => '<question>',
+            'description'  => 'yes/no poll. lasts 30 seconds.',
+            'usage'        => '<question>',
             'registerHelp' => true,
         ]);
 
-        echo __CLASS__ . " registered", PHP_EOL;
+        echo __CLASS__.' registered', PHP_EOL;
     }
-
 
     public static function createPoll($msg, $args)
     {
-        if ($args[0] == "") {
+        if ($args[0] == '') {
             return "you didn't ask a question...";
         }
-        $question = implode(" ", $args);
+        $question = implode(' ', $args);
         $response = "{$msg->author}'s poll:\n\n*$question*";
 
         Utils::send($msg, $response)->then(function ($result) use ($msg) {
             Utils::deleteMessage($msg);
-            $result->react("👍");
-            $result->react("👎");
+            $result->react('👍');
+            $result->react('👎');
 
             $poll_results = [
-                'upboats' => 0,
+                'upboats'   => 0,
                 'downboats' => 0,
             ];
 
@@ -54,9 +53,9 @@ final class Poll
                             )->then(function ($downboats) use (&$poll_results, $res) {
                                 $poll_results['downboats'] = count($downboats) - 1;
                                 switch ($poll_results['upboats'] <=> $poll_results['downboats']) {
-                                    case 1: $conclusion = "Yes!"; break;
+                                    case 1: $conclusion = 'Yes!'; break;
                                     case 0: $conclusion = "It's a tie..."; break;
-                                    case -1: $conclusion = "Nope"; break;
+                                    case -1: $conclusion = 'Nope'; break;
                                 }
                                 Utils::editMessage($res,
                                     "{$res->content}\n\n**Results**\nUpboats: {$poll_results['upboats']}\nDownboats: {$poll_results['downboats']}\n**$conclusion**"
@@ -68,5 +67,4 @@ final class Poll
             });
         });
     }
-
 }
