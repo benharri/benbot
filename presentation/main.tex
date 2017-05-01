@@ -1,0 +1,161 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+\documentclass{beamer}
+
+%-------------------------------------------------------
+\usetheme[background=dark, progressbar=foot]{metropolis}
+\title{Discord Chat Bot}
+\subtitle{Asynchronous PHP}
+\date{May 2, 2017}
+\author{Benjamin Hamilton Harris}
+\institute{Northern Michigan University}
+
+\usepackage{multicol}
+
+
+\begin{document}
+
+\maketitle
+
+
+\section{Introduction}
+
+\begin{frame}{Discord}
+    Discord Chat Client
+    \begin{itemize}
+        \item Marketed towards gamers
+        \item Rich text chat
+        \item Silky smooth voice chat
+    \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Discord API}
+	Discord exposes a REST-ful HTTP API
+	\begin{itemize}
+		\item Raw HTTP requests are cumbersome
+		\item Many wrapper libraries available
+		\item JavaScript, Python most popular
+	\end{itemize}
+
+\end{frame}
+
+
+\section{Project Info}
+
+\begin{frame}{Technology Stack}
+	Technologies
+	\begin{itemize}
+		\item PHP 7
+		\item DiscordPHP API wrapper library
+		\item ReactPHP Promises for Async
+		\item Composer
+	\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Project Background}
+	Proposal
+	\begin{itemize}
+		\item Started as passion project
+		\item General purpose chat bot
+		\item Rapidly growing feature set
+	\end{itemize}
+	
+\end{frame}
+
+
+\section{Grading}
+
+\begin{frame}{Possible Points}
+	\begin{multicols}{2}
+		\begin{itemize}
+			\item Get User Info [1 pts]
+			\item Get Profile Photo for arbitrary User [1 pts]
+			\item Get Server Info [2 pts]
+			\item Display Bot Status/Uptime [1 pts]
+			\item Send direct message to any user [1 pts]
+			\item Permissions for commands based on user's permissions [2 pts]
+			\item Talk to Cleverbot [3 pts]
+			\item Save images and retrieve them later [5 pts]
+			\item Save text and retrieve it later [2 pts]
+			\item Send me a text message [2 pts]
+			\item Send emails to a saved address for a user [2 pts]
+		\end{itemize}
+	\end{multicols}
+	
+\end{frame}
+
+
+\begin{frame}{Possible Points, cont.}
+	\begin{multicols}{2}
+		\begin{itemize}
+			\item Internet lookups
+			\begin{enumerate}[--]
+				\item Weather for any city [3 pts]
+				\item Time for any city  [3 pts]
+				\item Save a preferred city for each user for time and weather [2 pts]
+				\item Look up a random joke [2 pts]
+				\item \textbf{Send an image from Google Images [5 pts]}
+				\item Stream music from YouTube to voice channel [10 pts]
+			\end{enumerate}
+			\item Create and vote on polls [5 pts]
+			\item Chat games (TicTacToe, Hangman) [10 pts]
+			\item Text transform (emojis, unicode fonts, and ASCII art) [3 pts]
+			\item Roll an n-sided die [1 pts]
+			\item 8-Ball style fortunes [2 pts]
+		\end{itemize}
+	\end{multicols}
+
+\end{frame}
+
+
+\begin{frame}
+    \begin{center}
+        \Large\textbf{Demo Time!}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}{Grading Scale}
+    
+    63+ $\rightarrow$ \textbf{A}
+    
+    56+ $\rightarrow$ B
+    
+    49+ $\rightarrow$ C
+    
+    42+ $\rightarrow$ D
+    
+    35+ $\rightarrow$ F
+    
+    \textbf{65/70 possible points from proposal achieved}
+    
+\end{frame}
+
+
+
+\begin{frame}{Possible Extra Points}
+	Things I've done that might be worth more points!
+	\begin{itemize}
+        \item Edit and delete messages in the chat
+		\item Run a command line process and return stdout as a message
+        \item Evaluate arbitrary PHP code and return the results to the chat
+	\end{itemize}
+    \footnotesize I am the only user allowed to evaluate arbitrary code.
+   
+\end{frame}
+
+
+
+\begin{frame}
+	\begin{center}
+		\Large\textbf{Any Questions?}
+	\end{center}
+\end{frame}
+
+
+
+\end{document}
