@@ -73,7 +73,7 @@ final class Images
                     self::$bot->imgs[$imgname] = "$imgname.$ext";
                     file_put_contents(self::$bot->dir."/uploaded_images/$imgname.$ext", file_get_contents($msg->attachments[0]->url));
 
-                    return "image save as $imgname";
+                    return "image saved as $imgname";
                 }
             }
         }
