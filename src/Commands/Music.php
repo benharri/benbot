@@ -66,30 +66,15 @@ final class Music
     public static function playFromYouTube($msg, $args)
     {
         $channel = self::getVoiceChannel($msg);
-        print_r($channel);
         if (!$channel instanceof Channel) {
             return "you're not in a voice channel, silly";
         }
 
-        if (isset(self::$voiceclients[$msg->channel->guild->id]) && self::$voiceclients[$msg->channel->guild->id] instanceof VoiceClient) {
-            self::$voiceclients[$msg->channel->guild->id]->stop();
-            self::getVideoJSON($args)->then(function ($json) use ($msg) {
-                Utils::send($msg, "preparing...")->then(function ($statusmsg) use ($msg, $json) {
-                    self::downloadAudio($json)->then(function ($file) use ($statusmsg, $msg) {
-                        $statusmsg->channel->messages->delete($statusmsg);
-                        self::$voiceclients[$msg->channel->guild->id]->playFile(self::$bot->dir . "/music/$file")->then(function () {
-                            self::$voiceclients[$msg->channel->guild->id]->close();
-                        }, function ($e) {
-                            echo $e->getMessage(), PHP_EOL;
-                            echo $e->getTraceAsString(), PHP_EOL;
-                        });
-                    });
-                });
-            });
-        }
-
-        self::getVideoJSON($args)->then(function ($json) use ($channel, $msg) {
-            Utils::send($msg, "preparing...")->then(function ($statusmsg) use ($channel, $msg, $json) {
+        Utils::send($msg, "getting info...")->then(function ($statusmsg) use ($channel, $msg, $args) {
+            self::getVideoJSON($args)->then(function ($json) use ($channel, $msg, $statusmsg) {
+                $statusmsg->content = "downloading...";
+                $statusmsg->channel->messages->save($statusmsg);
+                print_r($json);
                 self::downloadAudio($json)->then(function ($file) use ($channel, $statusmsg, $msg) {
                     $statusmsg->channel->messages->delete($statusmsg);
                     self::$bot->joinVoiceChannel($channel)->then(function (VoiceClient $vc) use ($file, $msg) {
@@ -100,8 +85,17 @@ final class Music
                             echo $e->getMessage(), PHP_EOL;
                             echo $e->getTraceAsString(), PHP_EOL;
                         });
+                    }, function ($e) {
+                        echo $e->getMessage(), PHP_EOL;
+                        echo $e->getTraceAsString(), PHP_EOL;
                     });
+                }, function ($e) {
+                    echo $e->getMessage(), PHP_EOL;
+                    echo $e->getTraceAsString(), PHP_EOL;
                 });
+            }, function ($e) {
+                echo $e->getMessage(), PHP_EOL;
+                echo $e->getTraceAsString(), PHP_EOL;
             });
         });
     }
@@ -146,27 +140,30 @@ final class Music
 
         $cmd = "youtube-dl --dump-single-json ";
         if ($args[0] != "") {
-            if (strlen($args[0]) === 11 || strpos($args[0], "http") !== false) {
-                // is yt vid ID or URL
-                $cmd .= $args[0];
+            if (strlen($args[0]) === 11) {
+                $cmd .= "https://www.youtube.com/watch?v={$args[0]}";
+            } elseif (strpos($args[0], "youtube.com") !== false) {
+                $cmd = $args[0];
             } else {
                 $query = implode(" ", $args);
                 $cmd .= "'ytsearch:$query'";
             }
         }
-        echo $cmd, PHP_EOL;
 
         $process = new Process($cmd);
         $process->on('exit', function ($exitcode, $termsig) use (&$data, $deferred) {
-            if (intval($exitcode) === 1) {
-                $deferred->reject("invalid url");
+            if (intval($exitcode) == 1) {
+                $deferred->reject();
             } else {
                 $deferred->resolve(json_decode($data));
             }
             echo "$exitcode, $termsig", PHP_EOL;
         });
-        self::$bot->loop->addTimer(0.001, function ($timer) use (&$data, $deferred, $process) {
+        self::$bot->loop->addTimer(0.001, function () use (&$data, $process) {
             $process->start(self::$bot->loop);
+            $process->stderr->on('data', function ($output) {
+                echo $output, PHP_EOL;
+            });
             $process->stdout->on('data', function ($output) use (&$data) {
                 $data .= $output;
             });
@@ -179,8 +176,7 @@ final class Music
     private static function downloadAudio($result)
     {
         $deferred = new Deferred();
-
-        $json = $result->entries[0];
+        $json = $result->entries[0] ?? $result;
         $url = escapeshellarg($json->webpage_url);
         $filename = $json->id . '-' . md5($json->title) . '-' . $json->duration;
 
@@ -194,7 +190,7 @@ final class Music
 
         $file = escapeshellarg(self::$bot->dir . "/music/$filename.%(ext)s");
 
-        $cmd = "youtube-dl --extract-audio --audio-format mp3 --audio-quality 0 --restrict-filenames --no-check-certificate --no-warnings --source-address 0.0.0.0 -o $file $url";
+        $cmd = "youtube-dl --extract-audio --audio-format mp3 --audio-quality 0 --restrict-filenames --no-playlist --no-check-certificate --no-warnings --source-address 0.0.0.0 -o $file $url";
         echo $cmd, PHP_EOL;
 
         $process = new Process($cmd);

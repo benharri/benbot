@@ -92,6 +92,16 @@ final class BenBot extends Discord
                         return;
                     }
 
+                    if (Commands\Hangman::isGameOriginator($msg)) {
+                        Commands\Hangman::initGameWithWord($msg);
+                        return;
+                    }
+
+                    if (Commands\Hangman::isActive($msg)) {
+                        Commands\Hangman::handleMove($msg);
+                        return;
+                    }
+
 
                     if ($str->startsWith(';')) {
                         // is command!

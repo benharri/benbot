@@ -29,7 +29,8 @@ final class Command
 
     public function handle(Message $message, array $args)
     {
-        $subCommand = strtolower(array_shift($args));
+        $subCommandOrig = array_shift($args);
+        $subCommand = strtolower($subCommandOrig);
 
         if (array_key_exists($subCommand, $this->subCommands)) {
             return $this->subCommands[$subCommand]->handle($message, $args);
@@ -38,7 +39,7 @@ final class Command
         }
 
         if (!is_null($subCommand)) {
-            array_unshift($args, $subCommand);
+            array_unshift($args, $subCommandOrig);
         }
 
         return call_user_func_array($this->callable, [$message, $args]);
