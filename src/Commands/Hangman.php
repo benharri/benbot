@@ -34,7 +34,6 @@ final class Hangman
     public static function startGame($msg, $args)
     {
         return "```" . self::$gallows . "```";
-        return "not done yet";
     }
 
 }

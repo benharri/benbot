@@ -56,6 +56,8 @@ final class Debug
             ],
         ]);
 
+        self::$bot->registerCommand('edittest', [__CLASS__, 'editMsgTest']);
+
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
@@ -261,6 +263,24 @@ final class Debug
             ]);
             Utils::send($msg, "", $embed);
         }
+    }
+
+
+    public static function editMsgTest($msg, $args)
+    {
+        Utils::send($msg, count($msg->channel->guild->channels))->then(function ($result) {
+            $result->content = 'ben is best';
+            self::$bot->loop->addTimer(3, function ($timer) use ($result) {
+                $result->channel->messages->save($result)->then(function ($res) {
+                    self::$bot->loop->addTimer(2, function ($timer) use ($res) {
+                        $res->channel->messages->delete($res);
+                    });
+                }, function ($e) {
+                    echo $e->getMessage(), PHP_EOL;
+                    echo $e->getTraceAsString(), PHP_EOL;
+                });
+            });
+        });
     }
 
 

@@ -1,14 +1,16 @@
 #!/bin/bash
 
+source .env
+
 # pid=$(ps -ef | grep BenBot | grep -v grep | awk '{print $2}')
-pid=$(pidof BenBot)
+pid=$(pidof $WHICHBOT)
 
 case "$1" in
 
     nohup)
         if [ $pid ]; then
             echo "starting BenBot in background (nohup)"
-            nohup php run.php > bot.out 2> bot.err < /dev/null &
+            nohup php run.php $WHICHBOT > bot.out 2> bot.err < /dev/null &
         else
             echo "BenBot already running"
         fi
@@ -55,7 +57,7 @@ case "$1" in
         ;;
 
     cloc)
-        cloc --exclude-dir=vendor --include-lang=PHP .
+        cloc --exclude-dir=vendor --by-file-by-lang .
         ;;
 
     sync)
@@ -70,7 +72,7 @@ case "$1" in
             kill $pid
         fi
         echo "starting BenBot in background (nohup)"
-        nohup php run.php > bot.out 2> bot.err < /dev/null &
+        nohup php run.php $WHICHBOT > bot.out 2> bot.err < /dev/null &
         ;;
 
 
