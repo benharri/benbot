@@ -6,13 +6,12 @@ use BenBot\Utils;
 final class Hangman
 {
     private static $bot;
-    private static $gallows;
 
     public static function register(&$that)
     {
         self::$bot = $that;
 
-        self::$gallows = "
+        self::$bot->hangman['gallows'] = "
            _______
           |/      |
           |      (_)
@@ -60,6 +59,16 @@ final class Hangman
         $gameid = $msg->channel->id;
         self::$bot->hangman[$gameid] = [
             'active' => false,
+            'gallows' => '
+           _______
+          |/      |
+          |
+          |
+          |
+          |
+          |
+         _|___
+         '
         ];
         self::$bot->hangman['readygame'] = [
             'originator' => $msg->author,
