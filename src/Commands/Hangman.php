@@ -6,21 +6,13 @@ use BenBot\Utils;
 final class Hangman
 {
     private static $bot;
+    private static $gallows;
 
     public static function register(&$that)
     {
         self::$bot = $that;
 
-        self::$bot->hangman['gallows'] = "
-           _______
-          |/      |
-          |      (_)
-          |      \|/
-          |       |
-          |      / \
-          |
-         _|___
-         ";
+        self::$gallows = explode("==", file_get_contents(self::$bot->dir . "/gallows.txt"));
 
         self::$bot->registerCommand('hangman', [__CLASS__, 'startGame'], [
             'description' => 'play hangman. everyone in the channel can play',
@@ -28,6 +20,7 @@ final class Hangman
 
         echo __CLASS__ . " registered", PHP_EOL;
     }
+
 
 
     public static function isActive($msg)
@@ -59,16 +52,7 @@ final class Hangman
         $gameid = $msg->channel->id;
         self::$bot->hangman[$gameid] = [
             'active' => false,
-            'gallows' => '
-           _______
-          |/      |
-          |
-          |
-          |
-          |
-          |
-         _|___
-         '
+            'state' => 0,
         ];
         self::$bot->hangman['readygame'] = [
             'originator' => $msg->author,

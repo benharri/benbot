@@ -120,7 +120,7 @@ final class Debug
             $embed = self::$bot->factory(Embed::class, [
                 'title' => 'Benbot status',
                 'thumbnail' => ['url' => self::$bot->avatar],
-                'color' => EmbedColor::BLUE,
+                'color' => EmbedColors::BLUE,
                 'fields' => [
                     ['name' => 'Server Uptime'
                     ,'value' => Utils::secondsConvert($vitals->Uptime)
