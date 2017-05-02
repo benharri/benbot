@@ -184,16 +184,16 @@ final class BenBot extends Discord
                 'description' => 'shows help text',
                 'usage'       => '<command>',
             ]);
-                $helpcmd->registerSubCommand('all', function ($msg, $args) {
-                    $helptxts = "";
-                    foreach ($this->cmds as $cmd) {
-                        $helptxts .= ";{$cmd->command}\n";
-                    }
-                    return "```All available BenBot commands:\n\n$helptxts\n-------------------------------------------------------------\n;help [command] to get more information about a specific command```";
-                }, [
+            $helpcmd->registerSubCommand('all', function ($msg, $args) {
+                $helptxts = '';
+                foreach ($this->cmds as $cmd) {
+                    $helptxts .= ";{$cmd->command}\n";
+                }
+
+                return "```All available BenBot commands:\n\n$helptxts\n-------------------------------------------------------------\n;help [command] to get more information about a specific command```";
+            }, [
                     'description' => 'list all commands',
                 ]);
-
 
             Utils::ping('bot started successfully');
             echo PHP_EOL, 'BOT STARTED SUCCESSFULLY', PHP_EOL, PHP_EOL;
