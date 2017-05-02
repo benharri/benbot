@@ -45,7 +45,7 @@ final class BenBot extends Discord
         $this->jokes = explode('---', file_get_contents("$dir/miscjokes.txt"));
         $this->copypastas = explode('---', file_get_contents("$dir/copypasta.txt"));
         $this->yomamajokes = file("$dir/yomamajokes.txt");
-        $this->banner = file_get_contents("{$this->dir}/banner.txt");
+        $this->banner = file_get_contents("$dir/banner.txt");
         $this->tictactoe = [];
         $this->hangman = [];
 
@@ -88,8 +88,6 @@ final class BenBot extends Discord
 
                     if (Commands\Hangman::isActive($msg)) {
                         Commands\Hangman::handleMove($msg);
-
-                        return;
                     }
 
                     if ($str->startsWith(';')) {
@@ -163,7 +161,7 @@ final class BenBot extends Discord
             $this->start_time = Carbon::now();
 
             // register help function
-            $this->registerCommand('help', function ($msg, $args) {
+            $helpcmd = $this->registerCommand('help', function ($msg, $args) {
                 if (count($args) > 0 && $args[0] != '') {
                     $cmdstr = implode(' ', $args);
                     $command = $this->getCommand($cmdstr, true);
@@ -186,6 +184,16 @@ final class BenBot extends Discord
                 'description' => 'shows help text',
                 'usage'       => '<command>',
             ]);
+                $helpcmd->registerSubCommand('all', function ($msg, $args) {
+                    $helptxts = "";
+                    foreach ($this->cmds as $cmd) {
+                        $helptxts .= ";{$cmd->command}\n";
+                    }
+                    return "```All available BenBot commands:\n\n$helptxts\n-------------------------------------------------------------\n;help [command] to get more information about a specific command```";
+                }, [
+                    'description' => 'list all commands',
+                ]);
+
 
             Utils::ping('bot started successfully');
             echo PHP_EOL, 'BOT STARTED SUCCESSFULLY', PHP_EOL, PHP_EOL;
