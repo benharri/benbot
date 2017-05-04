@@ -81,21 +81,17 @@ final class Music
                         self::$voiceclients[$msg->channel->guild->id] = $vc;
                         $vc->playFile(self::$bot->dir . "/music/$file")->then(function () use ($vc) {
                             $vc->close();
-                        }, function ($e) {
-                            echo $e->getMessage(), PHP_EOL;
-                            echo $e->getTraceAsString(), PHP_EOL;
+                        }, function ($e) use ($msg) {
+                            Utils::logError($e, $msg);
                         });
-                    }, function ($e) {
-                        echo $e->getMessage(), PHP_EOL;
-                        echo $e->getTraceAsString(), PHP_EOL;
+                    }, function ($e) use ($msg) {
+                        Utils::logError($e, $msg);
                     });
-                }, function ($e) {
-                    echo $e->getMessage(), PHP_EOL;
-                    echo $e->getTraceAsString(), PHP_EOL;
+                }, function ($e) use ($msg) {
+                    Utils::logError($e, $msg);
                 });
-            }, function ($e) {
-                echo $e->getMessage(), PHP_EOL;
-                echo $e->getTraceAsString(), PHP_EOL;
+            }, function ($e) use ($msg) {
+                Utils::logError($e, $msg);
             });
         });
     }
@@ -143,7 +139,7 @@ final class Music
             if (strlen($args[0]) === 11) {
                 $cmd .= "https://www.youtube.com/watch?v={$args[0]}";
             } elseif (strpos($args[0], "youtube.com") !== false) {
-                $cmd = $args[0];
+                $cmd .= $args[0];
             } else {
                 $query = implode(" ", $args);
                 $cmd .= "'ytsearch:$query'";
@@ -179,6 +175,11 @@ final class Music
         $json = $result->entries[0] ?? $result;
         $url = escapeshellarg($json->webpage_url);
         $filename = $json->id . '-' . md5($json->title) . '-' . $json->duration;
+
+        if ($json->duration > 60 * 60) {
+            $deferred->reject("video too long, sorry");
+            return $deferred->promise();
+        }
 
         foreach (scandir(self::$bot->dir . '/music') as $file) {
             // check if we've already downloaded the file!

@@ -75,9 +75,8 @@ final class Hangman
             'gameid' => $gameid,
             'origmsg' => $msg,
         ];
-        $msg->author->user->sendMessage("enter the secret word")->otherwise(function ($e) {
-            echo $e->getMessage(), PHP_EOL;
-            echo $e->getTraceAsString(), PHP_EOL;
+        $msg->author->user->sendMessage("enter the secret word")->otherwise(function ($e) use ($msg) {
+            Utils::logError($e, $msg);
         });
         return "waiting for {$msg->author} to enter a word";
     }

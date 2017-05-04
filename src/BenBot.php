@@ -165,8 +165,8 @@ final class BenBot extends Discord
 
                 if (!Utils::isDM($msg) && $msg->channel->guild->id === "233603102047993856") {
                     if ($str->contains('dib', false)) {
-                        $msg->react(":dib:284335774823088129")->otherwise(function ($e) {
-                            echo $e->getMessage(), PHP_EOL;
+                        $msg->react(":dib:284335774823088129")->otherwise(function ($e) use ($msg) {
+                            Utils::logError($e, $msg);
                         });
                     }
                 }
