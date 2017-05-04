@@ -1,46 +1,43 @@
 <?php
+
 namespace BenBot\Commands;
 
 use BenBot\Utils;
-use React\Promise\Deferred;
 
 final class CleverBot
 {
-
     private static $bot;
     private static $cs;
 
     public static function register(&$that)
     {
         self::$bot = $that;
-        self::$cs  = [];
+        self::$cs = [];
 
         self::$bot->registerCommand('chat', [__CLASS__, 'chat'], [
-            'description' => 'talk to benbot',
-            'usage' => '<what you want to say>',
+            'description'  => 'talk to benbot',
+            'usage'        => '<what you want to say>',
             'registerHelp' => true,
-            'aliases' => [
+            'aliases'      => [
                 '',
                 'cleverbot',
             ],
         ]);
 
-        echo __CLASS__ . " registered", PHP_EOL;
+        echo __CLASS__.' registered', PHP_EOL;
     }
-
-
 
     public static function chat($msg, $args)
     {
         $msg->channel->broadcastTyping();
 
-        $url = "https://www.cleverbot.com/getreply";
+        $url = 'https://www.cleverbot.com/getreply';
         $key = getenv('CLEVERBOT_API_KEY');
-        $input = rawurlencode(implode(" ", $args));
+        $input = rawurlencode(implode(' ', $args));
 
         $url .= "?input=$input&key=$key";
         if (isset(self::$cs[$msg->channel->id])) {
-            $url .= "&cs=" . self::$cs[$msg->channel->id];
+            $url .= '&cs='.self::$cs[$msg->channel->id];
         }
 
         self::$bot->http->get($url, null, [], false)->then(function ($apidata) use ($msg) {
@@ -48,5 +45,4 @@ final class CleverBot
             Utils::send($msg, $apidata->output);
         });
     }
-
 }

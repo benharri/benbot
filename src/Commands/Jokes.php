@@ -1,11 +1,11 @@
 <?php
+
 namespace BenBot\Commands;
 
 use BenBot\Utils;
 
 final class Jokes
 {
-
     private static $bot;
 
     public static function register(&$that)
@@ -13,33 +13,28 @@ final class Jokes
         self::$bot = $that;
 
         $joke = self::$bot->registerCommand('joke', [__CLASS__, 'joke'], [
-            'description' => 'tells a random joke',
-            'usage' => '[chucknorris|yomama|dad]',
+            'description'  => 'tells a random joke',
+            'usage'        => '[chucknorris|yomama|dad]',
             'registerHelp' => true,
         ]);
-            $joke->registerSubCommand('chucknorris', [__CLASS__, 'chucknorris'], [
+        $joke->registerSubCommand('chucknorris', [__CLASS__, 'chucknorris'], [
                 'description' => 'get a fact about chuck norris',
-                'aliases' => [
+                'aliases'     => [
                     'chuck',
                     'norris',
                 ],
             ]);
 
-            $joke->registerSubCommand('yomama', [__CLASS__, 'yomama'], [
+        $joke->registerSubCommand('yomama', [__CLASS__, 'yomama'], [
                 'description' => 'yo mama joke',
             ]);
 
-            $joke->registerSubCommand('dad', [__CLASS__, 'dad'], [
+        $joke->registerSubCommand('dad', [__CLASS__, 'dad'], [
                 'description' => 'get a dad joke',
             ]);
 
-        echo __CLASS__ . " registered", PHP_EOL;
+        echo __CLASS__.' registered', PHP_EOL;
     }
-
-
-
-
-
 
     public static function joke($msg, $args)
     {
@@ -48,8 +43,8 @@ final class Jokes
 
     public static function chucknorris($msg, $args)
     {
-        echo "looking up chucknorris joke", PHP_EOL;
-        $url = "http://api.icndb.com/jokes/random1";
+        echo 'looking up chucknorris joke', PHP_EOL;
+        $url = 'http://api.icndb.com/jokes/random1';
         self::$bot->http->get($url, null, [], false)->then(function ($result) use ($msg) {
             Utils::send($msg, $result->value->joke);
         }, function ($e) use ($msg) {
@@ -64,13 +59,12 @@ final class Jokes
 
     public static function dad($msg, $args)
     {
-        echo "looking up dad joke", PHP_EOL;
-        $url = "https://icanhazdadjoke.com";
+        echo 'looking up dad joke', PHP_EOL;
+        $url = 'https://icanhazdadjoke.com';
         self::$bot->http->get($url, null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg) {
             Utils::send($msg, $result->joke);
         }, function ($e) use ($msg) {
             Utils::logError($e, $msg);
         });
     }
-
 }

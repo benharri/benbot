@@ -1,22 +1,18 @@
 <?php
+
 namespace BenBot;
 
-use Carbon\Carbon;
-use Discord\Parts\Embed\Embed;
 use React\Promise\Deferred;
 
 final class Utils
 {
-
     private static $bot;
 
     public static function init(&$that)
     {
         self::$bot = $that;
-        echo PHP_EOL, "Utils initialized.", PHP_EOL;
+        echo PHP_EOL, 'Utils initialized.', PHP_EOL;
     }
-
-
 
     public static function send($msg, $txt, $embed = null)
     {
@@ -28,7 +24,6 @@ final class Utils
             self::logError($e, $msg);
         });
     }
-
 
     public static function sendFile($msg, $filepath, $filename, $txt)
     {
@@ -54,29 +49,25 @@ final class Utils
         }
     }
 
-
     public static function isDM($msg)
     {
         return $msg->channel->is_private;
     }
-
 
     public static function getUserIDFromMsg($msg)
     {
         return self::isDM($msg) ? $msg->author->id : $msg->author->user->id;
     }
 
-
-    public static function timestampFromSnowflake ($snowflake)
+    public static function timestampFromSnowflake($snowflake)
     {
         return (($snowflake / 4194304) + 1420070400000) / 1000;
     }
 
-
     public static function ping($msg)
     {
         if (is_null(self::$bot)) {
-            throw new \Exception("Utils class not initialized");
+            throw new \Exception('Utils class not initialized');
         }
 
         $channel_id = self::$bot->devbot ? '297082205048668160' : '289611811094003715';
@@ -86,7 +77,6 @@ final class Utils
             ->channels->get('id', $channel_id)
             ->sendMessage("<@193011352275648514>, $msg");
     }
-
 
     public static function secondsConvert($uptime)
     {
@@ -101,7 +91,7 @@ final class Utils
         $minutes = floor($uptime / 60);
         $seconds = floor($uptime % 60);
         // Send out formatted string
-        $return = array();
+        $return = [];
         if ($years > 0) {
             $return[] = $years.' '.($years > 1 ? 'years' : 'year');
         }
@@ -117,9 +107,9 @@ final class Utils
         if ($seconds > 0) {
             $return[] = $seconds.(date('m/d') == '06/03' ? ' sex' : ' seconds');
         }
+
         return implode(', ', $return);
     }
-
 
     public static function convertMemoryUsage($system = false)
     {
@@ -128,12 +118,11 @@ final class Utils
         if ($mem_usage < 1024) {
             return "$mem_usage bytes";
         } elseif ($mem_usage < 1048576) {
-            return round($mem_usage / 1024, 2) . " kilobytes";
+            return round($mem_usage / 1024, 2).' kilobytes';
         } else {
-            return round($mem_usage / 1048576, 2) . " megabytes";
+            return round($mem_usage / 1048576, 2).' megabytes';
         }
     }
-
 
     public static function deleteMessage($msg)
     {
@@ -151,7 +140,6 @@ final class Utils
         return $deferred->promise();
     }
 
-
     public static function editMessage($msg, $text)
     {
         $deferred = new Deferred();
@@ -159,7 +147,7 @@ final class Utils
         self::$bot->http->patch(
             "channels/{$msg->channel->id}/messages/{$msg->id}",
             [
-                'content' => $text
+                'content' => $text,
             ]
         )->then(
             function ($response) use ($deferred, $msg) {
@@ -168,9 +156,9 @@ final class Utils
             },
             \React\Partial\bind_right($msg->reject, $deferred)
         );
+
         return $deferred->promise();
     }
-
 
     public static function arrayFlatten($array)
     {
@@ -185,7 +173,7 @@ final class Utils
                 $result[$key] = $val;
             }
         }
+
         return $result;
     }
-
 }
