@@ -209,6 +209,7 @@ final class Debug
             foreach ($user->roles as $role) {
                 $roles[] = $role->name;
             }
+            print_r($user->game);
             $embed = self::$bot->factory(Embed::class, [
                 'title'       => 'User info for',
                 'description' => "$user",

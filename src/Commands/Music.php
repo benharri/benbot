@@ -137,7 +137,7 @@ final class Music
             if (strlen($args[0]) === 11) {
                 $cmd .= "https://www.youtube.com/watch?v={$args[0]}";
             } elseif (strpos($args[0], 'youtube.com') !== false) {
-                $cmd = $args[0];
+                $cmd .= $args[0];
             } else {
                 $query = implode(' ', $args);
                 $cmd .= "'ytsearch:$query'";
