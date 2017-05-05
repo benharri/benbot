@@ -242,9 +242,8 @@ final class Debug
                     self::$bot->loop->addTimer(2, function ($timer) use ($res) {
                         $res->channel->messages->delete($res);
                     });
-                }, function ($e) {
-                    echo $e->getMessage(), PHP_EOL;
-                    echo $e->getTraceAsString(), PHP_EOL;
+                }, function ($e) use ($msg) {
+                    Utils::logError($e, $msg);
                 });
             });
         });

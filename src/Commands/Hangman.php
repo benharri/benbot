@@ -136,9 +136,8 @@ final class Hangman
             'guessed_letters' => [' '],
         ];
         self::$bot->hangman['readymsg'] = $msg;
-        $msg->author->user->sendMessage('enter the secret word')->otherwise(function ($e) {
-            echo $e->getMessage(), PHP_EOL;
-            echo $e->getTraceAsString(), PHP_EOL;
+        $msg->author->user->sendMessage("enter the secret word")->otherwise(function ($e) use ($msg) {
+            Utils::logError($e, $msg);
         });
         Utils::send($msg, "waiting for {$msg->author} to enter a word")->then(function ($result) use ($gameid) {
             self::$bot->hangman[$gameid]['last_msg'] = $result;
