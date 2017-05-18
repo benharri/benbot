@@ -164,6 +164,6 @@ final class Hangman
         return '```'.self::$gallows[self::$bot->hangman[$gameid]['state']]."\n".
             self::showSecretWord($gameid)."\n\n".
             'Incorrect letters: '.implode(' ', $incorrects)."\n".
-            'Guessed letters:'.implode(' ', $guesseds.'```';
+            'Guessed letters:'.implode(' ', $guesseds.'```');
     }
 }
