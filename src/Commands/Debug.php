@@ -5,6 +5,7 @@ namespace BenBot\Commands;
 use BenBot\EmbedColors;
 use BenBot\Utils;
 use Carbon\Carbon;
+use Discord\Helpers\Process;
 use Discord\Parts\Embed\Embed;
 
 final class Debug
@@ -81,7 +82,12 @@ final class Debug
     public static function sys($msg, $args)
     {
         if (Utils::getUserIDFromMsg($msg) == '193011352275648514') {
-            return '```'.shell_exec(implode(' ', $args)).'```';
+            $process = new Process(escapeshellcmd(implode(' ', $args)));
+            $process->start(self::$bot->loop);
+
+            $process->stdout->on('data', function ($chunk) use ($msg) {
+                Utils::send($msg, "```$chunk```");
+            });
         } else {
             return "**you're not allowed to use that command**";
         }

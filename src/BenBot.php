@@ -71,6 +71,7 @@ final class BenBot extends Discord
 
             $msghandler = function ($msg) {
                 $str = s($msg->content);
+
                 if (!$msg->author->bot) {
 
                     // handle game move for players

@@ -1,16 +1,16 @@
 # benbot
 
-[Add benbot to your server](https://discordapp.com/api/oauth2/authorize?client_id=288416337057939456&scope=bot&permissions=0)
+[Add benbot to your server](https://discordapp.com/oauth2/authorize?client_id=288416337057939456&scope=bot&permissions=36826176)
 
-This is a Discord bot I've been working on. Under heavy development. It's my senior project.
+This is a Discord bot I've been working on. Under heavy development. It was my senior project.
 
-Feel free to clone this project and try your hand at making a bot. 
+Feel free to clone or fork this project and try your hand at making a bot. 
 
 ## Set up
 
 > Requires PHP 7.0 or later (7.1.4 is preferred. it includes an important fix for SSL and sending files larger than 100kb)
 
-1. `git clone https://git.benharris.ch/srproj/benbot && cd benbot`
+1. `git clone https://git.benharr.is/srproj/benbot && cd benbot`
 1. Install DiscordPHP and dependencies: `composer install`
 1. Get your Discord API Key and save it in `.env` (copy or rename `.env.example` and paste your keys in)
 1. --optional save your API keys in `.env` for openweathermap.org, cleverbot.com, and a phone number for the text command

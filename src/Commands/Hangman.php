@@ -157,9 +157,13 @@ final class Hangman
 
     private static function showGameState($gameid)
     {
+        $guesseds = self::$bot->hangman[$gameid]['guessed_letters'];
+        sort($guesseds);
+        $incorrects = array_diff($guesseds, array_unique(str_split(self::$bot->hangman[$gameid]['secret_word'])));
+
         return '```'.self::$gallows[self::$bot->hangman[$gameid]['state']]."\n".
             self::showSecretWord($gameid)."\n\n".
-            'Incorrect letters: '.implode(' ', array_diff(self::$bot->hangman[$gameid]['guessed_letters'], str_split(self::$bot->hangman[$gameid]['secret_word'])))."\n".
-            'Guessed letters:'.implode(' ', self::$bot->hangman[$gameid]['guessed_letters']).'```';
+            'Incorrect letters: '.implode(' ', $incorrects)."\n".
+            'Guessed letters:'.implode(' ', $guesseds.'```';
     }
 }
