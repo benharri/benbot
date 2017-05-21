@@ -113,9 +113,8 @@ final class Debug
 
         $url = 'http://test.benharr.is/phpsysinfo/xml.php?plugin=complete&json';
         self::$bot->http->get($url, null, [], false)->then(function ($result) use ($msg, $usercount) {
-            print_r($result);
-            $vitals = $result->Vitals->{'@attributes'};
 
+            $vitals = $result->Vitals->{'@attributes'};
             $embed = self::$bot->factory(Embed::class, [
                 'title'     => 'Benbot status',
                 'thumbnail' => ['url' => self::$bot->avatar],
