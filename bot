@@ -59,8 +59,8 @@ case "$1" in
         ;;
 
     sync)
-        rsync -av ben@benharris.ch:workspace/benbot/uploaded_images/ uploaded_images/
-    	rsync -av ben@benharris.ch:workspace/benbot/bot_data/ bot_data/
+        rsync -av ben@tilde.team:workspace/benbot/uploaded_images/ uploaded_images/
+    	rsync -av ben@tilde.team:workspace/benbot/bot_data/ bot_data/
 
         ;;
 
