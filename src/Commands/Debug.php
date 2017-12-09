@@ -5,6 +5,7 @@ namespace BenBot\Commands;
 use BenBot\EmbedColors;
 use BenBot\Utils;
 use Carbon\Carbon;
+use Discord\Helpers\Process;
 use Discord\Parts\Embed\Embed;
 
 final class Debug
@@ -81,7 +82,12 @@ final class Debug
     public static function sys($msg, $args)
     {
         if (Utils::getUserIDFromMsg($msg) == '193011352275648514') {
-            return '```'.shell_exec(implode(' ', $args)).'```';
+            $process = new Process(escapeshellcmd(implode(' ', $args)));
+            $process->start(self::$bot->loop);
+
+            $process->stdout->on('data', function ($chunk) use ($msg) {
+                Utils::send($msg, "```$chunk```");
+            });
         } else {
             return "**you're not allowed to use that command**";
         }
@@ -107,9 +113,8 @@ final class Debug
 
         $url = 'http://test.benharr.is/phpsysinfo/xml.php?plugin=complete&json';
         self::$bot->http->get($url, null, [], false)->then(function ($result) use ($msg, $usercount) {
-            print_r($result);
-            $vitals = $result->Vitals->{'@attributes'};
 
+            $vitals = $result->Vitals->{'@attributes'};
             $embed = self::$bot->factory(Embed::class, [
                 'title'     => 'Benbot status',
                 'thumbnail' => ['url' => self::$bot->avatar],
@@ -209,6 +214,7 @@ final class Debug
             foreach ($user->roles as $role) {
                 $roles[] = $role->name;
             }
+            print_r($user->game);
             $embed = self::$bot->factory(Embed::class, [
                 'title'       => 'User info for',
                 'description' => "$user",
@@ -241,9 +247,8 @@ final class Debug
                     self::$bot->loop->addTimer(2, function ($timer) use ($res) {
                         $res->channel->messages->delete($res);
                     });
-                }, function ($e) {
-                    echo $e->getMessage(), PHP_EOL;
-                    echo $e->getTraceAsString(), PHP_EOL;
+                }, function ($e) use ($msg) {
+                    Utils::logError($e, $msg);
                 });
             });
         });

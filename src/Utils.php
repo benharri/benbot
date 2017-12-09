@@ -16,24 +16,37 @@ final class Utils
 
     public static function send($msg, $txt, $embed = null)
     {
-        return $msg->channel->sendMessage($txt, false, $embed)
-            ->otherwise(function ($e) use ($msg) {
-                echo $e->getMessage(), PHP_EOL;
-                echo $e->getTraceAsString(), PHP_EOL;
-                $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
-                self::ping($e->getMessage());
-            });
+        return $msg->channel->sendMessage(
+            $txt,
+            false,
+            $embed
+        )->otherwise(function($e) use ($msg) {
+            self::logError($e, $msg);
+        });
     }
 
     public static function sendFile($msg, $filepath, $filename, $txt)
     {
-        return $msg->channel->sendFile($filepath, $filename, $txt)
-            ->otherwise(function ($e) use ($msg) {
-                echo $e->getMessage(), PHP_EOL;
-                echo $e->getTraceAsString(), PHP_EOL;
-                $msg->reply("sry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```");
-                self::ping($e->getMessage());
-            });
+        return $msg->channel->sendFile(
+            $filepath,
+            $filename,
+            $txt
+        )->otherwise(function($e) use ($msg) {
+            self::logError($e, $msg);
+        });
+    }
+
+
+    public static function logError($e, $msg = null)
+    {
+        echo $e->getMessage(), PHP_EOL;
+        echo $e->getTraceAsString(), PHP_EOL;
+        if ($msg != null) {
+            self::send($msg,
+                "sorry, an error occurred. check with <@193011352275648514>.\n```{$e->getMessage()}```"
+            );
+            self::ping("```{$e->getMessage()}```\nin {$msg->channel->name} in {$msg->channel->guild->name}.\ncheck the logs.");
+        }
     }
 
     public static function isDM($msg)

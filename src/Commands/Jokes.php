@@ -48,7 +48,7 @@ final class Jokes
         self::$bot->http->get($url, null, [], false)->then(function ($result) use ($msg) {
             Utils::send($msg, $result->value->joke);
         }, function ($e) use ($msg) {
-            Utils::send($msg, $e->getMessage());
+            Utils::logError($e, $msg);
         });
     }
 
@@ -64,7 +64,7 @@ final class Jokes
         self::$bot->http->get($url, null, ['Accept' => 'application/json'], false)->then(function ($result) use ($msg) {
             Utils::send($msg, $result->joke);
         }, function ($e) use ($msg) {
-            Utils::send($msg, $e->getMessage());
+            Utils::logError($e, $msg);
         });
     }
 }
