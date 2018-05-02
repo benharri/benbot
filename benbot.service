@@ -1,0 +1,18 @@
+[Unit]
+Description=benbot discord bot
+After=benbot.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env php run.php
+WorkingDirectory=/home/ben/workspace/benbot
+User=ben
+Group=ben
+Restart=always
+RestartSec=5
+StartLimitInterval=60s
+StartLimitBurst=3
+
+[Install]
+WantedBy=default.target
+
